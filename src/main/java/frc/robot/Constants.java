@@ -13,7 +13,7 @@ package frc.robot;
  * constants are needed, to reduce verbosity.
  */
 public final class Constants {
-    // PWM wiring numbers
+    // PWM wiring ports
     public static final int LEFT_FRONT = 9;
     public static final int RIGHT_FRONT = 8;
     public static final int LEFT_BACK = 0;
@@ -23,7 +23,12 @@ public final class Constants {
     public static final int X_BOX_Y_AXIS = 0;
     public static final int X_BOX_X_AXIS = 1;
     public static final int CONTROLLER_NUMBER = 0;
+        // (x and y axises numbers are reversed)
+
 
     public static final double DRIVETRAIN_SPEED = 0.5;
+
+    public static final double DRIVE_FORWARD_TIME = 3.0;
+    public static final double AUTONOMOUS_SPEED = 0.1;
     
 }

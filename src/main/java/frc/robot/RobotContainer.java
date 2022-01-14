@@ -4,14 +4,11 @@
 
 package frc.robot;
 
-import javax.swing.text.html.parser.DTD;
-
 import edu.wpi.first.wpilibj.GenericHID;
 import edu.wpi.first.wpilibj.XboxController;
+import frc.robot.commands.DriveForwardTimed;
 import frc.robot.commands.DriveWithJoysticks;
-import frc.robot.commands.ExampleCommand;
 import frc.robot.subsystems.DriveTrain;
-import frc.robot.subsystems.ExampleSubsystem;
 import edu.wpi.first.wpilibj2.command.Command;
 
 /**
@@ -22,22 +19,24 @@ import edu.wpi.first.wpilibj2.command.Command;
  */
 public class RobotContainer {
   // The robot's subsystems and commands are defined here...
-  private final ExampleSubsystem m_exampleSubsystem = new ExampleSubsystem();
-  private final ExampleCommand m_autoCommand = new ExampleCommand(m_exampleSubsystem);
 
   // DriveTrain Declare
   private final DriveTrain driveTrain;
   private final DriveWithJoysticks driveWithJoysticks;
-  // private final DriveForwardTimed driveForwardTimed;
+  private final DriveForwardTimed driveForwardTimed;
   public static XboxController driController;
   public static XboxController driverController;
 
   /** The container for the robot. Contains subsystems, OI devices, and commands. */
   public RobotContainer() {
     driveTrain = new DriveTrain();
+    
     driveWithJoysticks = new DriveWithJoysticks(driveTrain);
     driveWithJoysticks.addRequirements(driveTrain);
     driveTrain.setDefaultCommand(driveWithJoysticks);
+
+    driveForwardTimed = new DriveForwardTimed(driveTrain);
+    driveForwardTimed.addRequirements(driveTrain);
 
     driverController = new XboxController(Constants.CONTROLLER_NUMBER);
 
@@ -59,7 +58,7 @@ public class RobotContainer {
    * @return the command to run in autonomous
    */
   public Command getAutonomousCommand() {
-    // An ExampleCommand will run in autonomous
-    return m_autoCommand;
+    // A command to run in autonomous
+    return driveForwardTimed;
   }
 }
