@@ -20,8 +20,11 @@ public final class Constants {
     public static final int RIGHT_BACK = 0;
 
     // xbox controller
-    public static final int X_BOX_Y_AXIS = 0;
-    public static final int X_BOX_X_AXIS = 1;
+    public static final int X_BOX_Y_AXIS = 1;
+    public static final int X_BOX_X_AXIS = 0;
+    public static final int X_BOX_LEFT_TRIGGER = 2;
+    public static final int X_BOX_RIGHT_TRIGGER = 3;
+
     public static final int CONTROLLER_NUMBER = 0;
         // (x and y axises numbers are reversed)
 

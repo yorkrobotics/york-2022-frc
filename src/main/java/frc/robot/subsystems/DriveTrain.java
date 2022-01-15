@@ -24,15 +24,17 @@ public class DriveTrain extends SubsystemBase {
   /** Creates a new DriveTrain. */
   public DriveTrain() {
     leftFront = new PWMSparkMax(Constants.LEFT_FRONT);
-    rightFront = new PWMSparkMax(Constants.RIGHT_FRONT);
     leftFront.setInverted(false);
+    rightFront = new PWMSparkMax(Constants.RIGHT_FRONT);
     rightFront.setInverted(false);
 
-    // leftBack = new PWMSparkMax(Constants.LEFT_BACK);
+    // leftBack = new PWMSparkMax(Constants.LEFT_BACK)
+    // leftBack.setInverted(false);
     // rightBack = new PWMSparkMax(Constants.RIGHT_BACK);
-
+    // rightBack.setInverted(false);
     // leftMotors = new MotorControllerGroup(leftFront, leftBack);
     // rightMotors = new MotorControllerGroup(rightFront, rightBack);
+        // NOTE: test the motors one by one
 
     drive = new DifferentialDrive(leftFront, rightFront);
   }
@@ -43,10 +45,26 @@ public class DriveTrain extends SubsystemBase {
   }
 
   public void driveWithJoysticks (XboxController controller, double speed){
-    drive.arcadeDrive(controller.getRawAxis(Constants.X_BOX_Y_AXIS)*speed, controller.getRawAxis(Constants.X_BOX_X_AXIS)*speed);
+    // drive.arcadeDrive(controller.getRawAxis(Constants.X_BOX_Y_AXIS)*speed, controller.getRawAxis(Constants.X_BOX_X_AXIS)*speed);
+    drive.arcadeDrive(controller.getLeftY()*speed, controller.getLeftX()*speed);
+
   }
 
-  public void driveForward(double speed){
+  public void Turning (XboxController controller, double speed){
+    // drive.arcadeDrive(0, controller.getRawAxis(Constants.X_BOX_X_AXIS)*speed);
+    drive.arcadeDrive(0, controller.getLeftX()*speed);
+
+  }
+
+  public void driveForward(XboxController controller, double speed){
+    drive.tankDrive(controller.getRightTriggerAxis()*speed, controller.getRightTriggerAxis()*speed);
+  }
+  
+  public void driveBackward(XboxController controller, double speed){
+    drive.tankDrive(controller.getRightTriggerAxis()*speed*-1, controller.getRightTriggerAxis()*speed*-1);
+  }
+
+  public void driveTimed(double speed){
     drive.tankDrive(speed, speed);
   }
 
