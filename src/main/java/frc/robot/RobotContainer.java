@@ -8,7 +8,9 @@ import edu.wpi.first.wpilibj.GenericHID;
 import edu.wpi.first.wpilibj.XboxController;
 import frc.robot.commands.DriveForwardTimed;
 import frc.robot.commands.DriveWithJoysticks;
+import frc.robot.commands.PID_test;
 import frc.robot.subsystems.DriveTrain;
+import frc.robot.subsystems.PID_Drive;
 import edu.wpi.first.wpilibj2.command.Command;
 
 /**
@@ -24,8 +26,11 @@ public class RobotContainer {
   private final DriveTrain driveTrain;
   private final DriveWithJoysticks driveWithJoysticks;
   private final DriveForwardTimed driveForwardTimed;
-  public static XboxController driController;
+
   public static XboxController driverController;
+
+  private final PID_Drive pDrive;
+  private final PID_test pt;
 
   /** The container for the robot. Contains subsystems, OI devices, and commands. */
   public RobotContainer() {
@@ -39,7 +44,8 @@ public class RobotContainer {
     driveForwardTimed = new DriveForwardTimed(driveTrain);
     driveForwardTimed.addRequirements(driveTrain);
 
-    
+    pDrive = new PID_Drive();
+    pt = new PID_test(pDrive);
 
     driverController = new XboxController(Constants.CONTROLLER_NUMBER);
 
@@ -67,6 +73,6 @@ public class RobotContainer {
    */
   public Command getAutonomousCommand() {
     // A command to run in autonomous
-    return driveForwardTimed;
+    return pt;
   }
 }

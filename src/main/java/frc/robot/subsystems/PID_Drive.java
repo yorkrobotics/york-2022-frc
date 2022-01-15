@@ -29,7 +29,7 @@ public class PID_Drive extends PIDSubsystem {
 
   @Override
   public void useOutput(double output, double setpoint) {
-    drive.tankDrive(output, output);
+    leftMotor.setVoltage(getController().calculate(setpoint));
   }
 
   @Override
@@ -38,5 +38,7 @@ public class PID_Drive extends PIDSubsystem {
     return encoder.getPosition() / Constants.GEAR_RATIO * 15.24 * Math.PI;
   }
 
-  
+  public void stop(){
+    drive.stopMotor();
+  }
 }
