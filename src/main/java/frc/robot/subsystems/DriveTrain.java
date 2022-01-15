@@ -26,7 +26,7 @@ public class DriveTrain extends SubsystemBase {
     leftFront = new PWMSparkMax(Constants.LEFT_FRONT);
     leftFront.setInverted(false);
     rightFront = new PWMSparkMax(Constants.RIGHT_FRONT);
-    rightFront.setInverted(false);
+    rightFront.setInverted(true);
 
     // leftBack = new PWMSparkMax(Constants.LEFT_BACK)
     // leftBack.setInverted(false);
@@ -47,6 +47,12 @@ public class DriveTrain extends SubsystemBase {
   public void driveWithJoysticks (XboxController controller, double speed){
     // drive.arcadeDrive(controller.getRawAxis(Constants.X_BOX_Y_AXIS)*speed, controller.getRawAxis(Constants.X_BOX_X_AXIS)*speed);
     drive.arcadeDrive(controller.getLeftY()*speed, controller.getLeftX()*speed);
+
+  }
+
+  public void driveWithTriggers (XboxController controller, double speed){
+    // drive.arcadeDrive(controller.getRawAxis(Constants.X_BOX_Y_AXIS)*speed, controller.getRawAxis(Constants.X_BOX_X_AXIS)*speed);
+    drive.arcadeDrive((controller.getRightTriggerAxis() - controller.getLeftTriggerAxis()) * speed, controller.getLeftX()*speed);
 
   }
 

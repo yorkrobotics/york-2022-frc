@@ -8,7 +8,6 @@ import edu.wpi.first.wpilibj.GenericHID;
 import edu.wpi.first.wpilibj.XboxController;
 import frc.robot.commands.DriveForwardTimed;
 import frc.robot.commands.DriveWithJoysticks;
-import frc.robot.commands.DriveWithTriggers;
 import frc.robot.subsystems.DriveTrain;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.button.JoystickButton;
@@ -26,7 +25,6 @@ public class RobotContainer {
   private final DriveTrain driveTrain;
   private final DriveWithJoysticks driveWithJoysticks;
   private final DriveForwardTimed driveForwardTimed;
-  private final DriveWithTriggers driveWithTriggers;
   public static XboxController driController;
   public static XboxController driverController;
 
@@ -36,9 +34,8 @@ public class RobotContainer {
     
     driveWithJoysticks = new DriveWithJoysticks(driveTrain);
     driveWithJoysticks.addRequirements(driveTrain);
-    driveWithTriggers = new DriveWithTriggers(driveTrain);
-    driveWithTriggers.addRequirements(driveTrain);
-    driveTrain.setDefaultCommand(driveWithTriggers);
+
+    driveTrain.setDefaultCommand(driveWithJoysticks);
 
     driveForwardTimed = new DriveForwardTimed(driveTrain);
     driveForwardTimed.addRequirements(driveTrain);

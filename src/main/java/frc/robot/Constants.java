@@ -32,6 +32,8 @@ public final class Constants {
     public static final double DRIVETRAIN_SPEED = 0.5;
 
     public static final double DRIVE_FORWARD_TIME = 3.0;
-    public static final double AUTONOMOUS_SPEED = 0.1;
+    public static final double AUTONOMOUS_SPEED = 0.5;
+    
+    public static final String DRIVE_MODE = "T"; //"J" = drive with joysticks, "T" = drive with triggers
     
 }
