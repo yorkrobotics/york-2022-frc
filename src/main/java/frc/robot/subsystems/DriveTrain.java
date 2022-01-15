@@ -59,15 +59,6 @@ public class DriveTrain extends SubsystemBase {
   public void Turning (XboxController controller, double speed){
     // drive.arcadeDrive(0, controller.getRawAxis(Constants.X_BOX_X_AXIS)*speed);
     drive.arcadeDrive(0, controller.getLeftX()*speed);
-
-  }
-
-  public void driveForward(XboxController controller, double speed){
-    drive.tankDrive(controller.getRightTriggerAxis()*speed, controller.getRightTriggerAxis()*speed);
-  }
-  
-  public void driveBackward(XboxController controller, double speed){
-    drive.tankDrive(controller.getRightTriggerAxis()*speed*-1, controller.getRightTriggerAxis()*speed*-1);
   }
 
   public void driveTimed(double speed){
