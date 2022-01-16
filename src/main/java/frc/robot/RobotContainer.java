@@ -9,6 +9,9 @@ import edu.wpi.first.wpilibj.XboxController;
 import frc.robot.commands.DriveForwardTimed;
 import frc.robot.commands.DriveWithJoysticks;
 import frc.robot.subsystems.DriveTrain;
+import frc.robot.subsystems.ColorSensor;
+import frc.robot.subsystems.PyCamera;
+
 import edu.wpi.first.wpilibj2.command.Command;
 
 /**
@@ -26,10 +29,16 @@ public class RobotContainer {
   private final DriveForwardTimed driveForwardTimed;
   public static XboxController driController;
   public static XboxController driverController;
+  // Color sensor
+  private final ColorSensor colorSensor;
+  private final PyCamera pyCam;
+
 
   /** The container for the robot. Contains subsystems, OI devices, and commands. */
   public RobotContainer() {
     driveTrain = new DriveTrain();
+    colorSensor = new ColorSensor();
+    pyCam = new PyCamera();
     
     driveWithJoysticks = new DriveWithJoysticks(driveTrain);
     driveWithJoysticks.addRequirements(driveTrain);
