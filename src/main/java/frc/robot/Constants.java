@@ -20,8 +20,11 @@ public final class Constants {
     public static final int RIGHT_BACK = 0;
 
     // xbox controller
-    public static final int X_BOX_Y_AXIS = 0;
-    public static final int X_BOX_X_AXIS = 1;
+    public static final int X_BOX_Y_AXIS = 1;
+    public static final int X_BOX_X_AXIS = 0;
+    public static final int X_BOX_LEFT_TRIGGER = 2;
+    public static final int X_BOX_RIGHT_TRIGGER = 3;
+
     public static final int CONTROLLER_NUMBER = 0;
         // (x and y axises numbers are reversed)
 
@@ -29,6 +32,8 @@ public final class Constants {
     public static final double DRIVETRAIN_SPEED = 0.5;
 
     public static final double DRIVE_FORWARD_TIME = 3.0;
-    public static final double AUTONOMOUS_SPEED = 0.1;
+    public static final double AUTONOMOUS_SPEED = 0.5;
+    
+    public static final String DRIVE_MODE = "T"; //"J" = drive with joysticks, "T" = drive with triggers
     
 }
