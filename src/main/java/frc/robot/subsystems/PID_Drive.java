@@ -19,12 +19,12 @@ public class PID_Drive extends PIDSubsystem {
   private CANSparkMax rightMotor = new CANSparkMax(1, MotorType.kBrushless);
   private RelativeEncoder encoder = leftMotor.getEncoder();
   DifferentialDrive drive = new DifferentialDrive(leftMotor, rightMotor);
-  
+
   public PID_Drive() {
     super(
         // The PIDController used by the subsystem
         new PIDController(Constants.DRIVE_KP, Constants.DRIVE_KI, Constants.DRIVE_KD));
-        setSetpoint(Constants.TARGET_DISTANCE);
+    setSetpoint(Constants.TARGET_DISTANCE);
   }
 
   @Override
@@ -38,7 +38,7 @@ public class PID_Drive extends PIDSubsystem {
     return encoder.getPosition() / Constants.GEAR_RATIO * 15.24 * Math.PI;
   }
 
-  public void stop(){
+  public void stop() {
     drive.stopMotor();
   }
 }
