@@ -62,15 +62,7 @@ public class DriveTrain extends SubsystemBase {
 
   }
 
-  public void driveForward(XboxController controller, double speed){
-    drive.tankDrive(controller.getRightTriggerAxis()*speed, controller.getRightTriggerAxis()*speed);
-  }
-  
-  public void driveBackward(XboxController controller, double speed){
-    drive.tankDrive(controller.getRightTriggerAxis()*speed*-1, controller.getRightTriggerAxis()*speed*-1);
-  }
-
-  public void driveTimed(double speed){
+  public void driveForward(double speed){
     drive.tankDrive(speed, speed);
   }
 
