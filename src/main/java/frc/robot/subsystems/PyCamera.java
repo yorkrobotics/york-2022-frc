@@ -12,25 +12,26 @@ import edu.wpi.first.networktables.NetworkTableEntry;
 
 public class PyCamera extends SubsystemBase {
   /** Creates a new PyCamera. */
-  public PyCamera() {}
+  public PyCamera() {
+    NetworkTableInstance inst = NetworkTableInstance.getDefault();
+    NetworkTableEntry[] entries = inst.getEntries("", 0);
+    NetworkTable table = inst.getTable("Vision");
+    NetworkTableEntry xEntry = table.getEntry("target_x");
+    NetworkTableEntry yEntry = table.getEntry("target_y");
+    inst.startClientTeam(5171);
+    Number[] default_x = new Number[]{1,2};
+    Number[] default_y = new Number[]{3,4};
+    Number[] x = xEntry.getNumberArray(default_x);
+    Number[] y = yEntry.getNumberArray(default_y);
+    for (NetworkTableEntry i : entries ) {
+      // System.out.println("X: " + i);
+      System.out.println(i.getName());
+    }
+  }
 
   @Override
   public void periodic() {
     // This method will be called once per scheduler run
-    // NetworkTableInstance inst = NetworkTableInstance.getDefault();
-    // NetworkTableEntry[] entries = inst.getEntries("", 0);
-    // NetworkTable table = inst.getTable("Vision");
-    // NetworkTableEntry xEntry = table.getEntry("target_x");
-    // NetworkTableEntry yEntry = table.getEntry("target_y");
-    // inst.startClientTeam(5171);
-    // Number[] default_x = new Number[]{1,2};
-    // Number[] default_y = new Number[]{3,4};
-    // Number[] x = xEntry.getNumberArray(default_x);
-    // Number[] y = yEntry.getNumberArray(default_y);
-    // for (NetworkTableEntry i : entries ) {
-    //   // System.out.println("X: " + i);
-    //   System.out.println(i.getName());
-    }
 
   }
 }
