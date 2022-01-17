@@ -31,14 +31,14 @@ public class RobotContainer {
   public static XboxController driverController;
   // Color sensor
   private final ColorSensor colorSensor;
-  private final PyCamera pyCam;
+  // private final PyCamera pyCam;
 
 
   /** The container for the robot. Contains subsystems, OI devices, and commands. */
   public RobotContainer() {
     driveTrain = new DriveTrain();
     colorSensor = new ColorSensor();
-    pyCam = new PyCamera();
+    //pyCam = new PyCamera();
     
     driveWithJoysticks = new DriveWithJoysticks(driveTrain);
     driveWithJoysticks.addRequirements(driveTrain);
