@@ -6,10 +6,12 @@ package frc.robot;
 
 import edu.wpi.first.wpilibj.GenericHID;
 import edu.wpi.first.wpilibj.XboxController;
+import edu.wpi.first.wpilibj.XboxController.Button;
 import frc.robot.commands.DriveForwardTimed;
 import frc.robot.commands.DriveWithJoysticks;
 import frc.robot.subsystems.DriveTrain;
 import edu.wpi.first.wpilibj2.command.Command;
+import edu.wpi.first.wpilibj2.command.button.JoystickButton;
 
 /**
  * This class is where the bulk of the robot should be declared. Since Command-based is a
@@ -21,30 +23,31 @@ public class RobotContainer {
   // The robot's subsystems and commands are defined here...
 
   // DriveTrain Declare
-  private final DriveTrain driveTrain;
+  private final DriveTrain m_drive;
   private final DriveWithJoysticks driveWithJoysticks;
   private final DriveForwardTimed driveForwardTimed;
-  public static XboxController driController;
-  public static XboxController driverController;
+
+
+  public static XboxController m_controller;
 
   /** The container for the robot. Contains subsystems, OI devices, and commands. */
   public RobotContainer() {
-    driveTrain = new DriveTrain();
+    m_drive = new DriveTrain();
     
-    driveWithJoysticks = new DriveWithJoysticks(driveTrain);
-    driveWithJoysticks.addRequirements(driveTrain);
+    driveWithJoysticks = new DriveWithJoysticks(m_drive);
+    driveWithJoysticks.addRequirements(m_drive);
 
-    driveTrain.setDefaultCommand(driveWithJoysticks);
+    m_drive.setDefaultCommand(driveWithJoysticks);
 
-    driveForwardTimed = new DriveForwardTimed(driveTrain);
-    driveForwardTimed.addRequirements(driveTrain);
+    driveForwardTimed = new DriveForwardTimed(m_drive);
+    driveForwardTimed.addRequirements(m_drive);
 
-    
+    m_controller = new XboxController(Constants.CONTROLLER_NUMBER);
 
-    driverController = new XboxController(Constants.CONTROLLER_NUMBER);
 
     // Configure the button bindings
-    configureButtonBindings();
+    configureButtonBindings(
+    );
   }
 
   /**
@@ -57,6 +60,8 @@ public class RobotContainer {
     // JoystickButton forwardTrigger = new JoystickButton(driverController, Constants.X_BOX_RIGHT_TRIGGER);
     // // forwardTrigger.whenActive();
     // JoystickButton backTrigger = new JoystickButton(driverController, Constants.X_BOX_LEFT_TRIGGER);
+    JoystickButton A_button = new JoystickButton(m_controller, Button.kA.value);
+    A_button.whenPressed(new DriveForwardTimed(m_drive));    
 
   }
 

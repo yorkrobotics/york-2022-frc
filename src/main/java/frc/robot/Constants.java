@@ -26,14 +26,21 @@ public final class Constants {
     public static final int X_BOX_RIGHT_TRIGGER = 3;
 
     public static final int CONTROLLER_NUMBER = 0;
-        // (x and y axises numbers are reversed)
 
 
     public static final double DRIVETRAIN_SPEED = 0.5;
 
-    public static final double DRIVE_FORWARD_TIME = 3.0;
+    public static final double DRIVE_FORWARD_TIME = 0.5;
     public static final double AUTONOMOUS_SPEED = 0.5;
     
-    public static final String DRIVE_MODE = "T"; //"J" = drive with joysticks, "T" = drive with triggers
+    public static final String DRIVE_MODE = "T";    //"J" = drive with joysticks, "T" = drive with triggers
+
+
+    public static final double DRIVE_KP = 0;
+    public static final double DRIVE_KI = 0;
+    public static final double DRIVE_KD = 0;
+    public static final double TARGET_DISTANCE = 3.0;
+    public static final double GEAR_RATIO = 0;  //gear ratio: 16.364, 5.601
+
     
 }
