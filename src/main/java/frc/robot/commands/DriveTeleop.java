@@ -9,12 +9,12 @@ import frc.robot.Constants;
 import frc.robot.RobotContainer;
 import frc.robot.subsystems.DriveTrain;
 
-public class DriveWithJoysticks extends CommandBase {
+public class DriveTeleop extends CommandBase {
   /** Creates a new DriveWithJoysticks. */
 
   private final DriveTrain driveTrain;
 
-  public DriveWithJoysticks(DriveTrain dt) {
+  public DriveTeleop(DriveTrain dt) {
     // Use addRequirements() here to declare subsystem dependencies.
     driveTrain = dt;
     addRequirements(driveTrain);
@@ -37,7 +37,9 @@ public class DriveWithJoysticks extends CommandBase {
 
   // Called once the command ends or is interrupted.
   @Override
-  public void end(boolean interrupted) {}
+  public void end(boolean interrupted) {
+    driveTrain.stop();
+  }
 
   // Returns true when the command should end.
   @Override

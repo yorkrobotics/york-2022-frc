@@ -50,6 +50,12 @@ public class DriveTrain extends SubsystemBase {
     // drive.arcadeDrive(controller.getRawAxis(Constants.X_BOX_Y_AXIS)*speed, controller.getRawAxis(Constants.X_BOX_X_AXIS)*speed);
     drive.arcadeDrive(-(controller.getRightTriggerAxis() - controller.getLeftTriggerAxis()) * speed, controller.getLeftX()*speed);
 
+<<<<<<< HEAD
+  }
+
+  public void driveForward (double speed){
+    drive.tankDrive(speed, speed);
+=======
   }
 
   public void driveForward (double speed){
@@ -58,6 +64,16 @@ public class DriveTrain extends SubsystemBase {
 
   public void stop(){
     drive.stopMotor();
+  }
+
+  public double getMetersDistance(){
+    // System.out.println(encoder.getPosition() / Constants.GEAR_RATIO * 0.145 * Math.PI);
+    return encoder.getPosition() / Constants.GEAR_RATIO * 0.145 * Math.PI; //0.145 is the wheel diameter
+>>>>>>> test
+  }
+
+  public void resetEncoder(){
+    encoder.setPosition(0);
   }
 
   public double getMetersDistance(){
