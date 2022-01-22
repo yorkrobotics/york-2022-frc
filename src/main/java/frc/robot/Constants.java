@@ -39,7 +39,7 @@ public final class Constants {
     public static final double DRIVE_KP = 0;
     public static final double DRIVE_KI = 0;
     public static final double DRIVE_KD = 0;
-    public static final double TARGET_DISTANCE = 0;
+    public static final double TARGET_DISTANCE = 3.0;
     public static final double GEAR_RATIO = 0;  //gear ratio: 16.364, 5.601
 
     

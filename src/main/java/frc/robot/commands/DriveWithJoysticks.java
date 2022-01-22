@@ -28,10 +28,10 @@ public class DriveWithJoysticks extends CommandBase {
   @Override
   public void execute() {
     if (Constants.DRIVE_MODE == "J"){
-      driveTrain.driveWithJoysticks(RobotContainer.driverController, Constants.DRIVETRAIN_SPEED);
+      driveTrain.driveWithJoysticks(RobotContainer.m_controller, Constants.DRIVETRAIN_SPEED);
     }
     else if (Constants.DRIVE_MODE == "T"){
-      driveTrain.driveWithTriggers(RobotContainer.driverController, Constants.DRIVETRAIN_SPEED);
+      driveTrain.driveWithTriggers(RobotContainer.m_controller, Constants.DRIVETRAIN_SPEED);
     }
   }
 

@@ -29,7 +29,8 @@ public class PID_Drive extends PIDSubsystem {
 
   @Override
   public void useOutput(double output, double setpoint) {
-    leftMotor.setVoltage(getController().calculate(setpoint));
+    leftMotor.set(output);
+    rightMotor.set(output);
   }
 
   @Override

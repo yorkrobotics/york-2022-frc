@@ -22,29 +22,30 @@ public class RobotContainer {
   // The robot's subsystems and commands are defined here...
 
   // DriveTrain Declare
-  private final DriveTrain driveTrain;
+  private final DriveTrain m_drive;
   private final DriveWithJoysticks driveWithJoysticks;
   private final DriveForwardTimed driveForwardTimed;
 
   private final DriveForwardDistance dfd;
 
-  public static XboxController driverController;
+  public static XboxController m_controller;
 
   /** The container for the robot. Contains subsystems, OI devices, and commands. */
   public RobotContainer() {
-    driveTrain = new DriveTrain();
+    m_drive = new DriveTrain();
     
-    driveWithJoysticks = new DriveWithJoysticks(driveTrain);
-    driveWithJoysticks.addRequirements(driveTrain);
+    driveWithJoysticks = new DriveWithJoysticks(m_drive);
+    driveWithJoysticks.addRequirements(m_drive);
 
-    driveTrain.setDefaultCommand(driveWithJoysticks);
+    m_drive.setDefaultCommand(driveWithJoysticks);
 
-    driveForwardTimed = new DriveForwardTimed(driveTrain);
-    driveForwardTimed.addRequirements(driveTrain);
+    driveForwardTimed = new DriveForwardTimed(m_drive);
+    driveForwardTimed.addRequirements(m_drive);
 
-    driverController = new XboxController(Constants.CONTROLLER_NUMBER);
+    m_controller = new XboxController(Constants.CONTROLLER_NUMBER);
 
-    dfd = new DriveForwardDistance(driveTrain);
+    dfd = new DriveForwardDistance(m_drive);
+    dfd.addRequirements(m_drive);
 
     // Configure the button bindings
     configureButtonBindings();
@@ -57,9 +58,9 @@ public class RobotContainer {
    * edu.wpi.first.wpilibj2.command.button.JoystickButton}.
    */
   private void configureButtonBindings() {
-    // JoystickButton forwardTrigger = new JoystickButton(driverController, Constants.X_BOX_RIGHT_TRIGGER);
+    // JoystickButton forwardTrigger = new JoystickButton(m_controller, Constants.X_BOX_RIGHT_TRIGGER);
     // // forwardTrigger.whenActive();
-    // JoystickButton backTrigger = new JoystickButton(driverController, Constants.X_BOX_LEFT_TRIGGER);
+    // JoystickButton backTrigger = new JoystickButton(m_controller, Constants.X_BOX_LEFT_TRIGGER);
 
   }
 
