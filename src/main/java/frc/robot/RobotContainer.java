@@ -9,7 +9,7 @@ import edu.wpi.first.wpilibj.XboxController;
 import edu.wpi.first.wpilibj.XboxController.Button;
 import frc.robot.commands.DriveForwardDistance;
 import frc.robot.commands.DriveForwardTimed;
-import frc.robot.commands.DriveWithJoysticks;
+import frc.robot.commands.DriveTeleop;
 import frc.robot.subsystems.DriveTrain;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.button.JoystickButton;
@@ -25,7 +25,7 @@ public class RobotContainer {
 
   // DriveTrain Declare
   private final DriveTrain m_drive;
-  private final DriveWithJoysticks driveWithJoysticks;
+  private final DriveTeleop driveTeleop;
   private final DriveForwardTimed driveForwardTimed;
 
   private final DriveForwardDistance dfd;
@@ -36,10 +36,10 @@ public class RobotContainer {
   public RobotContainer() {
     m_drive = new DriveTrain();
     
-    driveWithJoysticks = new DriveWithJoysticks(m_drive);
-    driveWithJoysticks.addRequirements(m_drive);
+    driveTeleop = new DriveTeleop(m_drive);
+    driveTeleop.addRequirements(m_drive);
 
-    m_drive.setDefaultCommand(driveWithJoysticks);
+    m_drive.setDefaultCommand(driveTeleop);
 
     driveForwardTimed = new DriveForwardTimed(m_drive);
     driveForwardTimed.addRequirements(m_drive);

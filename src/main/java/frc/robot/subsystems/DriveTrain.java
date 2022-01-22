@@ -61,7 +61,11 @@ public class DriveTrain extends SubsystemBase {
   }
 
   public double getMetersDistance(){
-    // System.out.println(encoder.getPosition() / Constants.GEAR_RATIO * 0.1524 * Math.PI);
-    return encoder.getPosition(); //6 inches to meters
+    // System.out.println(encoder.getPosition() / Constants.GEAR_RATIO * 0.145 * Math.PI);
+    return encoder.getPosition() / Constants.GEAR_RATIO * 0.145 * Math.PI; //0.145 is the wheel diameter
+  }
+
+  public void resetEncoder(){
+    encoder.setPosition(0);
   }
 }

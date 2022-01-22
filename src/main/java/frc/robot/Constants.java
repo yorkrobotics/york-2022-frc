@@ -36,10 +36,10 @@ public final class Constants {
     public static final String DRIVE_MODE = "T";    //"J" = drive with joysticks, "T" = drive with triggers
 
 
-    public static final double DRIVE_KP = 0.5;
-    public static final double DRIVE_KI = 1;
-    public static final double DRIVE_KD = 1;
-    public static final double TARGET_DISTANCE = 1000;
+    public static final double DRIVE_KP = 2.5;
+    public static final double DRIVE_KI = 0.01;
+    public static final double DRIVE_KD = 0.1;
+    public static final double TARGET_DISTANCE = 3;
     public static final double GEAR_RATIO = 16.364;  //gear ratio: 16.364, 5.601
 
     
