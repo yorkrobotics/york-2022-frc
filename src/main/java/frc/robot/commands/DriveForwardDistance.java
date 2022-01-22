@@ -23,15 +23,23 @@ public class DriveForwardDistance extends PIDCommand {
         // This should return the measurement
         () -> dt.getMetersDistance(),
         // This should return the setpoint (can also be a constant)
-        () -> Constants.TARGET_DISTANCE,
+        () -> -(Constants.TARGET_DISTANCE),
         // This uses the output
         output -> {
-          dt.driveForward(Math.min(1, Math.max(output, -1)));
+          System.out.println(output);
+          dt.driveForward(Math.min(0.5, Math.max(output, -0.5)));
         });
     // Use addRequirements() here to declare subsystem dependencies.
     // Configure additional PID options by calling `getController` here.
     driveTrain = dt;
     addRequirements(driveTrain);
+  }
+
+  @Override
+  public void initialize(){
+    super.initialize();
+    driveTrain.resetEncoder();
+    getController().setTolerance(0.01);
   }
 
   // Returns true when the command should end.
