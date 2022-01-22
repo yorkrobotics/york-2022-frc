@@ -16,17 +16,25 @@ public class PyCamera extends SubsystemBase {
     NetworkTableInstance inst = NetworkTableInstance.getDefault();
     NetworkTableEntry[] entries = inst.getEntries("", 0);
     NetworkTable table = inst.getTable("Vision");
-    NetworkTableEntry xEntry = table.getEntry("target_x");
-    NetworkTableEntry yEntry = table.getEntry("target_y");
+    //NetworkTable subtable = table.getSubTable("rPi Camera 0");
     inst.startClientTeam(5171);
     Number[] default_x = new Number[]{1,2};
     Number[] default_y = new Number[]{3,4};
-    Number[] x = xEntry.getNumberArray(default_x);
-    Number[] y = yEntry.getNumberArray(default_y);
-    for (NetworkTableEntry i : entries ) {
-      // System.out.println("X: " + i);
-      System.out.println(i.getName());
+    Boolean default_bool = false;
+    Number[] x = table.getEntry("target_x").getNumberArray(default_x);
+    //Number[] y = yEntry.getNumberArray(default_y);
+    //Boolean bool = entry.getBoolean(default_bool);
+    //System.out.println(bool);
+
+    System.out.println("-----------------------X values---------------- ");
+    for (Number i : x) { // System.out.println("X: " + i);
+      System.out.println("x value: " + i);
     }
+
+    // for (NetworkTableEntry i : entries ) { // System.out.println("X: " + i);
+    //   System.out.println(i.getName());
+    // }
+
   }
 
   @Override
