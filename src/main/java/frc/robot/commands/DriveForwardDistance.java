@@ -19,7 +19,7 @@ public class DriveForwardDistance extends PIDCommand {
   public DriveForwardDistance(DriveTrain dt) {
     super(
         // The controller that the command will use
-        new PIDController(Constants.DRIVE_KP, Constants.DRIVE_KI, Constants.DRIVE_KD),
+        new PIDController(Constants.DRIVE_kP, Constants.DRIVE_kI, Constants.DRIVE_kD),
         // This should return the measurement
         () -> dt.getMetersDistance(),
         // This should return the setpoint (can also be a constant)
