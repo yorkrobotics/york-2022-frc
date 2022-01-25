@@ -16,10 +16,10 @@ import edu.wpi.first.wpilibj2.command.SubsystemBase;
 import frc.robot.Constants;
 
 public class DriveTrain extends SubsystemBase {
-  private CANSparkMax leftFront = new CANSparkMax(3, MotorType.kBrushless);
-  private CANSparkMax leftBack = new CANSparkMax(4, MotorType.kBrushless);
-  private CANSparkMax rightFront = new CANSparkMax(1, MotorType.kBrushless);
-  private CANSparkMax rightBack = new CANSparkMax(2, MotorType.kBrushless);
+  private CANSparkMax leftFront = new CANSparkMax(1, MotorType.kBrushless);
+  private CANSparkMax leftBack = new CANSparkMax(2, MotorType.kBrushless);
+  private CANSparkMax rightFront = new CANSparkMax(4, MotorType.kBrushless);
+  private CANSparkMax rightBack = new CANSparkMax(3, MotorType.kBrushless);
 
   private RelativeEncoder encoder = leftFront.getEncoder();
   private final DifferentialDrive drive;
@@ -30,7 +30,7 @@ public class DriveTrain extends SubsystemBase {
     leftBack.follow(leftFront);
     rightBack.follow(rightFront);
     leftFront.setInverted(false);
-    rightFront.setInverted(true);
+    rightFront.setInverted(false);
 
     drive = new DifferentialDrive(leftFront, rightFront);
   }
@@ -48,7 +48,7 @@ public class DriveTrain extends SubsystemBase {
 
   public void driveWithTriggers (XboxController controller, double speed){
     // drive.arcadeDrive(controller.getRawAxis(Constants.X_BOX_Y_AXIS)*speed, controller.getRawAxis(Constants.X_BOX_X_AXIS)*speed);
-    drive.arcadeDrive(-(controller.getRightTriggerAxis() - controller.getLeftTriggerAxis()) * speed, controller.getLeftX()*speed);
+    drive.arcadeDrive((controller.getRightTriggerAxis() - controller.getLeftTriggerAxis()) * speed, controller.getLeftX()*speed);
 
   }
 
