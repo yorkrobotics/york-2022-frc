@@ -40,8 +40,8 @@ public class VelocityController extends SubsystemBase {
     rightFront = new CANSparkMax(4, MotorType.kBrushless);
     rightBack = new CANSparkMax(3, MotorType.kBrushless);
 
-    leftFront.setInverted(false);
-    rightFront.setInverted(true);
+    // leftFront.setInverted(false);
+    // rightFront.setInverted(false);
     
     leftBack.follow(leftFront);
     rightBack.follow(rightFront);
@@ -100,9 +100,9 @@ public class VelocityController extends SubsystemBase {
     }
 
     //controlling the speeds
-    double forward_value = controller.getLeftY()*maxRPM;
-    double left_setPoint = forward_value;
-    double right_setPoint = forward_value;
+    double velocity_value = (controller.getRightTriggerAxis() - controller.getLeftTriggerAxis())*maxRPM;
+    double left_setPoint = velocity_value;
+    double right_setPoint = velocity_value;
 
     left_pidController.setReference(right_setPoint, CANSparkMax.ControlType.kVelocity);
     right_pidController.setReference(left_setPoint, CANSparkMax.ControlType.kVelocity);
