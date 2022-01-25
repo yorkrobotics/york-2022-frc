@@ -27,12 +27,12 @@ public class DriveTeleop extends CommandBase {
   // Called every time the scheduler runs while the command is scheduled.
   @Override
   public void execute() {
-    if (Constants.DRIVE_MODE == "J"){
-      driveTrain.driveWithJoysticks(RobotContainer.m_controller, Constants.DRIVETRAIN_SPEED);
-    }
-    else if (Constants.DRIVE_MODE == "T"){
-      driveTrain.driveWithTriggers(RobotContainer.m_controller, Constants.DRIVETRAIN_SPEED);
-    }
+    // if (Constants.DRIVE_MODE == "J"){
+    //   driveTrain.driveWithJoysticks(RobotContainer.m_controller, Constants.DRIVETRAIN_SPEED);
+    // }
+    // else if (Constants.DRIVE_MODE == "T"){
+    driveTrain.driveWithTriggers(RobotContainer.m_controller, Constants.DRIVETRAIN_SPEED);
+
   }
 
   // Called once the command ends or is interrupted.

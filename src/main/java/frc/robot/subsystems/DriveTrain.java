@@ -22,13 +22,16 @@ public class DriveTrain extends SubsystemBase {
   private CANSparkMax rightBack = new CANSparkMax(3, MotorType.kBrushless);
 
   private RelativeEncoder encoder = leftFront.getEncoder();
-  private final DifferentialDrive drive;
+  private DifferentialDrive drive;
 
 
   /** Creates a new DriveTrain. */
   public DriveTrain() {
+
+
     leftBack.follow(leftFront);
     rightBack.follow(rightFront);
+
     leftFront.setInverted(false);
     rightFront.setInverted(false);
 
@@ -62,7 +65,7 @@ public class DriveTrain extends SubsystemBase {
 
   public double getMetersDistance(){
     // System.out.println(encoder.getPosition() / Constants.GEAR_RATIO * 0.145 * Math.PI);
-    return encoder.getPosition() / Constants.GEAR_RATIO * 0.145 * Math.PI; //0.145 is the wheel diameter
+    return encoder.getPosition() / Constants.GEAR_RATIO * 0.145 * Math.PI; //0.145 is the wheel diameter in cm
   }
 
   public void resetEncoder(){
