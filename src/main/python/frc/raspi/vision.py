@@ -218,7 +218,7 @@ def getDistance(center_list):
         left_point_x = center_list[0][0] # could be 1 for the second index
         #mid_point_x = center_list[1][0]
         right_point_x = center_list[2][0]
-        
+
         diff = right_point_x - left_point_x
 
         focal_length = 360
@@ -234,6 +234,10 @@ def getFocalLength(pixel_length):
         focal_length = pixel_length * actual_distance / actual_tape_width
         return focal_length # 183 or 360
     return -1
+
+def getPoints(rect):
+    vertices = rect.ravel() 
+    return vertices
 
 if __name__ == "__main__":
     if len(sys.argv) >= 2:
@@ -314,11 +318,6 @@ if __name__ == "__main__":
 
         _, contour_list, _ = cv2.findContours(binary_img, mode=cv2.RETR_EXTERNAL, method=cv2.CHAIN_APPROX_SIMPLE)
 
-        x_list = []
-        y_list = []
-
-        global vertices
-
         center_list = []
         for contour in contour_list:
 
@@ -329,42 +328,110 @@ if __name__ == "__main__":
             cv2.drawContours(output_img, contour, -1, color = (255, 255, 255), thickness = -1)
 
             rect = cv2.minAreaRect(contour)
+
+            quadrilateral = cv2.approxPolyDP(contour, 5, False)
+
+            vertices = getPoints(quadrilateral)
+
             center, size, angle = rect
             center = tuple([int(dim) for dim in center]) # Convert to int so we can draw
 
             center_list.append(center)
 
-            box = cv2.boxPoints(rect)
-            box = np.int0(box)
-            left_point_x = np.min(box[:, 0])
-            right_point_x = np.max(box[:, 0])
-            top_point_y = np.min(box[:, 1])
-            bottom_point_y = np.max(box[:, 1])
-
-            left_point_y = box[:, 1][np.where(box[:, 0] == left_point_x)][0]
-            right_point_y = box[:, 1][np.where(box[:, 0] == right_point_x)][0]
-            top_point_x = box[:, 0][np.where(box[:, 1] == top_point_y)][0]
-            bottom_point_x = box[:, 0][np.where(box[:, 1] == bottom_point_y)][0]
-            vertices = np.array([[top_point_x, top_point_y], [bottom_point_x, bottom_point_y], [left_point_x, left_point_y], [right_point_x, right_point_y]])
             # Draw rectangle and circle
-            cv2.drawContours(output_img, [box], -1, color = (0, 0, 255), thickness = 2)
-            cv2.circle(output_img, center = center, radius = 3, color = (0, 0, 255), thickness = -1)
+            cv2.drawContours(output_img, [quadrilateral], -1, color = (0, 0, 255), thickness = 2)
+            #cv2.circle(output_img, center = center, radius = 3, color = (0, 0, 255), thickness = -1)
 
-            x_list.append((center[0] - width / 2) / (width / 2))
-            x_list.append((center[1] - width / 2) / (width / 2))
+        # TODO for solvepnp
+
+        # focal lengths
+        fx = 360
+        fy = 300 
+        camera_matrix = [[fx, 0, width / 2], [0, fy, height / 2], [0, 0, 1]]
+        # 2D projection onto the camera
+        object_points = [[  0. ,   0. ,   0. ],
+                [ 82.5,   0. ,   0. ],
+                [165. ,   0. ,   0. ],
+                [247.5,   0. ,   0. ],
+                [ 55. ,  27.5,   0. ],
+                [137.5,  27.5,   0. ],
+                [220. ,  27.5,   0. ],
+                [ 27.5,  55. ,   0. ],
+                [110. ,  55. ,   0. ],
+                [192.5,  55. ,   0. ],
+                [  0. ,  82.5,   0. ],
+                [ 82.5,  82.5,   0. ],
+                [165. ,  82.5,   0. ],
+                [247.5,  82.5,   0. ],
+                [ 55. , 110. ,   0. ],
+                [137.5, 110. ,   0. ],
+                [220. , 110. ,   0. ],
+                [ 27.5, 137.5,   0. ],
+                [110. , 137.5,   0. ],
+                [192.5, 137.5,   0. ],
+                [  0. , 165. ,   0. ],
+                [ 82.5, 165. ,   0. ],
+                [165. , 165. ,   0. ],
+                [247.5, 165. ,   0. ]]
+
+
+        image_points = [[648.84735, 335.1484 ],
+                [522.6854 , 317.74222],
+                [400.24448, 301.46362],
+                [281.39792, 285.43964],
+                [560.8046 , 366.6523 ],
+                [437.57022, 349.67358],
+                [318.269  , 333.33557],
+                [598.38196, 415.80203],
+                [475.02866, 397.87906],
+                [354.60062, 380.84167],
+                [636.9289 , 465.04666],
+                [512.3496 , 446.39185],
+                [391.26932, 428.63168],
+                [273.65057, 411.7955 ],
+                [549.6402 , 495.04532],
+                [428.12842, 476.45554],
+                [309.60794, 458.5343 ],
+                [587.5397 , 543.42163],
+                [465.2291 , 524.39795],
+                [346.24826, 505.79684],
+                [624.71814, 591.7365 ],
+                [502.51782, 572.03394],
+                [382.8287 , 552.7545 ],
+                [266.8465 , 534.29364]]
+
+        camera_matrix, object_points, image_points = [np.array(x) for x in [camera_matrix, object_points, image_points]]
+
+        distortion = None
+        ret, rvec, T = cv2.solvePnP(object_points, image_points, camera_matrix, distortion, flags=cv2.SOLVEPNP_EPNP)
+        R, _ = cv2.Rodrigues(rvec)
+
+        # print('R')
+        # print(R)
+        # print()
+        # print('T:')
+        # print(T)
+
+        # vision_nt.putNumberArray('rotation_matrix', R)
+
+
+        hoop_coord = []
+        for i in T:
+            hoop_coord.append(int(i))
+
+        vision_nt.putNumberArray('translation_vector', hoop_coord)
+
 
         cv2.circle(output_img, center = (int(width/2), int(height/2)), radius = 1, color = (0, 0, 255), thickness = 1)
-
-        vision_nt.putNumberArray('target_x', x_list)
-        vision_nt.putNumberArray('target_y', y_list)
 
         processing_time = time.time() - start_time
         fps = 1 / processing_time
         #cv2.putText(output_img, "HSV: " + str(pixel_center) + "coord: " + str(vertices), (0, 40), cv2.FONT_HERSHEY_SIMPLEX, 0.5, (255, 255, 255))
+        cv2.putText(output_img, "PS:" + str(vertices), (0, 40), cv2.FONT_HERSHEY_SIMPLEX, 0.3, (255, 255, 255))
         # for i in range(0, len(center_list)):
         #     cv2.putText(output_img, "Center: " + str(center_list[i]), (0, 15 + i*15), cv2.FONT_HERSHEY_SIMPLEX, 0.3, (255, 255, 255))
 
-        cv2.putText(output_img, "dis: " + str(getDistance(center_list)), (0, 50), cv2.FONT_HERSHEY_SIMPLEX, 0.5, (255, 255, 255))
+        #cv2.putText(output_img, "dis: " + str(getDistance(center_list)), (0, 50), cv2.FONT_HERSHEY_SIMPLEX, 0.5, (255, 255, 255))
 
 
 
