@@ -13,23 +13,6 @@ import edu.wpi.first.networktables.NetworkTableEntry;
 public class PyCamera extends SubsystemBase {
   /** Creates a new PyCamera. */
   public PyCamera() {
-    NetworkTableInstance inst = NetworkTableInstance.getDefault();
-    NetworkTableEntry[] entries = inst.getEntries("", 0);
-    NetworkTable table = inst.getTable("Vision");
-    //NetworkTable subtable = table.getSubTable("rPi Camera 0");
-    inst.startClientTeam(5171);
-    Number[] default_x = new Number[]{1,2};
-    Number[] default_y = new Number[]{3,4};
-    Boolean default_bool = false;
-    Number[] x = table.getEntry("target_x").getNumberArray(default_x);
-    //Number[] y = yEntry.getNumberArray(default_y);
-    //Boolean bool = entry.getBoolean(default_bool);
-    //System.out.println(bool);
-
-    System.out.println("-----------------------X values---------------- ");
-    for (Number i : x) { // System.out.println("X: " + i);
-      System.out.println("x value: " + i);
-    }
 
     // for (NetworkTableEntry i : entries ) { // System.out.println("X: " + i);
     //   System.out.println(i.getName());
@@ -39,7 +22,32 @@ public class PyCamera extends SubsystemBase {
 
   @Override
   public void periodic() {
-    // This method will be called once per scheduler run
+  }
 
+  public Number[] getHoopCenter (){
+    NetworkTableInstance inst = NetworkTableInstance.getDefault();
+    NetworkTableEntry[] entries = inst.getEntries("", 0);
+    NetworkTable table = inst.getTable("Vision");
+    //NetworkTable subtable = table.getSubTable("rPi Camera 0");
+    inst.startClientTeam(5171);
+    Number[] default_x = new Number[]{1,2};
+    Number[] default_y = new Number[]{3,4};
+    Number[] default_hoop_center_coord = new Number[]{0, 0, 0};
+    Number[] x = table.getEntry("target_x").getNumberArray(default_x);
+    Number[] hoop_coord = table.getEntry("translation_vector").getNumberArray(default_hoop_center_coord);
+    //Number[] y = yEntry.getNumberArray(default_y);
+    //Boolean bool = entry.getBoolean(default_bool);
+    //System.out.println(bool);
+
+    // System.out.println("-----------------------X values---------------- ");
+    // for (Number i : x) { // System.out.println("X: " + i);
+    //   System.out.println("x value: " + i);
+    // }
+
+    System.out.println("-----------------------Hoop Coord ---------------- ");
+    for (Number i : hoop_coord) { // System.out.println("X: " + i);
+      System.out.println(i);
+    }
+    return hoop_coord;
   }
 }

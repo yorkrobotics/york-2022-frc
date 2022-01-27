@@ -39,6 +39,8 @@ public class RobotContainer {
     driveTrain = new DriveTrain();
     colorSensor = new ColorSensor();
     pyCam = new PyCamera();
+
+    pyCam.getHoopCenter();
     
     driveWithJoysticks = new DriveWithJoysticks(driveTrain);
     driveWithJoysticks.addRequirements(driveTrain);

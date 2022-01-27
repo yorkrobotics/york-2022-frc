@@ -314,7 +314,6 @@ if __name__ == "__main__":
         sat = pixel_center[1]
         val = pixel_center[2]
 
-        binary_output_stream.putFrame(binary_img)
 
         _, contour_list, _ = cv2.findContours(binary_img, mode=cv2.RETR_EXTERNAL, method=cv2.CHAIN_APPROX_SIMPLE)
 
@@ -338,9 +337,33 @@ if __name__ == "__main__":
 
             center_list.append(center)
 
+
+
+
             # Draw rectangle and circle
             cv2.drawContours(output_img, [quadrilateral], -1, color = (0, 0, 255), thickness = 2)
             #cv2.circle(output_img, center = center, radius = 3, color = (0, 0, 255), thickness = -1)
+
+# Setting parameter values
+        t_lower = 100  # Lower Threshold
+        t_upper = 150  # Upper threshold
+          
+# Applying the Canny Edge filter
+        edge = cv2.Canny(binary_img, t_lower, t_upper)
+
+        #binary_img = np.float32(binary_img)
+        dst = cv2.cornerHarris(binary_img,2,3,0.04)
+        
+
+#result is dilated for marking the corners, not important
+        dst = cv2.dilate(dst,None)
+
+# Threshold for an optimal value, it may vary depending on the image.
+        hsv_img[dst>0.01*dst.max()]=[0,0,255]
+
+
+
+        binary_output_stream.putFrame(hsv_img)
 
         # TODO for solvepnp
 
@@ -427,7 +450,7 @@ if __name__ == "__main__":
         processing_time = time.time() - start_time
         fps = 1 / processing_time
         #cv2.putText(output_img, "HSV: " + str(pixel_center) + "coord: " + str(vertices), (0, 40), cv2.FONT_HERSHEY_SIMPLEX, 0.5, (255, 255, 255))
-        cv2.putText(output_img, "PS:" + str(vertices), (0, 40), cv2.FONT_HERSHEY_SIMPLEX, 0.3, (255, 255, 255))
+        # cv2.putText(output_img, "PS:" + str(vertices), (0, 40), cv2.FONT_HERSHEY_SIMPLEX, 0.3, (255, 255, 255))
         # for i in range(0, len(center_list)):
         #     cv2.putText(output_img, "Center: " + str(center_list[i]), (0, 15 + i*15), cv2.FONT_HERSHEY_SIMPLEX, 0.3, (255, 255, 255))
 
