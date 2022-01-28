@@ -5,18 +5,18 @@
 package frc.robot.commands;
 
 import edu.wpi.first.wpilibj2.command.CommandBase;
+import frc.robot.Constants;
 import frc.robot.RobotContainer;
 import frc.robot.subsystems.VelocityController;
 
-public class DriveWithVelocityControl extends CommandBase {
+public class DriveWithPositionControl extends CommandBase {
   private VelocityController vController;
 
-  /** Creates a new DriveWithVelocityControl. */
-  public DriveWithVelocityControl(VelocityController v) {
+  /** Creates a new DriveWithPositionControl. */
+  public DriveWithPositionControl(VelocityController v) {
     // Use addRequirements() here to declare subsystem dependencies.
     vController = v;
     addRequirements(vController);
-
   }
 
   // Called when the command is initially scheduled.
@@ -26,13 +26,12 @@ public class DriveWithVelocityControl extends CommandBase {
   // Called every time the scheduler runs while the command is scheduled.
   @Override
   public void execute() {
-    vController.driveWithVelocityControl(RobotContainer.m_controller);
+    vController.driveWithPositionControl(RobotContainer.m_controller, Constants.TARGET_DISTANCE);
   }
 
   // Called once the command ends or is interrupted.
   @Override
-  public void end(boolean interrupted) {
-  }
+  public void end(boolean interrupted) {}
 
   // Returns true when the command should end.
   @Override

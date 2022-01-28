@@ -41,11 +41,13 @@ public final class Constants {
     public static final double DRIVE_kD = 0.1;
     public static final double MAXIMUM_OUTPUT = 0.5;
     public static final double MINIMUM_OUTPUT = -0.5;
+    public static final double MAX_RPM = 4000;
 
 
-
-    public static final double TARGET_DISTANCE = 3;
     public static final double GEAR_RATIO = 16.364;  //gear ratio: 16.364, 5.601
+    // public static final double TARGET_DISTANCE = 3 * GEAR_RATIO / 0.145 / Math.PI;
+    public static final double TARGET_DISTANCE = 3;
+
 
     
 }
