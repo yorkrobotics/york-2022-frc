@@ -65,11 +65,8 @@ public class RobotContainer {
     driveWithPositionControl.addRequirements(m_drive);
 
     gearShift = new GearShift();
-    gearShiftDown = new GearShiftDown(gearShift);
-    gearShiftDown.addRequirements(gearShift);
-    gearShiftUp = new GearShiftUp(gearShift);
-    gearShiftUp.addRequirements(gearShift);
-
+    gearShiftDown = new GearShiftDown(gearShift, m_drive);
+    gearShiftUp = new GearShiftUp(gearShift, m_drive);
 
     // Configure the button bindings
     configureButtonBindings(

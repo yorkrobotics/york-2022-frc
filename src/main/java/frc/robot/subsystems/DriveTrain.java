@@ -5,7 +5,6 @@
 package frc.robot.subsystems;
 
 import com.revrobotics.CANSparkMax;
-import com.revrobotics.RelativeEncoder;
 import com.revrobotics.SparkMaxPIDController;
 import com.revrobotics.CANSparkMaxLowLevel.MotorType;
 
@@ -18,7 +17,7 @@ import frc.robot.Constants;
 public class DriveTrain extends SubsystemBase {
   private CANSparkMax leftFront, leftBack, rightFront, rightBack;
 
-  public double kP, kI, kD, kMaxOutput, kMinOutput, maxRPM;
+  public double kP, kI, kD, kMaxOutput, kMinOutput, maxRPM, gearRatio;
 
   private SparkMaxPIDController leftPIDController, rightPIDController;
 
@@ -86,7 +85,7 @@ public class DriveTrain extends SubsystemBase {
     double max = SmartDashboard.getNumber("Max Output", 0);
     double min = SmartDashboard.getNumber("Min Output", 0);
 
-    double setRotations = setMeters * Constants.GEAR_RATIO / 0.145 / Math.PI;
+    double setRotations = setMeters * gearRatio / 0.145 / Math.PI;
     
     // if PID coefficients on SmartDashboard have changed, write new values to controller
     if((p != kP)) { leftPIDController.setP(p); rightPIDController.setP(p); kP = p; }
@@ -139,7 +138,6 @@ public class DriveTrain extends SubsystemBase {
     SmartDashboard.putNumber("zRotation", zRotaion);
 
 
-
     xSpeed = MathUtil.clamp(xSpeed, -1.0, 1.0);
     zRotaion = MathUtil.clamp(zRotaion, -1.0, 1.0);
 
@@ -182,5 +180,10 @@ public class DriveTrain extends SubsystemBase {
     rightPIDController.setReference(rightSpeed * Constants.MAX_RPM, CANSparkMax.ControlType.kVelocity);
 
   }
-
+  public void setToHighGear(){
+    gearRatio = Constants.GEAR_RATIO_HIGH;
+  }
+  public void setToLowGear(){
+    gearRatio = Constants.GEAR_RATIO_LOW;
+  }
 }
