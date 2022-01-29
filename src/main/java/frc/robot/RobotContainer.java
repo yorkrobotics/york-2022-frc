@@ -1,4 +1,3 @@
-
 // Copyright (c) FIRST and other WPILib contributors.
 // Open Source Software; you can modify and/or share it under the terms of
 // the WPILib BSD license file in the root directory of this project.
@@ -10,12 +9,12 @@ import edu.wpi.first.wpilibj.XboxController;
 import edu.wpi.first.wpilibj.XboxController.Button;
 import frc.robot.commands.DriveTeleop;
 import frc.robot.commands.DriveWithPositionControl;
-import frc.robot.commands.ShootBall;
-import frc.robot.subsystems.DriveTrain;
-import frc.robot.subsystems.Shooter;
 import frc.robot.commands.GearShiftDown;
 import frc.robot.commands.GearShiftUp;
+import frc.robot.commands.ShootBall;
+import frc.robot.subsystems.DriveTrain;
 import frc.robot.subsystems.GearShift;
+import frc.robot.subsystems.Shooter;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.button.JoystickButton;
 
@@ -67,7 +66,9 @@ public class RobotContainer {
 
     gearShift = new GearShift();
     gearShiftDown = new GearShiftDown(gearShift);
+    gearShiftDown.addRequirements(gearShift);
     gearShiftUp = new GearShiftUp(gearShift);
+    gearShiftUp.addRequirements(gearShift);
 
 
     // Configure the button bindings
@@ -83,13 +84,11 @@ public class RobotContainer {
    */
   private void configureButtonBindings() {  
     JoystickButton button_A = new JoystickButton(m_controller, Button.kA.value);
-    button_A.whenPressed(new DriveWithPositionControl(m_drive));   
-
     button_A.whenPressed(new DriveWithPositionControl(m_drive));
     JoystickButton button_B = new JoystickButton(m_controller, Button.kB.value);
-    button_B.whenPressed(new GearShiftUp(gearShift));
+    button_B.whenPressed(gearShiftDown);
     JoystickButton button_Y = new JoystickButton(m_controller, Button.kY.value);
-    button_Y.whenPressed(new GearShiftDown(gearShift));
+    button_Y.whenPressed(gearShiftUp);
   }
 
   /**
