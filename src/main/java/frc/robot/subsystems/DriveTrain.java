@@ -5,12 +5,12 @@
 package frc.robot.subsystems;
 
 import com.revrobotics.CANSparkMax;
+import com.revrobotics.RelativeEncoder;
 import com.revrobotics.SparkMaxPIDController;
 import com.revrobotics.CANSparkMaxLowLevel.MotorType;
 
 import edu.wpi.first.math.MathUtil;
 import edu.wpi.first.wpilibj.XboxController;
-import edu.wpi.first.wpilibj.drive.DifferentialDrive;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
 import frc.robot.Constants;
@@ -21,9 +21,6 @@ public class DriveTrain extends SubsystemBase {
   public double kP, kI, kD, kMaxOutput, kMinOutput, maxRPM;
 
   private SparkMaxPIDController leftPIDController, rightPIDController;
-
-  // private VelocityControlCANSparkMax v_leftFront, v_rightFront, v_leftBack, v_rightBack;
-
 
   /** Creates a new VelocityController. */
   public DriveTrain() {
@@ -38,10 +35,10 @@ public class DriveTrain extends SubsystemBase {
     rightFront = new CANSparkMax(4, MotorType.kBrushless);
     rightBack = new CANSparkMax(3, MotorType.kBrushless);
 
-    // v_leftFront = new VelocityControlCANSparkMax(leftFront);
-    // v_rightFront = new VelocityControlCANSparkMax(rightFront);
-    // v_leftBack = new VelocityControlCANSparkMax(leftBack);
-    // v_rightBack = new VelocityControlCANSparkMax(rightBack);
+    leftFront.restoreFactoryDefaults();
+    leftBack.restoreFactoryDefaults();
+    rightFront.restoreFactoryDefaults();
+    rightBack.restoreFactoryDefaults();
 
     leftBack.follow(leftFront);
     rightBack.follow(rightFront);
@@ -82,28 +79,6 @@ public class DriveTrain extends SubsystemBase {
   
   }
 
-  // public void driveWithVelocityControl(XboxController controller){
-  //   // get coefficients from SmartDashboard
-  //   double p = SmartDashboard.getNumber("P Gain", 0);
-  //   double i = SmartDashboard.getNumber("I Gain", 0);
-  //   double d = SmartDashboard.getNumber("D Gain", 0);
-  //   double max = SmartDashboard.getNumber("Max Output", 0);
-  //   double min = SmartDashboard.getNumber("Min Output", 0);
-
-  //   // if PID coefficients on SmartDashboard have changed, write new values to controller
-  //   if((p != kP)) { leftPIDController.setP(p); rightPIDController.setP(p); kP = p; }
-  //   if((i != kI)) { leftPIDController.setI(i); rightPIDController.setP(i); kI = i; }
-  //   if((d != kD)) { leftPIDController.setD(d); rightPIDController.setP(d); kD = d; }
-  //   if((max != kMaxOutput) || (min != kMinOutput)) { 
-  //     leftPIDController.setOutputRange(min, max); 
-  //     leftPIDController.setOutputRange(min, max);
-  //     kMinOutput = min; kMaxOutput = max; 
-  //   }
-
-  //   mArcadeDrive(controller);
-
-  // }
-
   public void driveWithPositionControl(XboxController controller, double setMeters){
     double p = SmartDashboard.getNumber("P Gain", 0);
     double i = SmartDashboard.getNumber("I Gain", 0);
@@ -119,14 +94,19 @@ public class DriveTrain extends SubsystemBase {
     if((d != kD)) { leftPIDController.setD(d); rightPIDController.setD(d); kD = d; }
     if((max != kMaxOutput) || (min != kMinOutput)) { 
       leftPIDController.setOutputRange(min, max); 
-      leftPIDController.setOutputRange(min, max);
+      rightPIDController.setOutputRange(min, max);
       kMinOutput = min; kMaxOutput = max; 
     }
+
+    leftFront.getEncoder().setPosition(0);
+    rightFront.getEncoder().setPosition(0);
 
     leftPIDController.setReference(setRotations, CANSparkMax.ControlType.kPosition);
     rightPIDController.setReference(setRotations, CANSparkMax.ControlType.kPosition);
 
     SmartDashboard.putNumber("SetRotations", setRotations);
+    SmartDashboard.putNumber("left_encoder", leftFront.getEncoder().getPosition());
+    SmartDashboard.putNumber("right_encoder", rightFront.getEncoder().getPosition());
 
   }
 
@@ -146,7 +126,7 @@ public class DriveTrain extends SubsystemBase {
     if((d != kD)) { leftPIDController.setD(d); rightPIDController.setD(d); kD = d; }
     if((max != kMaxOutput) || (min != kMinOutput)) { 
       leftPIDController.setOutputRange(min, max); 
-      leftPIDController.setOutputRange(min, max);
+      rightPIDController.setOutputRange(min, max);
       kMinOutput = min; kMaxOutput = max; 
     }
 
@@ -197,9 +177,6 @@ public class DriveTrain extends SubsystemBase {
 
     SmartDashboard.putNumber("leftSpeed", leftSpeed);
     SmartDashboard.putNumber("rightSpeed", rightSpeed);
-
-    // leftFront.set(leftSpeed * 0.5);
-    // rightFront.set(rightSpeed * 0.5);
 
     leftPIDController.setReference(leftSpeed * Constants.MAX_RPM, CANSparkMax.ControlType.kVelocity);
     rightPIDController.setReference(rightSpeed * Constants.MAX_RPM, CANSparkMax.ControlType.kVelocity);

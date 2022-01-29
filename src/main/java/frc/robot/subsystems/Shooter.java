@@ -27,8 +27,8 @@ public class Shooter extends SubsystemBase {
   }
 
   public void runShooter(XboxController controller){
-    top.set(controller.getRightY() * 0.5);
-    bottom.set(controller.getLeftY() * 0.5);
+    top.set(controller.getRightY() * 0.8);
+    bottom.set(controller.getLeftY() * 0.8);
 
     SmartDashboard.putNumber("Top", controller.getRightY());
     SmartDashboard.putNumber("Bottom", controller.getLeftY());
