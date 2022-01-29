@@ -27,9 +27,9 @@ public class DriveTrain extends SubsystemBase {
 
   /** Creates a new VelocityController. */
   public DriveTrain() {
-    kP = 6e-5; 
-    kI = 0;
-    kD = 0; 
+    kP = 6e-6; 
+    kI = 5e-7;
+    kD = 1e-6; 
     kMaxOutput = 0.5; 
     kMinOutput = -0.5;
 
@@ -115,8 +115,8 @@ public class DriveTrain extends SubsystemBase {
     
     // if PID coefficients on SmartDashboard have changed, write new values to controller
     if((p != kP)) { leftPIDController.setP(p); rightPIDController.setP(p); kP = p; }
-    if((i != kI)) { leftPIDController.setI(i); rightPIDController.setP(i); kI = i; }
-    if((d != kD)) { leftPIDController.setD(d); rightPIDController.setP(d); kD = d; }
+    if((i != kI)) { leftPIDController.setI(i); rightPIDController.setI(i); kI = i; }
+    if((d != kD)) { leftPIDController.setD(d); rightPIDController.setD(d); kD = d; }
     if((max != kMaxOutput) || (min != kMinOutput)) { 
       leftPIDController.setOutputRange(min, max); 
       leftPIDController.setOutputRange(min, max);
@@ -142,8 +142,8 @@ public class DriveTrain extends SubsystemBase {
     
     // if PID coefficients on SmartDashboard have changed, write new values to controller
     if((p != kP)) { leftPIDController.setP(p); rightPIDController.setP(p); kP = p; }
-    if((i != kI)) { leftPIDController.setI(i); rightPIDController.setP(i); kI = i; }
-    if((d != kD)) { leftPIDController.setD(d); rightPIDController.setP(d); kD = d; }
+    if((i != kI)) { leftPIDController.setI(i); rightPIDController.setI(i); kI = i; }
+    if((d != kD)) { leftPIDController.setD(d); rightPIDController.setD(d); kD = d; }
     if((max != kMaxOutput) || (min != kMinOutput)) { 
       leftPIDController.setOutputRange(min, max); 
       leftPIDController.setOutputRange(min, max);
@@ -153,7 +153,11 @@ public class DriveTrain extends SubsystemBase {
     double xSpeed = controller.getRightTriggerAxis() - controller.getLeftTriggerAxis();
     double zRotaion = controller.getLeftX();
 
-    if (Math.abs(zRotaion) < 0.05) zRotaion = 0;
+    if (Math.abs(zRotaion) < 0.25) zRotaion = 0;
+
+    SmartDashboard.putNumber("Controller LeftX", controller.getLeftX());
+    SmartDashboard.putNumber("zRotation", zRotaion);
+
 
 
     xSpeed = MathUtil.clamp(xSpeed, -1.0, 1.0);
