@@ -5,7 +5,7 @@
 package frc.robot.subsystems;
 
 import com.revrobotics.CANSparkMax;
-import com.revrobotics.SparkMaxPIDController;
+// import com.revrobotics.SparkMaxPIDController;
 import com.revrobotics.CANSparkMaxLowLevel.MotorType;
 
 import edu.wpi.first.wpilibj.XboxController;
@@ -14,7 +14,7 @@ import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
 import frc.robot.Constants;
 
-public class VelocityController extends SubsystemBase {
+public class DriveTrainController extends SubsystemBase {
   private CANSparkMax leftFront, leftBack, rightFront, rightBack;
 
   public double kP, kI, kD, kMaxOutput, kMinOutput, maxRPM;
@@ -25,7 +25,7 @@ public class VelocityController extends SubsystemBase {
 
 
   /** Creates a new VelocityController. */
-  public VelocityController() {
+  public DriveTrainController() {
     kP = 6e-5; 
     kI = 0;
     kD = 0; 
@@ -109,10 +109,8 @@ public class VelocityController extends SubsystemBase {
     double max = SmartDashboard.getNumber("Max Output", 0);
     double min = SmartDashboard.getNumber("Min Output", 0);
 
-
     double setRotations = setMeters * Constants.GEAR_RATIO / 0.145 / Math.PI;
     
-
     // if PID coefficients on SmartDashboard have changed, write new values to controller
     if((p != kP)) { v_leftFront.setP(p); v_rightFront.setP(p); kP = p; }
     if((i != kI)) { v_leftFront.setI(i); v_rightFront.setP(i); kI = i; }
@@ -129,6 +127,10 @@ public class VelocityController extends SubsystemBase {
     SmartDashboard.putNumber("SetRotations", setRotations);
     SmartDashboard.putNumber("ProcessVariable", v_leftFront.getEncoder().getPosition());
 
+  }
+
+  public double getPosition(){
+    return v_leftFront.get();
   }
 
 }
