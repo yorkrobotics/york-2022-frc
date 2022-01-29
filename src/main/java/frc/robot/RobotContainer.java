@@ -50,8 +50,7 @@ public class RobotContainer {
     dfd.addRequirements(m_drive);
 
     // Configure the button bindings
-    configureButtonBindings(
-    );
+    configureButtonBindings();
   }
 
   /**
