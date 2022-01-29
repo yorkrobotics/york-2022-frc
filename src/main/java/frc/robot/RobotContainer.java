@@ -10,7 +10,10 @@ import edu.wpi.first.wpilibj.XboxController.Button;
 import frc.robot.commands.DriveForwardDistance;
 import frc.robot.commands.DriveTeleop;
 import frc.robot.commands.DriveWithPositionControl;
+import frc.robot.commands.GearShiftDown;
+import frc.robot.commands.GearShiftUp;
 import frc.robot.subsystems.DriveTrainController;
+import frc.robot.subsystems.GearShift;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.button.JoystickButton;
 
@@ -30,6 +33,9 @@ public class RobotContainer {
   private DriveTrainController m_velocityController;
   private DriveTeleop driveTeleop;
   private DriveWithPositionControl driveWithPositionControl;
+  private GearShiftDown gearShiftDown;
+  private GearShiftUp gearShiftUp;
+  private GearShift gearShift;
 
   public static XboxController m_controller;
 
@@ -45,8 +51,13 @@ public class RobotContainer {
     driveTeleop.addRequirements(m_velocityController);
     m_velocityController.setDefaultCommand(driveTeleop);
 
+
     driveWithPositionControl = new DriveWithPositionControl(m_velocityController);
     driveWithPositionControl.addRequirements(m_velocityController);
+
+    gearShift = new GearShift();
+    gearShiftDown = new GearShiftDown(gearShift);
+    gearShiftUp = new GearShiftUp(gearShift);
 
 
     // Configure the button bindings
@@ -62,8 +73,11 @@ public class RobotContainer {
    */
   private void configureButtonBindings() {  
     JoystickButton button_A = new JoystickButton(m_controller, Button.kA.value);
-    button_A.whenPressed(new DriveWithPositionControl(m_velocityController));   
-
+    button_A.whenPressed(new DriveWithPositionControl(m_velocityController));
+    JoystickButton button_B = new JoystickButton(m_controller, Button.kB.value);
+    button_B.whenPressed(new GearShiftUp(gearShift));
+    JoystickButton button_Y = new JoystickButton(m_controller, Button.kY.value);
+    button_Y.whenPressed(new GearShiftDown(gearShift));
   }
 
   /**
