@@ -9,9 +9,16 @@ import edu.wpi.first.wpilibj.XboxController;
 import edu.wpi.first.wpilibj.XboxController.Button;
 import frc.robot.commands.DriveTeleop;
 import frc.robot.commands.DriveWithPositionControl;
+<<<<<<< HEAD
 import frc.robot.commands.ShootBall;
 import frc.robot.subsystems.DriveTrain;
 import frc.robot.subsystems.Shooter;
+=======
+import frc.robot.commands.GearShiftDown;
+import frc.robot.commands.GearShiftUp;
+import frc.robot.subsystems.DriveTrainController;
+import frc.robot.subsystems.GearShift;
+>>>>>>> 8b911191b605df19f1670d399d3394925e3c8f60
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.button.JoystickButton;
 
@@ -28,6 +35,9 @@ public class RobotContainer {
   private DriveTrain m_drive;
   private DriveTeleop driveTeleop;
   private DriveWithPositionControl driveWithPositionControl;
+  private GearShiftDown gearShiftDown;
+  private GearShiftUp gearShiftUp;
+  private GearShift gearShift;
 
   //Shooter
   private Shooter m_shooter;
@@ -47,6 +57,7 @@ public class RobotContainer {
     driveTeleop.addRequirements(m_drive);
     m_drive.setDefaultCommand(driveTeleop);
 
+<<<<<<< HEAD
     driveWithPositionControl = new DriveWithPositionControl(m_drive);
     driveWithPositionControl.addRequirements(m_drive);
 
@@ -54,6 +65,16 @@ public class RobotContainer {
     shootBall = new ShootBall(m_shooter);
     shootBall.addRequirements(m_shooter);
     // m_shooter.setDefaultCommand(shootBall);
+=======
+
+    driveWithPositionControl = new DriveWithPositionControl(m_velocityController);
+    driveWithPositionControl.addRequirements(m_velocityController);
+
+    gearShift = new GearShift();
+    gearShiftDown = new GearShiftDown(gearShift);
+    gearShiftUp = new GearShiftUp(gearShift);
+
+>>>>>>> 8b911191b605df19f1670d399d3394925e3c8f60
 
     // Configure the button bindings
     configureButtonBindings(
@@ -68,8 +89,16 @@ public class RobotContainer {
    */
   private void configureButtonBindings() {  
     JoystickButton button_A = new JoystickButton(m_controller, Button.kA.value);
+<<<<<<< HEAD
     button_A.whenPressed(new DriveWithPositionControl(m_drive));   
 
+=======
+    button_A.whenPressed(new DriveWithPositionControl(m_velocityController));
+    JoystickButton button_B = new JoystickButton(m_controller, Button.kB.value);
+    button_B.whenPressed(new GearShiftUp(gearShift));
+    JoystickButton button_Y = new JoystickButton(m_controller, Button.kY.value);
+    button_Y.whenPressed(new GearShiftDown(gearShift));
+>>>>>>> 8b911191b605df19f1670d399d3394925e3c8f60
   }
 
   /**
