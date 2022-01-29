@@ -24,11 +24,11 @@ public class RobotContainer {
   // The robot's subsystems and commands are defined here...
 
   // DriveTrain Declare
-  private DriveTrain m_drive;
-  private DriveTeleop driveTeleop;
-  private DriveForwardTimed driveForwardTimed;
+  private final DriveTrain m_drive;
+  private final DriveTeleop driveTeleop;
+  private final DriveForwardTimed driveForwardTimed;
 
-  private DriveForwardDistance dfd;
+  private final DriveForwardDistance dfd;
 
   public static XboxController m_controller;
 
@@ -45,6 +45,8 @@ public class RobotContainer {
 
     driveForwardTimed = new DriveForwardTimed(m_drive);
     driveForwardTimed.addRequirements(m_drive);
+
+    m_controller = new XboxController(Constants.CONTROLLER_NUMBER);
 
     dfd = new DriveForwardDistance(m_drive);
     dfd.addRequirements(m_drive);
