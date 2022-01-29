@@ -2,6 +2,7 @@ package frc.robot.subsystems;
 
 import com.revrobotics.CANSparkMax;
 import com.revrobotics.SparkMaxPIDController;
+import com.revrobotics.CANSparkMax.ControlType;
 import com.revrobotics.RelativeEncoder;
 
 import edu.wpi.first.wpilibj.motorcontrol.MotorController;
@@ -90,8 +91,8 @@ public class VelocityControlCANSparkMax implements MotorController {
         m_motor.follow(vControl.getMotor());
     }
 
-    public void setPosition(double value){
-        m_controller.setReference(value, CANSparkMax.ControlType.kPosition);
+    public void setReference(double value, ControlType ctrl){
+        m_controller.setReference(value, ctrl);
     }
     
 

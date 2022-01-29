@@ -121,8 +121,8 @@ public class DriveTrainController extends SubsystemBase {
       kMinOutput = min; kMaxOutput = max; 
     }
 
-    v_leftFront.setPosition(setRotations);
-    v_rightFront.setPosition(setRotations);
+    v_leftFront.setReference(setRotations, CANSparkMax.ControlType.kPosition);
+    v_rightFront.setReference(setRotations, CANSparkMax.ControlType.kPosition);
 
     SmartDashboard.putNumber("SetRotations", setRotations);
     SmartDashboard.putNumber("ProcessVariable", v_leftFront.getEncoder().getPosition());
