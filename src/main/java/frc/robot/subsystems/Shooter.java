@@ -6,6 +6,7 @@ package frc.robot.subsystems;
 
 import edu.wpi.first.wpilibj.XboxController;
 import edu.wpi.first.wpilibj.motorcontrol.PWMVictorSPX;
+import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
 
 public class Shooter extends SubsystemBase {
@@ -15,6 +16,9 @@ public class Shooter extends SubsystemBase {
   public Shooter() {
     top = new PWMVictorSPX(0);
     bottom = new PWMVictorSPX(1);
+
+    top.setInverted(false);
+    bottom.setInverted(false);
   }
 
   @Override
@@ -23,7 +27,11 @@ public class Shooter extends SubsystemBase {
   }
 
   public void runShooter(XboxController controller){
-    top.set(controller.getRightY());
-    bottom.set(controller.getRightY());
+    top.set(controller.getRightY() * 0.5);
+    bottom.set(controller.getLeftY() * 0.5);
+
+    SmartDashboard.putNumber("Top", controller.getRightY());
+    SmartDashboard.putNumber("Bottom", controller.getLeftY());
+
   }
 }

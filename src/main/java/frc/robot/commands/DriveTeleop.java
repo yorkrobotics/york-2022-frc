@@ -6,13 +6,13 @@ package frc.robot.commands;
 
 import edu.wpi.first.wpilibj2.command.CommandBase;
 import frc.robot.RobotContainer;
-import frc.robot.subsystems.DriveTrainController;
+import frc.robot.subsystems.DriveTrain;
 
 public class DriveTeleop extends CommandBase {
-  private DriveTrainController vController;
+  private DriveTrain vController;
 
   /** Creates a new DriveWithVelocityControl. */
-  public DriveTeleop(DriveTrainController v) {
+  public DriveTeleop(DriveTrain v) {
     // Use addRequirements() here to declare subsystem dependencies.
     vController = v;
     addRequirements(vController);
@@ -26,7 +26,7 @@ public class DriveTeleop extends CommandBase {
   // Called every time the scheduler runs while the command is scheduled.
   @Override
   public void execute() {
-    vController.driveWithVelocityControl(RobotContainer.m_controller);
+    vController.mArcadeDrive(RobotContainer.m_controller);
   }
 
   // Called once the command ends or is interrupted.

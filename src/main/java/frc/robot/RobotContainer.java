@@ -7,10 +7,11 @@ package frc.robot;
 import edu.wpi.first.wpilibj.GenericHID;
 import edu.wpi.first.wpilibj.XboxController;
 import edu.wpi.first.wpilibj.XboxController.Button;
-import frc.robot.commands.DriveForwardDistance;
 import frc.robot.commands.DriveTeleop;
 import frc.robot.commands.DriveWithPositionControl;
-import frc.robot.subsystems.DriveTrainController;
+import frc.robot.commands.ShootBall;
+import frc.robot.subsystems.DriveTrain;
+import frc.robot.subsystems.Shooter;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.button.JoystickButton;
 
@@ -24,12 +25,13 @@ public class RobotContainer {
   // The robot's subsystems and commands are defined here...
 
   // DriveTrain Declare
-
-  private DriveForwardDistance driveForwardDistance;
-
-  private DriveTrainController m_velocityController;
+  private DriveTrain m_drive;
   private DriveTeleop driveTeleop;
   private DriveWithPositionControl driveWithPositionControl;
+
+  //Shooter
+  private Shooter m_shooter;
+  private ShootBall shootBall;
 
   public static XboxController m_controller;
 
@@ -40,14 +42,18 @@ public class RobotContainer {
     m_controller = new XboxController(Constants.CONTROLLER_NUMBER);
 
     //Driving during teleop.
-    m_velocityController = new DriveTrainController();
-    driveTeleop = new DriveTeleop(m_velocityController);
-    driveTeleop.addRequirements(m_velocityController);
-    m_velocityController.setDefaultCommand(driveTeleop);
+    m_drive = new DriveTrain();
+    driveTeleop = new DriveTeleop(m_drive);
+    driveTeleop.addRequirements(m_drive);
+    m_drive.setDefaultCommand(driveTeleop);
 
-    driveWithPositionControl = new DriveWithPositionControl(m_velocityController);
-    driveWithPositionControl.addRequirements(m_velocityController);
+    driveWithPositionControl = new DriveWithPositionControl(m_drive);
+    driveWithPositionControl.addRequirements(m_drive);
 
+    m_shooter = new Shooter();
+    shootBall = new ShootBall(m_shooter);
+    shootBall.addRequirements(m_shooter);
+    // m_shooter.setDefaultCommand(shootBall);
 
     // Configure the button bindings
     configureButtonBindings(
@@ -62,7 +68,7 @@ public class RobotContainer {
    */
   private void configureButtonBindings() {  
     JoystickButton button_A = new JoystickButton(m_controller, Button.kA.value);
-    button_A.whenPressed(new DriveWithPositionControl(m_velocityController));   
+    button_A.whenPressed(new DriveWithPositionControl(m_drive));   
 
   }
 
@@ -73,6 +79,6 @@ public class RobotContainer {
    */
   public Command getAutonomousCommand() {
     // A command to run in autonomous
-    return driveForwardDistance;
+    return shootBall;
   }
 }

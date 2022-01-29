@@ -5,18 +5,16 @@
 package frc.robot.commands;
 
 import edu.wpi.first.wpilibj2.command.CommandBase;
-import frc.robot.Constants;
 import frc.robot.RobotContainer;
-import frc.robot.subsystems.DriveTrain;
+import frc.robot.subsystems.Shooter;
 
-public class DriveWithPositionControl extends CommandBase {
-  private DriveTrain vController;
-
-  /** Creates a new DriveWithPositionControl. */
-  public DriveWithPositionControl(DriveTrain v) {
+public class ShootBall extends CommandBase {
+  private Shooter m_shooter;
+  /** Creates a new ShootBall. */
+  public ShootBall(Shooter s) {
     // Use addRequirements() here to declare subsystem dependencies.
-    vController = v;
-    addRequirements(vController);
+    m_shooter = s;
+    addRequirements(m_shooter);
   }
 
   // Called when the command is initially scheduled.
@@ -26,7 +24,7 @@ public class DriveWithPositionControl extends CommandBase {
   // Called every time the scheduler runs while the command is scheduled.
   @Override
   public void execute() {
-    vController.driveWithPositionControl(RobotContainer.m_controller, Constants.TARGET_DISTANCE);
+    m_shooter.runShooter(RobotContainer.m_controller);
   }
 
   // Called once the command ends or is interrupted.
