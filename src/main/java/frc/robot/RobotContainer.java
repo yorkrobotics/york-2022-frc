@@ -8,12 +8,9 @@ import edu.wpi.first.wpilibj.GenericHID;
 import edu.wpi.first.wpilibj.XboxController;
 import edu.wpi.first.wpilibj.XboxController.Button;
 import frc.robot.commands.DriveForwardDistance;
-import frc.robot.commands.DriveForwardTimed;
 import frc.robot.commands.DriveTeleop;
 import frc.robot.commands.DriveWithPositionControl;
-import frc.robot.commands.DriveWithVelocityControl;
-import frc.robot.subsystems.DriveTrain;
-import frc.robot.subsystems.VelocityController;
+import frc.robot.subsystems.DriveTrainController;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.button.JoystickButton;
 
@@ -27,40 +24,26 @@ public class RobotContainer {
   // The robot's subsystems and commands are defined here...
 
   // DriveTrain Declare
-  private DriveTrain m_drive;
+
+  private DriveForwardDistance driveForwardDistance;
+
+  private DriveTrainController m_velocityController;
   private DriveTeleop driveTeleop;
-  private DriveForwardTimed driveForwardTimed;
-
-  private DriveForwardDistance dfd;
-
-  private VelocityController m_velocityController;
-  private DriveWithVelocityControl driveWithVelocityControl;
   private DriveWithPositionControl driveWithPositionControl;
 
   public static XboxController m_controller;
 
   /** The container for the robot. Contains subsystems, OI devices, and commands. */
   public RobotContainer() {
-    // m_drive = new DriveTrain();
-    
-    // driveTeleop = new DriveTeleop(m_drive);
-    // driveTeleop.addRequirements(m_drive);
 
-    // m_drive.setDefaultCommand(driveTeleop);
-
-    // driveForwardTimed = new DriveForwardTimed(m_drive);
-    // driveForwardTimed.addRequirements(m_drive);
-
+    //drive's controller
     m_controller = new XboxController(Constants.CONTROLLER_NUMBER);
 
-    // dfd = new DriveForwardDistance(m_drive);
-    // dfd.addRequirements(m_drive);
-
-    // Testing velocity controller
-    m_velocityController = new VelocityController();
-    driveWithVelocityControl = new DriveWithVelocityControl(m_velocityController);
-    driveWithVelocityControl.addRequirements(m_velocityController);
-    m_velocityController.setDefaultCommand(driveWithVelocityControl);
+    //Driving during teleop.
+    m_velocityController = new DriveTrainController();
+    driveTeleop = new DriveTeleop(m_velocityController);
+    driveTeleop.addRequirements(m_velocityController);
+    m_velocityController.setDefaultCommand(driveTeleop);
 
     driveWithPositionControl = new DriveWithPositionControl(m_velocityController);
     driveWithPositionControl.addRequirements(m_velocityController);
@@ -90,6 +73,6 @@ public class RobotContainer {
    */
   public Command getAutonomousCommand() {
     // A command to run in autonomous
-    return dfd;
+    return driveForwardDistance;
   }
 }

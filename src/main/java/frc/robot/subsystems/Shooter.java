@@ -4,14 +4,26 @@
 
 package frc.robot.subsystems;
 
+import edu.wpi.first.wpilibj.XboxController;
+import edu.wpi.first.wpilibj.motorcontrol.PWMVictorSPX;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
 
 public class Shooter extends SubsystemBase {
+  private PWMVictorSPX top, bottom;
+
   /** Creates a new Shooter. */
-  public Shooter() {}
+  public Shooter() {
+    top = new PWMVictorSPX(0);
+    bottom = new PWMVictorSPX(1);
+  }
 
   @Override
   public void periodic() {
     // This method will be called once per scheduler run
+  }
+
+  public void runShooter(XboxController controller){
+    top.set(controller.getRightY());
+    bottom.set(controller.getRightY());
   }
 }

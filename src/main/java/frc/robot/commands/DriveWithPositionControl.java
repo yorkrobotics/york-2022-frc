@@ -7,13 +7,13 @@ package frc.robot.commands;
 import edu.wpi.first.wpilibj2.command.CommandBase;
 import frc.robot.Constants;
 import frc.robot.RobotContainer;
-import frc.robot.subsystems.VelocityController;
+import frc.robot.subsystems.DriveTrainController;
 
 public class DriveWithPositionControl extends CommandBase {
-  private VelocityController vController;
+  private DriveTrainController vController;
 
   /** Creates a new DriveWithPositionControl. */
-  public DriveWithPositionControl(VelocityController v) {
+  public DriveWithPositionControl(DriveTrainController v) {
     // Use addRequirements() here to declare subsystem dependencies.
     vController = v;
     addRequirements(vController);
