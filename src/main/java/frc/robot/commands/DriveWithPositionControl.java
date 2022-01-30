@@ -21,12 +21,14 @@ public class DriveWithPositionControl extends CommandBase {
 
   // Called when the command is initially scheduled.
   @Override
-  public void initialize() {}
+  public void initialize() {
+    vController.driveWithPositionControl(RobotContainer.m_controller, Constants.TARGET_DISTANCE);
+
+  }
 
   // Called every time the scheduler runs while the command is scheduled.
   @Override
   public void execute() {
-    vController.driveWithPositionControl(RobotContainer.m_controller, Constants.TARGET_DISTANCE);
   }
 
   // Called once the command ends or is interrupted.

@@ -81,7 +81,7 @@ public class RobotContainer {
    */
   private void configureButtonBindings() {  
     JoystickButton button_A = new JoystickButton(m_controller, Button.kA.value);
-    button_A.whenPressed(new DriveWithPositionControl(m_drive));
+    button_A.whenPressed(driveWithPositionControl);
     JoystickButton button_B = new JoystickButton(m_controller, Button.kB.value);
     button_B.whenPressed(gearShiftDown);
     JoystickButton button_Y = new JoystickButton(m_controller, Button.kY.value);
@@ -95,6 +95,6 @@ public class RobotContainer {
    */
   public Command getAutonomousCommand() {
     // A command to run in autonomous
-    return shootBall;
+    return driveWithPositionControl;
   }
 }
