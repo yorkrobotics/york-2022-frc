@@ -212,32 +212,73 @@ def startSwitchedCamera(config):
 
     return server
 
-def getDistance(center_list):
-    # assuming only three values in center_list
-    if len(center_list) == 3:
-        left_point_x = center_list[0][0] # could be 1 for the second index
-        #mid_point_x = center_list[1][0]
-        right_point_x = center_list[2][0]
+def getCenterHSV():
+    # for testing purposes 
+    pixel_center = hsv_img[int(height/2), int(width/2)]
+    cv2.circle(output_img, center = (int(width/2), int(height/2)), radius = 1, color = (0, 0, 255), thickness = 1)
+    cv2.putText(output_img, "HSV: " + str(pixel_center), (0, 40), cv2.FONT_HERSHEY_SIMPLEX, 0.5, (255, 255, 255))
 
-        diff = right_point_x - left_point_x
+def getHoopCenter(output_stream, vertice_list):
+    # TODO for solvepnp
 
-        focal_length = 360
-        distance = 9 * focal_length / diff
+    # focal lengths
+    fx = 2022.3166
+    fy = 2023.5474
+    width2 = 892.06
+    height2 = 512.88
+    camera_matrix = [[fx, 0, width2], [0, fy, height2], [0, 0, 1]]
+    # 2D projection onto the camera
+    object_points = [
+            [  -13.72 ,   -1.0 ,   15.90 ],
+            [  -13.72 ,   1.0 ,   15.90 ],
+            [  -12.25 ,   1.0 ,   17.05 ],
+            [  -12.25 ,   -1.0 ,   17.05 ],
 
-        return distance
-    return -1
+            [ -7.5,  -1.0,   19.618 ],
+            [ -7.5,  1.0,   19.618 ],
+            [-2.7,  1.0,   20.825 ],
+            [-2.7,  -1.0,   20.825 ],
 
-def getFocalLength(pixel_length):
-    if pixel_length != -1:
-        actual_tape_width = 9 # inches
-        actual_distance = 76 # inches
-        focal_length = pixel_length * actual_distance / actual_tape_width
-        return focal_length # 183 or 360
-    return -1
+            [2.7,  -1.0,   20.825 ],
+            [2.7,  1.0,   20.825 ],
+            [7.5,  1.0,   19.618 ],
+            [7.5,  -1.0,   19.618 ],
 
-def getPoints(rect):
-    vertices = rect.ravel() 
-    return vertices
+            # [13.72 ,   -1.0 ,   15.90 ],
+            # [13.72 ,   1.0 ,   15.90 ],
+            # [12.25 ,   1.0 ,   17.05 ],
+            # [12.25 ,   -1.0 ,   17.05 ],
+
+            ]
+
+    distortion = [1.803, -186.72, 0.0, 0.0, 6469.52]
+
+    image_points = []
+    for l in vertice_list:
+        result = list(map(list, zip(l[::2], l[1::2])))
+        for i in result:
+            i = list(map(float, i))
+            image_points.append(i)
+
+    hoop_coord = []
+    if len(image_points) == 12:
+        camera_matrix, object_points, image_points, distortion = [np.array(x) for x in [camera_matrix, object_points, image_points, distortion]]
+
+        # distortion = None
+        ret, rvec, T = cv2.solvePnP(object_points, image_points, camera_matrix, distortion, flags=cv2.SOLVEPNP_EPNP)
+        R, _ = cv2.Rodrigues(rvec)
+
+        for i in T:
+            hoop_coord.append(int(i))
+
+        cv2.putText(output_stream, str(hoop_coord), (200, 100), 0, 3, (128, 255, 0), 3)
+
+    print("image_points:", image_points)
+    # draw points to debug
+    print(hoop_coord)
+    return hoop_coord
+
+
 
 if __name__ == "__main__":
     if len(sys.argv) >= 2:
@@ -285,8 +326,6 @@ if __name__ == "__main__":
     width = config2['cameras'][0]['width']
     height = config2['cameras'][0]['height']
 
-
-
     inst = CameraServer.getInstance()
     input_stream = inst.getVideo()
     output_stream = inst.putVideo('Processed', width, height)
@@ -306,157 +345,43 @@ if __name__ == "__main__":
 
         # Convert to HSV and threshold image
         hsv_img = cv2.cvtColor(input_img, cv2.COLOR_BGR2HSV)
-        binary_img = cv2.inRange(hsv_img, (75, 49, 200), (90, 255, 255))
 
-        # for testing purposes 
-        pixel_center = hsv_img[int(height/2), int(width/2)]
-        hue = pixel_center[0]
-        sat = pixel_center[1]
-        val = pixel_center[2]
+        binary_img = cv2.inRange(hsv_img, (75, 200, 200), (95, 255, 255))
+        ret,thresh = cv2.threshold(binary_img, 127, 255, 0)
 
+        kernel = cv2.getStructuringElement(cv2.MORPH_RECT, (10,10))
+        # binary_img = cv2.morphologyEx(binary_img, cv2.MORPH_CLOSE, kernel)
+        # binary_img = cv2.dilate(thresh, kernel, iterations=3)
+
+        # getCenterHSV()
 
         _, contour_list, _ = cv2.findContours(binary_img, mode=cv2.RETR_EXTERNAL, method=cv2.CHAIN_APPROX_SIMPLE)
 
-        center_list = []
+        vertice_list = []
         for contour in contour_list:
-
             # Ignore small contours that could be because of noise/bad thresholding
             if cv2.contourArea(contour) < 15:
                 continue
-
-            cv2.drawContours(output_img, contour, -1, color = (255, 255, 255), thickness = -1)
-
-            rect = cv2.minAreaRect(contour)
-
+            # cv2.drawContours(output_img, contour, -1, color = (255, 255, 255), thickness = -1)
             quadrilateral = cv2.approxPolyDP(contour, 5, False)
 
-            vertices = getPoints(quadrilateral)
+            vertices = quadrilateral.ravel()
 
-            center, size, angle = rect
-            center = tuple([int(dim) for dim in center]) # Convert to int so we can draw
-
-            center_list.append(center)
-
-
-
+            epsilon = 0.1 * cv2.arcLength(contour, True)
+            approx = cv2.approxPolyDP(contour, epsilon, True)
+            cv2.drawContours(binary_img, [quadrilateral], 0, (128, 255, 255), 3)
+            vertice_list.append(quadrilateral.ravel().tolist())
 
             # Draw rectangle and circle
             cv2.drawContours(output_img, [quadrilateral], -1, color = (0, 0, 255), thickness = 2)
             #cv2.circle(output_img, center = center, radius = 3, color = (0, 0, 255), thickness = -1)
 
-# Setting parameter values
-        t_lower = 100  # Lower Threshold
-        t_upper = 150  # Upper threshold
-          
-# Applying the Canny Edge filter
-        edge = cv2.Canny(binary_img, t_lower, t_upper)
-
-        #binary_img = np.float32(binary_img)
-        dst = cv2.cornerHarris(binary_img,2,3,0.04)
-        
-
-#result is dilated for marking the corners, not important
-        dst = cv2.dilate(dst,None)
-
-# Threshold for an optimal value, it may vary depending on the image.
-        hsv_img[dst>0.01*dst.max()]=[0,0,255]
-
-
-
-        binary_output_stream.putFrame(hsv_img)
-
-        # TODO for solvepnp
-
-        # focal lengths
-        fx = 360
-        fy = 300 
-        camera_matrix = [[fx, 0, width / 2], [0, fy, height / 2], [0, 0, 1]]
-        # 2D projection onto the camera
-        object_points = [[  0. ,   0. ,   0. ],
-                [ 82.5,   0. ,   0. ],
-                [165. ,   0. ,   0. ],
-                [247.5,   0. ,   0. ],
-                [ 55. ,  27.5,   0. ],
-                [137.5,  27.5,   0. ],
-                [220. ,  27.5,   0. ],
-                [ 27.5,  55. ,   0. ],
-                [110. ,  55. ,   0. ],
-                [192.5,  55. ,   0. ],
-                [  0. ,  82.5,   0. ],
-                [ 82.5,  82.5,   0. ],
-                [165. ,  82.5,   0. ],
-                [247.5,  82.5,   0. ],
-                [ 55. , 110. ,   0. ],
-                [137.5, 110. ,   0. ],
-                [220. , 110. ,   0. ],
-                [ 27.5, 137.5,   0. ],
-                [110. , 137.5,   0. ],
-                [192.5, 137.5,   0. ],
-                [  0. , 165. ,   0. ],
-                [ 82.5, 165. ,   0. ],
-                [165. , 165. ,   0. ],
-                [247.5, 165. ,   0. ]]
-
-
-        image_points = [[648.84735, 335.1484 ],
-                [522.6854 , 317.74222],
-                [400.24448, 301.46362],
-                [281.39792, 285.43964],
-                [560.8046 , 366.6523 ],
-                [437.57022, 349.67358],
-                [318.269  , 333.33557],
-                [598.38196, 415.80203],
-                [475.02866, 397.87906],
-                [354.60062, 380.84167],
-                [636.9289 , 465.04666],
-                [512.3496 , 446.39185],
-                [391.26932, 428.63168],
-                [273.65057, 411.7955 ],
-                [549.6402 , 495.04532],
-                [428.12842, 476.45554],
-                [309.60794, 458.5343 ],
-                [587.5397 , 543.42163],
-                [465.2291 , 524.39795],
-                [346.24826, 505.79684],
-                [624.71814, 591.7365 ],
-                [502.51782, 572.03394],
-                [382.8287 , 552.7545 ],
-                [266.8465 , 534.29364]]
-
-        camera_matrix, object_points, image_points = [np.array(x) for x in [camera_matrix, object_points, image_points]]
-
-        distortion = None
-        ret, rvec, T = cv2.solvePnP(object_points, image_points, camera_matrix, distortion, flags=cv2.SOLVEPNP_EPNP)
-        R, _ = cv2.Rodrigues(rvec)
-
-        # print('R')
-        # print(R)
-        # print()
-        # print('T:')
-        # print(T)
-
-        # vision_nt.putNumberArray('rotation_matrix', R)
-
-
-        hoop_coord = []
-        for i in T:
-            hoop_coord.append(int(i))
-
-        vision_nt.putNumberArray('translation_vector', hoop_coord)
-
-
-        cv2.circle(output_img, center = (int(width/2), int(height/2)), radius = 1, color = (0, 0, 255), thickness = 1)
+        vision_nt.putNumberArray('translation_vector', getHoopCenter(output_stream, vertice_list))
 
         processing_time = time.time() - start_time
         fps = 1 / processing_time
-        #cv2.putText(output_img, "HSV: " + str(pixel_center) + "coord: " + str(vertices), (0, 40), cv2.FONT_HERSHEY_SIMPLEX, 0.5, (255, 255, 255))
-        # cv2.putText(output_img, "PS:" + str(vertices), (0, 40), cv2.FONT_HERSHEY_SIMPLEX, 0.3, (255, 255, 255))
-        # for i in range(0, len(center_list)):
-        #     cv2.putText(output_img, "Center: " + str(center_list[i]), (0, 15 + i*15), cv2.FONT_HERSHEY_SIMPLEX, 0.3, (255, 255, 255))
 
-        #cv2.putText(output_img, "dis: " + str(getDistance(center_list)), (0, 50), cv2.FONT_HERSHEY_SIMPLEX, 0.5, (255, 255, 255))
-
-
-
+        binary_output_stream.putFrame(binary_img)
         output_stream.putFrame(output_img)
         time.sleep(processing_time)
+
