@@ -12,7 +12,9 @@ import frc.robot.commands.DriveWithPositionControl;
 import frc.robot.commands.GearShiftDown;
 import frc.robot.commands.GearShiftUp;
 import frc.robot.commands.ShootBall;
+import frc.robot.commands.feed;
 import frc.robot.subsystems.DriveTrain;
+import frc.robot.subsystems.FeedIntake;
 import frc.robot.subsystems.GearShift;
 import frc.robot.subsystems.Shooter;
 import edu.wpi.first.wpilibj2.command.Command;
@@ -38,6 +40,10 @@ public class RobotContainer {
   //Shooter
   private Shooter m_shooter;
   private ShootBall shootBall;
+
+  //Feed
+  private FeedIntake m_feed;
+  private feed feed;
 
   public static XboxController m_controller;
 
@@ -80,6 +86,8 @@ public class RobotContainer {
     button_B.whenPressed(new GearShiftUp(gearShift));
     JoystickButton button_Y = new JoystickButton(m_controller, Button.kY.value);
     button_Y.whenPressed(new GearShiftDown(gearShift));
+    JoystickButton button_X = new JoystickButton(m_controller, Button.kX.value);
+    button_X.whenHeld(new feed(m_feed));
   }
 
   /**

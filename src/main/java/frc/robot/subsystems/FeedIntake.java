@@ -14,9 +14,9 @@ public class FeedIntake extends SubsystemBase {
 
   /** Creates a new ExampleSubsystem. */
   public FeedIntake() {
-      speed = 0;
-      intake = new PWMVictorSPX(2);
-      intake.setInverted(false);
+    speed = 0;
+    intake = new PWMVictorSPX(2);
+    intake.setInverted(false);
   }
 
   @Override
