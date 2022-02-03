@@ -212,15 +212,14 @@ def startSwitchedCamera(config):
 
     return server
 
-def getCenterHSV():
+def getCenterHSV(output_img):
     # for testing purposes 
     pixel_center = hsv_img[int(height/2), int(width/2)]
     cv2.circle(output_img, center = (int(width/2), int(height/2)), radius = 1, color = (0, 0, 255), thickness = 1)
     cv2.putText(output_img, "HSV: " + str(pixel_center), (0, 40), cv2.FONT_HERSHEY_SIMPLEX, 0.5, (255, 255, 255))
 
-def getHoopCenter(output_stream, vertice_list):
+def getHoopCenter(output_img, vertice_list):
     # TODO for solvepnp
-
     # focal lengths
     fx = 2022.3166
     fy = 2023.5474
@@ -271,11 +270,14 @@ def getHoopCenter(output_stream, vertice_list):
         for i in T:
             hoop_coord.append(int(i))
 
-        cv2.putText(output_stream, str(hoop_coord), (200, 100), 0, 3, (128, 255, 0), 3)
+        cv2.putText(output_img, str(hoop_coord), (200, 100), 0, 3, (128, 255, 0), 3)
 
     print("image_points:", image_points)
     # draw points to debug
     print(hoop_coord)
+
+    for i in image_points:
+        cv2.circle(output_img, center = tuple(list(map(int, i))), radius = 4, color = (255, 0, 255), thickness = -1)
     return hoop_coord
 
 
@@ -346,14 +348,14 @@ if __name__ == "__main__":
         # Convert to HSV and threshold image
         hsv_img = cv2.cvtColor(input_img, cv2.COLOR_BGR2HSV)
 
-        binary_img = cv2.inRange(hsv_img, (75, 200, 200), (95, 255, 255))
+        binary_img = cv2.inRange(hsv_img, (75, 25, 120), (95, 255, 255))
         ret,thresh = cv2.threshold(binary_img, 127, 255, 0)
 
         kernel = cv2.getStructuringElement(cv2.MORPH_RECT, (10,10))
         # binary_img = cv2.morphologyEx(binary_img, cv2.MORPH_CLOSE, kernel)
         # binary_img = cv2.dilate(thresh, kernel, iterations=3)
 
-        # getCenterHSV()
+        getCenterHSV(output_img)
 
         _, contour_list, _ = cv2.findContours(binary_img, mode=cv2.RETR_EXTERNAL, method=cv2.CHAIN_APPROX_SIMPLE)
 
@@ -376,7 +378,7 @@ if __name__ == "__main__":
             cv2.drawContours(output_img, [quadrilateral], -1, color = (0, 0, 255), thickness = 2)
             #cv2.circle(output_img, center = center, radius = 3, color = (0, 0, 255), thickness = -1)
 
-        vision_nt.putNumberArray('translation_vector', getHoopCenter(output_stream, vertice_list))
+        # vision_nt.putNumberArray('translation_vector', getHoopCenter(output_img, vertice_list))
 
         processing_time = time.time() - start_time
         fps = 1 / processing_time
