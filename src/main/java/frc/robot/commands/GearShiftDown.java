@@ -6,6 +6,7 @@ import frc.robot.subsystems.GearShift;
 
 public class GearShiftDown extends CommandBase {
     GearShift m_gear;
+    private boolean shifted = false;
 
     public GearShiftDown(GearShift gear){
         m_gear = gear;
@@ -14,5 +15,11 @@ public class GearShiftDown extends CommandBase {
     @Override
     public void execute() {
         m_gear.shiftDown();
+        shifted = true;
+    }
+
+    @Override
+    public boolean isFinished() {
+        return shifted;
     }
 }

@@ -8,6 +8,7 @@ public class GearShiftUp extends CommandBase {
 
     /**creates a new GearShift */
     GearShift m_gear;
+    private boolean shifted = false;
 
     public GearShiftUp(GearShift gear){
         m_gear = gear;
@@ -16,5 +17,11 @@ public class GearShiftUp extends CommandBase {
     @Override
     public void execute() {
         m_gear.shiftUp();
+        shifted = true;
+    }
+
+    @Override
+    public boolean isFinished() {
+        return shifted;
     }
 }

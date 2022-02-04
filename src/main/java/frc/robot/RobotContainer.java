@@ -33,17 +33,13 @@ public class RobotContainer {
   private DriveTrain m_drive;
   private DriveTeleop driveTeleop;
   private DriveWithPositionControl driveWithPositionControl;
-  private GearShiftDown gearShiftDown;
-  private GearShiftUp gearShiftUp;
   private GearShift gearShift;
 
   //Shooter
   private Shooter m_shooter;
-  private ShootBall shootBall;
 
   //Feed
   private FeedIntake m_feed;
-  private feed feed;
 
   public static XboxController m_controller;
 
@@ -64,15 +60,12 @@ public class RobotContainer {
     driveWithPositionControl.addRequirements(m_drive);
 
     gearShift = new GearShift();
-    gearShiftDown = new GearShiftDown(gearShift);
-    gearShiftUp = new GearShiftUp(gearShift);
     
     //feed
     m_feed = new FeedIntake();
 
     //Shooter stuff
     m_shooter = new Shooter();
-    shootBall = new ShootBall(m_shooter, m_controller);
 
     // Configure the button bindings
     configureButtonBindings();
@@ -84,15 +77,26 @@ public class RobotContainer {
    * edu.wpi.first.wpilibj.Joystick} or {@link XboxController}), and then passing it to a {@link
    * edu.wpi.first.wpilibj2.command.button.JoystickButton}.
    */
-  private void configureButtonBindings() {  
+  private void configureButtonBindings() {
+    // Bumpers to shift
+    JoystickButton rightBumper = new JoystickButton(m_controller, Button.kRightBumper.value);
+    rightBumper.whenPressed(new GearShiftUp(gearShift));
+    JoystickButton leftBumper = new JoystickButton(m_controller, Button.kLeftBumper.value);
+    leftBumper.whenPressed(new GearShiftDown(gearShift));
+
+    // A to do position control
     JoystickButton button_A = new JoystickButton(m_controller, Button.kA.value);
     button_A.whenPressed(new DriveWithPositionControl(m_drive));
+
     JoystickButton button_B = new JoystickButton(m_controller, Button.kB.value);
-    button_B.whenPressed(new GearShiftUp(gearShift));
-    JoystickButton button_Y = new JoystickButton(m_controller, Button.kY.value);
-    button_Y.whenPressed(new GearShiftDown(gearShift));
+
+    // X to feed
     JoystickButton button_X = new JoystickButton(m_controller, Button.kX.value);
     button_X.whileHeld(new feed(m_feed));
+    
+    // Y to shoot
+    JoystickButton button_Y = new JoystickButton(m_controller, Button.kY.value);
+    button_Y.whileHeld(new ShootBall(m_shooter));
   }
 
   /**
@@ -102,6 +106,6 @@ public class RobotContainer {
    */
   public Command getAutonomousCommand() {
     // A command to run in autonomous
-    return shootBall;
+    return null;
   }
 }

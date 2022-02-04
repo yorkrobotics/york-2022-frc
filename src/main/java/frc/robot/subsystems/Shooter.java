@@ -11,26 +11,30 @@ import edu.wpi.first.wpilibj2.command.SubsystemBase;
 
 public class Shooter extends SubsystemBase {
   private PWMVictorSPX top, bottom;
+  double speed;
 
   /** Creates a new Shooter. */
   public Shooter() {
-    top = new PWMVictorSPX(2);
-    bottom = new PWMVictorSPX(3);
+    top = new PWMVictorSPX(0);
+    bottom = new PWMVictorSPX(2);
 
     top.setInverted(false);
     bottom.setInverted(false);
   }
 
+  public void setSpeed(double spd) {
+    speed = spd;
+    top.set(spd);
+    bottom.set(spd);
+  }
+
+  public void stopMotor() {
+    top.set(0);
+    bottom.set(0);
+  }
+
   @Override
   public void periodic() {
     // This method will be called once per scheduler run
-  }
-
-  public void runShooter(XboxController controller){
-    top.set(controller.getRightY() * 0.5);
-    bottom.set(controller.getLeftY() * 0.5);
-
-    SmartDashboard.putNumber("Top", controller.getRightY());
-    SmartDashboard.putNumber("Bottom", controller.getLeftY());
   }
 }
