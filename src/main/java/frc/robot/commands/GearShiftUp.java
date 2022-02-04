@@ -8,23 +8,23 @@ import frc.robot.subsystems.GearShift;
 public class GearShiftUp extends CommandBase {
 
     /**creates a new GearShift */
-    GearShift m_gear;
-    DriveTrain m_drive;
+    GearShift mGear;
+    DriveTrain mDrive;
     boolean isShifted;
 
     public GearShiftUp(GearShift gear, DriveTrain drive){
-        m_gear = gear;
-        m_drive = drive;
+        mGear = gear;
+        mDrive = drive;
         isShifted = false;
         //added requirements
-        addRequirements(m_gear);
-        addRequirements(m_drive);
+        addRequirements(mGear);
+        addRequirements(mDrive);
     }
 
     @Override
     public void execute() {
-        m_gear.shiftUp();
-        m_drive.setToHighGear();
+        mGear.shiftUp();
+        mDrive.setToHighGear();
         isShifted = true;
     }
 

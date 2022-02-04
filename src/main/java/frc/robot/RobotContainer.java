@@ -12,6 +12,7 @@ import frc.robot.commands.DriveWithPositionControl;
 import frc.robot.commands.GearShiftDown;
 import frc.robot.commands.GearShiftUp;
 import frc.robot.commands.ShootBall;
+import frc.robot.commands.SwitchDriveMode;
 import frc.robot.subsystems.DriveTrain;
 import frc.robot.subsystems.GearShift;
 import frc.robot.subsystems.Shooter;
@@ -34,39 +35,35 @@ public class RobotContainer {
   private GearShiftDown gearShiftDown;
   private GearShiftUp gearShiftUp;
   private GearShift gearShift;
+  private SwitchDriveMode switchDriveMode;
 
   //Shooter
   private Shooter m_shooter;
   private ShootBall shootBall;
 
-  public static XboxController m_controller;
+  public static XboxController mController;
 
   /** The container for the robot. Contains subsystems, OI devices, and commands. */
   public RobotContainer() {
 
     //drive's controller
-    m_controller = new XboxController(Constants.CONTROLLER_NUMBER);
+    mController = new XboxController(Constants.CONTROLLER_NUMBER);
 
     //Driving during teleop.
     m_drive = new DriveTrain();
     driveTeleop = new DriveTeleop(m_drive);
-    driveTeleop.addRequirements(m_drive);
     m_drive.setDefaultCommand(driveTeleop);
 
     driveWithPositionControl = new DriveWithPositionControl(m_drive);
-    driveWithPositionControl.addRequirements(m_drive);
-
-    m_shooter = new Shooter();
-    shootBall = new ShootBall(m_shooter);
-    shootBall.addRequirements(m_shooter);
-    // m_shooter.setDefaultCommand(shootBall);
-
-    driveWithPositionControl = new DriveWithPositionControl(m_drive);
-    driveWithPositionControl.addRequirements(m_drive);
+    switchDriveMode = new SwitchDriveMode(m_drive);
 
     gearShift = new GearShift();
     gearShiftDown = new GearShiftDown(gearShift, m_drive);
     gearShiftUp = new GearShiftUp(gearShift, m_drive);
+
+    m_shooter = new Shooter();
+    shootBall = new ShootBall(m_shooter);
+    // m_shooter.setDefaultCommand(shootBall);
 
     // Configure the button bindings
     configureButtonBindings(
@@ -80,12 +77,14 @@ public class RobotContainer {
    * edu.wpi.first.wpilibj2.command.button.JoystickButton}.
    */
   private void configureButtonBindings() {  
-    JoystickButton button_A = new JoystickButton(m_controller, Button.kA.value);
+    JoystickButton button_A = new JoystickButton(mController, Button.kA.value);
     button_A.whenPressed(driveWithPositionControl);
-    JoystickButton button_B = new JoystickButton(m_controller, Button.kB.value);
+    JoystickButton button_B = new JoystickButton(mController, Button.kB.value);
     button_B.whenPressed(gearShiftDown);
-    JoystickButton button_Y = new JoystickButton(m_controller, Button.kY.value);
+    JoystickButton button_Y = new JoystickButton(mController, Button.kY.value);
     button_Y.whenPressed(gearShiftUp);
+    JoystickButton button_X = new JoystickButton(mController, Button.kX.value);
+    button_X.whenPressed(switchDriveMode);
   }
 
   /**
