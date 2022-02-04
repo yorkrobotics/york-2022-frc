@@ -14,8 +14,8 @@ public class Shooter extends SubsystemBase {
 
   /** Creates a new Shooter. */
   public Shooter() {
-    top = new PWMVictorSPX(0);
-    bottom = new PWMVictorSPX(1);
+    top = new PWMVictorSPX(2);
+    bottom = new PWMVictorSPX(3);
 
     top.setInverted(false);
     bottom.setInverted(false);
@@ -28,7 +28,7 @@ public class Shooter extends SubsystemBase {
 
   public void runShooter(XboxController controller){
     top.set(controller.getRightY() * 0.5);
-    bottom.set(controller.getLeftY() * 0.6);
+    bottom.set(controller.getLeftY() * 0.5);
 
     SmartDashboard.putNumber("Top", controller.getRightY());
     SmartDashboard.putNumber("Bottom", controller.getLeftY());

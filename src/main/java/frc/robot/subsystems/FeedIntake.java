@@ -15,7 +15,7 @@ public class FeedIntake extends SubsystemBase {
   /** Creates a new ExampleSubsystem. */
   public FeedIntake() {
     speed = 0;
-    intake = new PWMVictorSPX(2);
+    intake = new PWMVictorSPX(1);
     intake.setInverted(false);
   }
 
@@ -26,7 +26,7 @@ public class FeedIntake extends SubsystemBase {
 
   public void setSpeed(double spd) {
     speed = spd;
-    intake.set(0.5);
+    intake.set(spd);
   }
 
   public double getSpeed() {

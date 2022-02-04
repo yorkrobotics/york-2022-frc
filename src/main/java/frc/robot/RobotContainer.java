@@ -66,11 +66,16 @@ public class RobotContainer {
     gearShift = new GearShift();
     gearShiftDown = new GearShiftDown(gearShift);
     gearShiftUp = new GearShiftUp(gearShift);
+    
+    //feed
+    m_feed = new FeedIntake();
 
+    //Shooter stuff
+    m_shooter = new Shooter();
+    shootBall = new ShootBall(m_shooter, m_controller);
 
     // Configure the button bindings
-    configureButtonBindings(
-    );
+    configureButtonBindings();
   }
 
   /**
@@ -87,7 +92,7 @@ public class RobotContainer {
     JoystickButton button_Y = new JoystickButton(m_controller, Button.kY.value);
     button_Y.whenPressed(new GearShiftDown(gearShift));
     JoystickButton button_X = new JoystickButton(m_controller, Button.kX.value);
-    button_X.whenHeld(new feed(m_feed));
+    button_X.whileHeld(new feed(m_feed));
   }
 
   /**

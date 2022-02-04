@@ -4,16 +4,18 @@
 
 package frc.robot.commands;
 
+import edu.wpi.first.wpilibj.XboxController;
 import edu.wpi.first.wpilibj2.command.CommandBase;
-import frc.robot.RobotContainer;
 import frc.robot.subsystems.Shooter;
 
 public class ShootBall extends CommandBase {
   private Shooter m_shooter;
+  private XboxController m_controller;
   /** Creates a new ShootBall. */
-  public ShootBall(Shooter s) {
+  public ShootBall(Shooter s, XboxController target_controller) {
     // Use addRequirements() here to declare subsystem dependencies.
     m_shooter = s;
+    m_controller = target_controller;
     addRequirements(m_shooter);
   }
 
@@ -24,7 +26,7 @@ public class ShootBall extends CommandBase {
   // Called every time the scheduler runs while the command is scheduled.
   @Override
   public void execute() {
-    m_shooter.runShooter(RobotContainer.m_controller);
+    m_shooter.runShooter(m_controller);
   }
 
   // Called once the command ends or is interrupted.
