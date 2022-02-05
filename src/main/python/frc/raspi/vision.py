@@ -11,6 +11,7 @@ import time
 import sys
 import cv2
 import numpy as np
+import os
 
 from cscore import CameraServer, VideoSource, UsbCamera, MjpegServer
 from networktables import NetworkTablesInstance
@@ -218,8 +219,27 @@ def getCenterHSV(output_img):
     cv2.circle(output_img, center = (int(width/2), int(height/2)), radius = 1, color = (0, 0, 255), thickness = 1)
     cv2.putText(output_img, "HSV: " + str(pixel_center), (0, 40), cv2.FONT_HERSHEY_SIMPLEX, 0.5, (255, 255, 255))
 
+def sortQuadList(quad_list):
+    # sort according to x
+    print("[DEBUG] old quad:", quad_list)
+    if len(quad_list) == 8:
+        for j in range(0, len(quad_list) - 2, 2):
+            max = quad_list[j]
+            for i in range(j, len(quad_list), 2):
+                if quad_list[i] > max: # if current x value is the biggest
+                    max = quad_list[j]
+                    quad_list.insert(j, quad_list.pop(i)) # insert x coord
+                    quad_list.insert(j+ 1, quad_list.pop(i+1)) # insert y coord
+        # sort according to y
+        if quad_list[1] < quad_list[3]:
+            quad_list[2], quad_list[0] = quad_list[0], quad_list[2]
+            quad_list[3], quad_list[1] = quad_list[1], quad_list[3]
+        if quad_list[5] < quad_list[7]:
+            quad_list[6], quad_list[4] = quad_list[4], quad_list[6]
+            quad_list[7], quad_list[5] = quad_list[5], quad_list[7]
+
+
 def getHoopCenter(output_img, vertice_list):
-    # TODO for solvepnp
     # focal lengths
     fx = 2022.3166
     fy = 2023.5474
@@ -228,42 +248,89 @@ def getHoopCenter(output_img, vertice_list):
     camera_matrix = [[fx, 0, width2], [0, fy, height2], [0, 0, 1]]
     # 2D projection onto the camera
     object_points = [
-            [  -13.72 ,   -1.0 ,   15.90 ],
-            [  -13.72 ,   1.0 ,   15.90 ],
-            [  -12.25 ,   1.0 ,   17.05 ],
-            [  -12.25 ,   -1.0 ,   17.05 ],
+            # [  -13.72 ,   -1.0 ,   15.90 ],
+            # [  -13.72 ,   1.0 ,   15.90 ],
+            # [  -12.25 ,   1.0 ,   17.05 ],
+            # [  -12.25 ,   -1.0 ,   17.05 ],
 
-            [ -7.5,  -1.0,   19.618 ],
-            [ -7.5,  1.0,   19.618 ],
-            [-2.7,  1.0,   20.825 ],
-            [-2.7,  -1.0,   20.825 ],
+            # [ -7.5,  -1.0,   19.618 ],
+            # [ -7.5,  1.0,   19.618 ],
+            # [-2.7,  1.0,   20.825 ],
+            # [-2.7,  -1.0,   20.825 ],
 
-            [2.7,  -1.0,   20.825 ],
-            [2.7,  1.0,   20.825 ],
-            [7.5,  1.0,   19.618 ],
-            [7.5,  -1.0,   19.618 ],
+            # [2.7,  -1.0,   20.825 ],
+            # [2.7,  1.0,   20.825 ],
+            # [7.5,  1.0,   19.618 ],
+            # [7.5,  -1.0,   19.618 ],
 
             # [13.72 ,   -1.0 ,   15.90 ],
             # [13.72 ,   1.0 ,   15.90 ],
             # [12.25 ,   1.0 ,   17.05 ],
             # [12.25 ,   -1.0 ,   17.05 ],
 
+
+
+            # [-330.0, -30.0, .0],
+            # [-330.0, 30.0, .0],
+            # [-200.0, 30.0, .0],
+            # [-200.0, -30.0, .0],
+
+            # [-60.0, -30.0, .0],
+            # [60.0, 30.0, .0],
+            # [60.0, 30.0, .0],
+            # [-60.0, -30.0, .0],
+
+            # [200.0, -30.0, .0],
+            # [200.0, 30.0, .0],
+            # [330.0, 30.0, .0],
+            # [330.0, -30.0, .0],
+
+            # imperial(inches)
+            [-12.9, -1.0, .0],
+            [-12.9, 1.0, .0],
+            [-7.9, 1.0, .0],
+            [-7.9, -1.0, .0],
+
+            [-2.5, -1.0, .0],
+            [2.5, 1.0, .0],
+            [2.5, 1.0, .0],
+            [-2.5, -1.0, .0],
+
+            [7.9, -1.0, .0],
+            [7.9, 1.0, .0],
+            [12.9, 1.0, .0],
+            [12.9, -1.0, .0],
             ]
 
-    distortion = [1.803, -186.72, 0.0, 0.0, 6469.52]
+    # distortion = [1.803, -186.72, 0.0, 0.0, 6469.52]
+    distortion = None
+
 
     image_points = []
-    for l in vertice_list:
-        result = list(map(list, zip(l[::2], l[1::2])))
+
+    # sort image points
+    for quad in vertice_list:
+        sortQuadList(quad)
+        print("\n[DEBUG] Sorted Quad List: ", quad)
+
+        result = list(map(list, zip(quad[::2], quad[1::2])))
         for i in result:
             i = list(map(float, i))
             image_points.append(i)
 
+
+    # for l in vertice_list:
+    #     result = list(map(list, zip(l[::2], l[1::2])))
+    #     for i in result:
+    #         i = list(map(float, i))
+    #         image_points.append(i)
+
+
     hoop_coord = []
     if len(image_points) == 12:
-        camera_matrix, object_points, image_points, distortion = [np.array(x) for x in [camera_matrix, object_points, image_points, distortion]]
+        # camera_matrix, object_points, image_points, distortion = [np.array(x) for x in [camera_matrix, object_points, image_points, distortion]]
+        camera_matrix, object_points, image_points = [np.array(x) for x in [camera_matrix, object_points, image_points]]
 
-        # distortion = None
         ret, rvec, T = cv2.solvePnP(object_points, image_points, camera_matrix, distortion, flags=cv2.SOLVEPNP_EPNP)
         R, _ = cv2.Rodrigues(rvec)
 
@@ -272,9 +339,11 @@ def getHoopCenter(output_img, vertice_list):
 
         cv2.putText(output_img, str(hoop_coord), (200, 100), 0, 3, (128, 255, 0), 3)
 
-    print("image_points:", image_points)
+    print("[DEBUG] Hoop center: ", hoop_coord)
+
+    # print("image_points:", image_points)
     # draw points to debug
-    print(hoop_coord)
+    # print(hoop_coord)
 
     for i in image_points:
         cv2.circle(output_img, center = tuple(list(map(int, i))), radius = 4, color = (255, 0, 255), thickness = -1)
@@ -332,6 +401,10 @@ if __name__ == "__main__":
     input_stream = inst.getVideo()
     output_stream = inst.putVideo('Processed', width, height)
     binary_output_stream = inst.putVideo('Binary', width, height)
+
+    os.system("echo hello world!")
+    os.system("v4l2-ctl -c auto_exposure=1")
+    os.system("v4l2-ctl -c exposure_time_absolute=30")
      # loop forever
     while True:
         start_time = time.time()
@@ -348,14 +421,14 @@ if __name__ == "__main__":
         # Convert to HSV and threshold image
         hsv_img = cv2.cvtColor(input_img, cv2.COLOR_BGR2HSV)
 
-        binary_img = cv2.inRange(hsv_img, (75, 25, 120), (95, 255, 255))
+        binary_img = cv2.inRange(hsv_img, (75, 100, 120), (95, 255, 255))
         ret,thresh = cv2.threshold(binary_img, 127, 255, 0)
 
         kernel = cv2.getStructuringElement(cv2.MORPH_RECT, (10,10))
         # binary_img = cv2.morphologyEx(binary_img, cv2.MORPH_CLOSE, kernel)
         # binary_img = cv2.dilate(thresh, kernel, iterations=3)
 
-        getCenterHSV(output_img)
+        # getCenterHSV(output_img)
 
         _, contour_list, _ = cv2.findContours(binary_img, mode=cv2.RETR_EXTERNAL, method=cv2.CHAIN_APPROX_SIMPLE)
 
@@ -365,12 +438,11 @@ if __name__ == "__main__":
             if cv2.contourArea(contour) < 15:
                 continue
             # cv2.drawContours(output_img, contour, -1, color = (255, 255, 255), thickness = -1)
-            quadrilateral = cv2.approxPolyDP(contour, 5, False)
-
-            vertices = quadrilateral.ravel()
 
             epsilon = 0.1 * cv2.arcLength(contour, True)
-            approx = cv2.approxPolyDP(contour, epsilon, True)
+            quadrilateral = cv2.approxPolyDP(contour, epsilon, True)
+            vertices = quadrilateral.ravel()
+
             cv2.drawContours(binary_img, [quadrilateral], 0, (128, 255, 255), 3)
             vertice_list.append(quadrilateral.ravel().tolist())
 
@@ -378,7 +450,7 @@ if __name__ == "__main__":
             cv2.drawContours(output_img, [quadrilateral], -1, color = (0, 0, 255), thickness = 2)
             #cv2.circle(output_img, center = center, radius = 3, color = (0, 0, 255), thickness = -1)
 
-        # vision_nt.putNumberArray('translation_vector', getHoopCenter(output_img, vertice_list))
+        vision_nt.putNumberArray('translation_vector', getHoopCenter(output_img, vertice_list))
 
         processing_time = time.time() - start_time
         fps = 1 / processing_time
