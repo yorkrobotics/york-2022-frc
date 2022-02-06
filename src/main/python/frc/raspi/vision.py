@@ -223,13 +223,15 @@ def sortQuadList(quad_list):
     # sort according to x
     print("[DEBUG] old quad:", quad_list)
     if len(quad_list) == 8:
-        for j in range(0, len(quad_list) - 2, 2):
-            max = quad_list[j]
-            for i in range(j, len(quad_list), 2):
-                if quad_list[i] > max: # if current x value is the biggest
-                    max = quad_list[j]
-                    quad_list.insert(j, quad_list.pop(i)) # insert x coord
-                    quad_list.insert(j+ 1, quad_list.pop(i+1)) # insert y coord
+        points = list(zip(quad_list[::2], quad_list[1::2]))
+        sorted(points, key=lambda t: t[0])
+            # max = quad_list[j]
+        # for j in range(0, len(quad_list) - 2, 2):
+        #     for i in range(j, len(quad_list), 2):
+        #         if quad_list[i] > max: # if current x value is the biggest
+        #             max = quad_list[j]
+        #             quad_list.insert(j, quad_list.pop(i)) # insert x coord
+        #             quad_list.insert(j+ 1, quad_list.pop(i+1)) # insert y coord
         # sort according to y
         if quad_list[1] < quad_list[3]:
             quad_list[2], quad_list[0] = quad_list[0], quad_list[2]
@@ -241,10 +243,10 @@ def sortQuadList(quad_list):
 
 def getHoopCenter(output_img, vertice_list):
     # focal lengths
-    fx = 2022.3166
-    fy = 2023.5474
-    width2 = 892.06
-    height2 = 512.88
+    fx = 2000.49844
+    fy = 2000.52991
+    width2 = 900.441373
+    height2 = 540.857930
     camera_matrix = [[fx, 0, width2], [0, fy, height2], [0, 0, 1]]
     # 2D projection onto the camera
     object_points = [
@@ -286,20 +288,22 @@ def getHoopCenter(output_img, vertice_list):
             # [330.0, -30.0, .0],
 
             # imperial(inches)
-            [-12.9, -1.0, .0],
             [-12.9, 1.0, .0],
+            [-12.9, -1.0, .0],
             [-7.9, 1.0, .0],
             [-7.9, -1.0, .0],
 
+            [-2.5, 1.0, .0],
             [-2.5, -1.0, .0],
             [2.5, 1.0, .0],
-            [2.5, 1.0, .0],
-            [-2.5, -1.0, .0],
+            [2.5, -1.0, .0],
 
-            [7.9, -1.0, .0],
             [7.9, 1.0, .0],
+            [7.9, -1.0, .0],
             [12.9, 1.0, .0],
             [12.9, -1.0, .0],
+
+
             ]
 
     # distortion = [1.803, -186.72, 0.0, 0.0, 6469.52]
@@ -421,7 +425,7 @@ if __name__ == "__main__":
         # Convert to HSV and threshold image
         hsv_img = cv2.cvtColor(input_img, cv2.COLOR_BGR2HSV)
 
-        binary_img = cv2.inRange(hsv_img, (75, 100, 120), (95, 255, 255))
+        binary_img = cv2.inRange(hsv_img, (55, 100, 120), (95, 255, 255))
         ret,thresh = cv2.threshold(binary_img, 127, 255, 0)
 
         kernel = cv2.getStructuringElement(cv2.MORPH_RECT, (10,10))
@@ -443,7 +447,7 @@ if __name__ == "__main__":
             quadrilateral = cv2.approxPolyDP(contour, epsilon, True)
             vertices = quadrilateral.ravel()
 
-            cv2.drawContours(binary_img, [quadrilateral], 0, (128, 255, 255), 3)
+            # cv2.drawContours(binary_img, [quadrilateral], 0, (128, 255, 255), 3)
             vertice_list.append(quadrilateral.ravel().tolist())
 
             # Draw rectangle and circle
