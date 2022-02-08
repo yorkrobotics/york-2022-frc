@@ -225,13 +225,6 @@ def sortQuadList(quad_list):
     if len(quad_list) == 8:
         points = list(zip(quad_list[::2], quad_list[1::2]))
         sorted(points, key=lambda t: t[0])
-            # max = quad_list[j]
-        # for j in range(0, len(quad_list) - 2, 2):
-        #     for i in range(j, len(quad_list), 2):
-        #         if quad_list[i] > max: # if current x value is the biggest
-        #             max = quad_list[j]
-        #             quad_list.insert(j, quad_list.pop(i)) # insert x coord
-        #             quad_list.insert(j+ 1, quad_list.pop(i+1)) # insert y coord
         # sort according to y
         if quad_list[1] < quad_list[3]:
             quad_list[2], quad_list[0] = quad_list[0], quad_list[2]
@@ -250,23 +243,23 @@ def getHoopCenter(output_img, vertice_list):
     camera_matrix = [[fx, 0, width2], [0, fy, height2], [0, 0, 1]]
     # 2D projection onto the camera
     object_points = [
-            # [  -13.72 ,   -1.0 ,   15.90 ],
             # [  -13.72 ,   1.0 ,   15.90 ],
+            # [  -13.72 ,   -1.0 ,   15.90 ],
             # [  -12.25 ,   1.0 ,   17.05 ],
             # [  -12.25 ,   -1.0 ,   17.05 ],
 
-            # [ -7.5,  -1.0,   19.618 ],
             # [ -7.5,  1.0,   19.618 ],
+            # [ -7.5,  -1.0,   19.618 ],
             # [-2.7,  1.0,   20.825 ],
             # [-2.7,  -1.0,   20.825 ],
 
-            # [2.7,  -1.0,   20.825 ],
             # [2.7,  1.0,   20.825 ],
+            # [2.7,  -1.0,   20.825 ],
             # [7.5,  1.0,   19.618 ],
             # [7.5,  -1.0,   19.618 ],
 
-            # [13.72 ,   -1.0 ,   15.90 ],
             # [13.72 ,   1.0 ,   15.90 ],
+            # [13.72 ,   -1.0 ,   15.90 ],
             # [12.25 ,   1.0 ,   17.05 ],
             # [12.25 ,   -1.0 ,   17.05 ],
 
@@ -288,20 +281,20 @@ def getHoopCenter(output_img, vertice_list):
             # [330.0, -30.0, .0],
 
             # imperial(inches)
-            [-12.9, 1.0, .0],
-            [-12.9, -1.0, .0],
-            [-7.9, 1.0, .0],
-            [-7.9, -1.0, .0],
+            [-12.9375, 1.0, .0],
+            [-12.9375, -1.0, .0],
+            [-7.9375, 1.0, .0],
+            [-7.9375, -1.0, .0],
 
             [-2.5, 1.0, .0],
             [-2.5, -1.0, .0],
             [2.5, 1.0, .0],
             [2.5, -1.0, .0],
 
-            [7.9, 1.0, .0],
-            [7.9, -1.0, .0],
-            [12.9, 1.0, .0],
-            [12.9, -1.0, .0],
+            [7.9375, 1.0, .0],
+            [7.9375, -1.0, .0],
+            [12.9375, 1.0, .0],
+            [12.9375, -1.0, .0],
 
 
             ]
@@ -331,7 +324,7 @@ def getHoopCenter(output_img, vertice_list):
 
 
     hoop_coord = []
-    if len(image_points) == 12:
+    if len(image_points) == len(object_points):
         # camera_matrix, object_points, image_points, distortion = [np.array(x) for x in [camera_matrix, object_points, image_points, distortion]]
         camera_matrix, object_points, image_points = [np.array(x) for x in [camera_matrix, object_points, image_points]]
 
@@ -406,7 +399,6 @@ if __name__ == "__main__":
     output_stream = inst.putVideo('Processed', width, height)
     binary_output_stream = inst.putVideo('Binary', width, height)
 
-    os.system("echo hello world!")
     os.system("v4l2-ctl -c auto_exposure=1")
     os.system("v4l2-ctl -c exposure_time_absolute=30")
      # loop forever
