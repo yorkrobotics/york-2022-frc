@@ -88,15 +88,16 @@ public class RobotContainer {
     JoystickButton button_A = new JoystickButton(m_controller, Button.kA.value);
     button_A.whenPressed(new DriveWithPositionControl(m_drive));
 
+    // B TBD
     JoystickButton button_B = new JoystickButton(m_controller, Button.kB.value);
 
     // X to feed
     JoystickButton button_X = new JoystickButton(m_controller, Button.kX.value);
-    button_X.whileHeld(new feed(m_feed));
+    button_X.whileHeld(new ShootBall(m_shooter));
     
     // Y to shoot
     JoystickButton button_Y = new JoystickButton(m_controller, Button.kY.value);
-    button_Y.whileHeld(new ShootBall(m_shooter));
+    button_Y.whileHeld(new feed(m_feed));
   }
 
   /**

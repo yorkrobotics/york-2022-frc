@@ -7,19 +7,17 @@ package frc.robot.commands;
 import frc.robot.subsystems.FeedIntake;
 import edu.wpi.first.wpilibj2.command.CommandBase;
 
-/** An example command that uses an example subsystem. */
 public class feed extends CommandBase {
-  private final FeedIntake feedSystem;
+  private FeedIntake feedSystem;
 
   /**
-   * Creates a new ExampleCommand.
    *
-   * @param subsystem The subsystem used by this command.
+   * @param sub The subsystem used by this command.
    */
-  public feed(FeedIntake subsystem) {
-    feedSystem = subsystem;
+  public feed(FeedIntake sub) {
+    feedSystem = sub;
     // Use addRequirements() here to declare subsystem dependencies.
-    addRequirements(subsystem);
+    addRequirements(feedSystem);
   }
 
   // Called when the command is initially scheduled.
