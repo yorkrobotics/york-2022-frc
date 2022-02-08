@@ -66,8 +66,7 @@ public class RobotContainer {
     // m_shooter.setDefaultCommand(shootBall);
 
     // Configure the button bindings
-    configureButtonBindings(
-    );
+    configureButtonBindings();
   }
 
   /**
