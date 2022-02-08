@@ -11,10 +11,12 @@ import frc.robot.commands.DriveTeleop;
 import frc.robot.commands.DriveWithPositionControl;
 import frc.robot.commands.GearShiftDown;
 import frc.robot.commands.GearShiftUp;
+import frc.robot.commands.RunLifter;
 import frc.robot.commands.ShootBall;
 import frc.robot.commands.SwitchDriveMode;
 import frc.robot.subsystems.DriveTrain;
 import frc.robot.subsystems.GearShift;
+import frc.robot.subsystems.Lifter;
 import frc.robot.subsystems.Shooter;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.button.JoystickButton;
@@ -30,6 +32,7 @@ public class RobotContainer {
   private DriveTrain mDrive;
   private GearShift mGearShift;
   private Shooter mShooter;
+  private Lifter mLifter;
 
   // Commands
   private DriveTeleop driveTeleop;
@@ -38,6 +41,7 @@ public class RobotContainer {
   private GearShiftDown gearShiftDown;
   private GearShiftUp gearShiftUp;
   private ShootBall shootBall;
+  private RunLifter runLifter;
 
   // XboxController
   public static XboxController mController;
@@ -66,6 +70,11 @@ public class RobotContainer {
     shootBall = new ShootBall(mShooter);
     // mShooter.setDefaultCommand(shootBall);
 
+    //Lift subsystem
+    mLifter = new Lifter();
+    runLifter = new RunLifter(mLifter);
+    mLifter.setDefaultCommand(runLifter);
+
     // Configure the button bindings
     configureButtonBindings();
   }
@@ -85,6 +94,7 @@ public class RobotContainer {
     button_Y.whenPressed(gearShiftUp);
     JoystickButton button_X = new JoystickButton(mController, Button.kX.value);
     button_X.whenPressed(switchDriveMode);
+
   }
 
   /**

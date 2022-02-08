@@ -66,9 +66,9 @@ public class DriveTrain extends SubsystemBase {
     kMinOutput_velocity = -0.5;  
     kMaxOutput_velocity = 0.5; 
 
-    kP_position = 0.1; 
-    kI_position = 1e-4;
-    kD_position = 1; 
+    kP_position = 0; 
+    kI_position = 0;
+    kD_position = 0; 
     kMinOutput_position = -0.5;
     kMaxOutput_position = 0.5; 
   }
