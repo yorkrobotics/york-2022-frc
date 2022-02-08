@@ -133,6 +133,7 @@ public class DriveTrain extends SubsystemBase {
     }
   }
 
+  // Setting the motors according to velocity control
   public void setVelocity(double left_velocity, double right_velocity){
     if (mDriveControlState == DriveControlState.VELOCITY_CONTROL){
       mleftPIDController.setReference(left_velocity * Constants.DRIVE_MAX_RPM, CANSparkMax.ControlType.kVelocity);
@@ -143,6 +144,7 @@ public class DriveTrain extends SubsystemBase {
     }
   }
 
+  // Setting the motors according to position control
   public void setPosition(double setPoint){
     if (mDriveControlState == DriveControlState.POSITION_CONTROL){
       mleftPIDController.setReference(metersToRotations(setPoint), CANSparkMax.ControlType.kPosition);

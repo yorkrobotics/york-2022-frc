@@ -26,44 +26,45 @@ import edu.wpi.first.wpilibj2.command.button.JoystickButton;
  * subsystems, commands, and button mappings) should be declared here.
  */
 public class RobotContainer {
-  // The robot's subsystems and commands are defined here...
+  // Subsystems
+  private DriveTrain mDrive;
+  private GearShift mGearShift;
+  private Shooter mShooter;
 
-  // DriveTrain Declare
-  private DriveTrain m_drive;
+  // Commands
   private DriveTeleop driveTeleop;
   private DriveWithPositionControl driveWithPositionControl;
+  private SwitchDriveMode switchDriveMode;
   private GearShiftDown gearShiftDown;
   private GearShiftUp gearShiftUp;
-  private GearShift gearShift;
-  private SwitchDriveMode switchDriveMode;
-
-  //Shooter
-  private Shooter m_shooter;
   private ShootBall shootBall;
 
+  // XboxController
   public static XboxController mController;
 
   /** The container for the robot. Contains subsystems, OI devices, and commands. */
   public RobotContainer() {
 
-    //drive's controller
+    // Driver's controller
     mController = new XboxController(Constants.CONTROLLER_NUMBER);
 
-    //Driving during teleop.
-    m_drive = new DriveTrain();
-    driveTeleop = new DriveTeleop(m_drive);
-    m_drive.setDefaultCommand(driveTeleop);
+    // DriveTrain subsystem
+    mDrive = new DriveTrain();
+    driveTeleop = new DriveTeleop(mDrive);
+    mDrive.setDefaultCommand(driveTeleop);
 
-    driveWithPositionControl = new DriveWithPositionControl(m_drive);
-    switchDriveMode = new SwitchDriveMode(m_drive);
+    driveWithPositionControl = new DriveWithPositionControl(mDrive);
+    switchDriveMode = new SwitchDriveMode(mDrive);
 
-    gearShift = new GearShift();
-    gearShiftDown = new GearShiftDown(gearShift, m_drive);
-    gearShiftUp = new GearShiftUp(gearShift, m_drive);
+    // GearShift subsystem
+    mGearShift = new GearShift();
+    gearShiftDown = new GearShiftDown(mGearShift, mDrive);
+    gearShiftUp = new GearShiftUp(mGearShift, mDrive);
 
-    m_shooter = new Shooter();
-    shootBall = new ShootBall(m_shooter);
-    // m_shooter.setDefaultCommand(shootBall);
+    // Shooter subsystem
+    mShooter = new Shooter();
+    shootBall = new ShootBall(mShooter);
+    // mShooter.setDefaultCommand(shootBall);
 
     // Configure the button bindings
     configureButtonBindings();

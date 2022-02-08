@@ -9,12 +9,12 @@ import frc.robot.RobotContainer;
 import frc.robot.subsystems.Shooter;
 
 public class ShootBall extends CommandBase {
-  private Shooter m_shooter;
+  private Shooter mShooter;
   /** Creates a new ShootBall. */
   public ShootBall(Shooter s) {
     // Use addRequirements() here to declare subsystem dependencies.
-    m_shooter = s;
-    addRequirements(m_shooter);
+    mShooter = s;
+    addRequirements(mShooter);
   }
 
   // Called when the command is initially scheduled.
@@ -24,7 +24,7 @@ public class ShootBall extends CommandBase {
   // Called every time the scheduler runs while the command is scheduled.
   @Override
   public void execute() {
-    m_shooter.runShooter(RobotContainer.mController);
+    mShooter.runShooter(RobotContainer.mController);
   }
 
   // Called once the command ends or is interrupted.
