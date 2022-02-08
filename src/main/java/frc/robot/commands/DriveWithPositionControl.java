@@ -4,49 +4,43 @@
 
 package frc.robot.commands;
 
-import edu.wpi.first.wpilibj.Timer;
 import edu.wpi.first.wpilibj2.command.CommandBase;
 import frc.robot.Constants;
 import frc.robot.subsystems.DriveTrain;
+import frc.robot.subsystems.DriveTrain.DriveControlState;
 
-public class DriveForwardTimed extends CommandBase {
-  /** Creates a new DriveForwardTimed. */
+public class DriveWithPositionControl extends CommandBase {
+  private DriveTrain mDrive;
 
-  DriveTrain driveTrain;
-  private boolean finish = false;
-  Timer timer;
-
-  public DriveForwardTimed(DriveTrain dt) {
-    // Use addRequirements() here to declare subsystem dependencies.d
-    driveTrain = dt;
-    addRequirements(driveTrain);
-    timer = new Timer();
+  /** Creates a new DriveWithPositionControl. */
+  public DriveWithPositionControl(DriveTrain v) {
+    // Use addRequirements() here to declare subsystem dependencies.
+    mDrive = v;
+    addRequirements(mDrive);
   }
 
   // Called when the command is initially scheduled.
   @Override
   public void initialize() {
-    timer.reset();
-    timer.start();
-    while(timer.get() < Constants.DRIVE_FORWARD_TIME){
-      driveTrain.driveForward(Constants.AUTONOMOUS_SPEED);
+    if (mDrive.getDriveControlState() != DriveControlState.POSITION_CONTROL){
+      mDrive.setToPositionControl();
     }
-    finish = true;
+    mDrive.configurePositionControl();
   }
 
   // Called every time the scheduler runs while the command is scheduled.
   @Override
-  public void execute() {}
+  public void execute() {
+    mDrive.setPosition(Constants.TARGET_DISTANCE);
+  }
 
   // Called once the command ends or is interrupted.
   @Override
-  public void end(boolean interrupted) {
-    driveTrain.stop();
-  }
+  public void end(boolean interrupted) {}
 
   // Returns true when the command should end.
   @Override
   public boolean isFinished() {
-    return finish;
+    return false;
   }
 }

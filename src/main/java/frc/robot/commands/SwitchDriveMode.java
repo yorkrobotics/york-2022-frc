@@ -4,59 +4,53 @@
 
 package frc.robot.commands;
 
-import edu.wpi.first.wpilibj.drive.DifferentialDrive.WheelSpeeds;
 import edu.wpi.first.wpilibj2.command.CommandBase;
-import frc.robot.RobotContainer;
 import frc.robot.subsystems.DriveTrain;
 import frc.robot.subsystems.DriveTrain.DriveControlState;
 
-public class DriveTeleop extends CommandBase {
+public class SwitchDriveMode extends CommandBase {
   private DriveTrain mDrive;
-  private WheelSpeeds mWheelSpeeds;
-
-  /** Creates a new DriveWithVelocityControl. */
-  public DriveTeleop(DriveTrain d) {
+  private boolean isSwitched;
+  /** Creates a new SwitchDriveMode. */
+  public SwitchDriveMode(DriveTrain dt) {
     // Use addRequirements() here to declare subsystem dependencies.
-    mDrive = d;
+    mDrive = dt;
     addRequirements(mDrive);
+    
   }
 
   // Called when the command is initially scheduled.
   @Override
   public void initialize() {
-    switch(mDrive.getDriveControlState()){
-      case OPEN_LOOP:
-        break;
-      case VELOCITY_CONTROL:
-        mDrive.configureVelocityControl();
-        break;
-      case POSITION_CONTROL:
-        break;
-    }
+
+    isSwitched = false;
+
+
   }
 
   // Called every time the scheduler runs while the command is scheduled.
   @Override
   public void execute() {
-    mWheelSpeeds = mDrive.getWheelSpeeds(RobotContainer.mController);
-
-    if (mDrive.getDriveControlState() == DriveControlState.OPEN_LOOP){
-      mDrive.setOpenLoop(mWheelSpeeds.left, mWheelSpeeds.right);
-      }
-      
     if (mDrive.getDriveControlState() == DriveControlState.VELOCITY_CONTROL){
-      mDrive.setVelocity(mWheelSpeeds.left, mWheelSpeeds.right);
+      mDrive.setOpenLoop();
+      System.out.println("switched to open loop");
+      isSwitched = true;
+    }
+    else if (mDrive.getDriveControlState() == DriveControlState.OPEN_LOOP){
+      mDrive.setToVelocityControl();
+      mDrive.configureVelocityControl();
+      System.out.println("switched to velocity control");
+      isSwitched = true;
     }
   }
 
   // Called once the command ends or is interrupted.
   @Override
-  public void end(boolean interrupted) {
-  }
+  public void end(boolean interrupted) {}
 
   // Returns true when the command should end.
   @Override
   public boolean isFinished() {
-    return false;
+    return isSwitched;
   }
 }

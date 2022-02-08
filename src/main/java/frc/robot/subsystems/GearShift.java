@@ -11,15 +11,26 @@ public class GearShift extends SubsystemBase {
     private DoubleSolenoid m_shifter;
 
 
-    public void robotInit() {
+    public GearShift(){
         m_shifter = new DoubleSolenoid(PneumaticsModuleType.CTREPCM, 6, 1);
        // m_controller = new XboxController(0); 
     }
+
+  /*  @Override
+    public void periodic() {
+        super.periodic();
+        System.out.print(m_shifter.get());
+    }
+    */
+
     public void shiftDown(){
         m_shifter.set(Value.kForward);
+        //System.out.print(m_shifter.get());
     }
     public void shiftUp(){
         m_shifter.set(Value.kReverse);
+       // System.out.print(m_shifter.get());
     }
+
 }
 

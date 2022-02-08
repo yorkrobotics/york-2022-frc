@@ -28,7 +28,7 @@ public final class Constants {
     public static final int CONTROLLER_NUMBER = 0;
 
 
-    public static final double DRIVETRAIN_SPEED = 0.5;
+    public static final double MAX_OPENLOOP_SPEED = 0.5;
 
     public static final double DRIVE_FORWARD_TIME = 0.5;
     public static final double AUTONOMOUS_SPEED = 0.5;
@@ -36,11 +36,22 @@ public final class Constants {
     public static final String DRIVE_MODE = "T";    //"J" = drive with joysticks, "T" = drive with triggers
 
 
-    public static final double DRIVE_KP = 2.5;
-    public static final double DRIVE_KI = 0.01;
-    public static final double DRIVE_KD = 0.1;
+    public static final double DRIVE_kP = 2.5;
+    public static final double DRIVE_kI = 0.01;
+    public static final double DRIVE_kD = 0.1;
+    public static final double MAXIMUM_OUTPUT = 0.5;
+    public static final double MINIMUM_OUTPUT = -0.5;
+
+    public static final double DRIVE_MAX_RPM = 4000;
+
+
+    public static final double GEAR_RATIO_LOW = 16.364;
+    public static final double GEAR_RATIO_HIGH = 5.601;
+      //gear ratio: 16.364, 5.601
     public static final double TARGET_DISTANCE = 3;
-    public static final double GEAR_RATIO = 16.364;  //gear ratio: 16.364, 5.601
+
+    public static final double WIDTH_BETWEEN_WHEELS = 0.655; //The distance between left wheels and right wheels
+
 
     
 }
