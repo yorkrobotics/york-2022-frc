@@ -12,6 +12,8 @@ import com.revrobotics.CANSparkMaxLowLevel.MotorType;
 
 import edu.wpi.first.math.MathUtil;
 import edu.wpi.first.wpilibj.XboxController;
+import edu.wpi.first.wpilibj.drive.DifferentialDrive;
+import edu.wpi.first.wpilibj.drive.DifferentialDrive.WheelSpeeds;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
 import frc.robot.Constants;
@@ -22,10 +24,12 @@ public class DriveTrain extends SubsystemBase {
   private RelativeEncoder mleftFrontEncoder, mrightFrontEncoder;
   //Controller setup
   private SparkMaxPIDController mleftPIDController, mrightPIDController;
-
   private DriveControlState mDriveControlState;
 
   private double gearRatio;
+  private double kP_velocity, kI_velocity, kD_velocity, kMinOutput_velocity, kMaxOutput_velocity;
+  private double kP_position, kI_position, kD_position, kMinOutput_position, kMaxOutput_position;
+
 
   /** Creates a new VelocityController. */
   public DriveTrain() {
@@ -54,72 +58,66 @@ public class DriveTrain extends SubsystemBase {
     mrightPIDController = mrightFront.getPIDController();
 
     mDriveControlState = DriveControlState.OPEN_LOOP; //Default drive mode set to open loop
+
+    //Store PID coefficients
+    kP_velocity = 6e-6; 
+    kI_velocity = 5e-7;
+    kD_velocity = 1e-6; 
+    kMinOutput_velocity = -0.5;  
+    kMaxOutput_velocity = 0.5; 
+
+    kP_position = 0.1; 
+    kI_position = 1e-4;
+    kD_position = 1; 
+    kMinOutput_position = -0.5;
+    kMaxOutput_position = 0.5; 
   }
 
   @Override
   public void periodic() {
     // This method will be called once per scheduler run
-    // SmartDashboard.putNumber("P Gain", kP);
-    // SmartDashboard.putNumber("I Gain", kI);
-    // SmartDashboard.putNumber("D Gain", kD);
-    // SmartDashboard.putNumber("Max Output", kMaxOutput);
-    // SmartDashboard.putNumber("Min Output", kMinOutput);
+    // Update and get values from the smart dashboard
+    if (mDriveControlState == DriveControlState.VELOCITY_CONTROL){
+      SmartDashboard.putNumber("P Gain", kP_velocity);
+      SmartDashboard.putNumber("I Gain", kI_velocity);
+      SmartDashboard.putNumber("D Gain", kD_velocity);
+      SmartDashboard.putNumber("Max Output", kMaxOutput_velocity);
+      SmartDashboard.putNumber("Min Output", kMinOutput_velocity);
+
+      double p = SmartDashboard.getNumber("P Gain", 0);
+      double i = SmartDashboard.getNumber("I Gain", 0);
+      double d = SmartDashboard.getNumber("D Gain", 0);
+      double max = SmartDashboard.getNumber("Max Output", 0);
+      double min = SmartDashboard.getNumber("Min Output", 0);
+
+      if((p != kP_velocity)) { mleftPIDController.setP(p); mrightPIDController.setP(p); kP_velocity = p; configureVelocityControl();}
+      if((i != kI_velocity)) { mleftPIDController.setI(i); mrightPIDController.setI(i); kI_velocity = i; configureVelocityControl();}
+      if((d != kD_velocity)) { mleftPIDController.setD(d); mrightPIDController.setD(d); kD_velocity = d; configureVelocityControl();}
+      if((max != kMaxOutput_velocity) || (min != kMinOutput_velocity)) { 
+        mleftPIDController.setOutputRange(min, max); 
+        mrightPIDController.setOutputRange(min, max);
+        kMinOutput_velocity = min; kMaxOutput_velocity = max; 
+        configureVelocityControl();
+      }
+    }
+    
     SmartDashboard.putNumber("left_encoder", rotationsToMeters(mleftFrontEncoder.getPosition()));
     SmartDashboard.putNumber("right_encoder", rotationsToMeters(mleftFrontEncoder.getPosition()));
   }
 
   public void configureVelocityControl(){
-    mDriveControlState = DriveControlState.VELOCITY_CONTROL;
-    //Tuned PID values for velocity control
-    double kP = 6e-6; 
-    double kI = 5e-7;
-    double kD = 1e-6; 
-    double kMaxOutput = 0.5; 
-    double kMinOutput = -0.5;
+    mDriveControlState = DriveControlState.VELOCITY_CONTROL;    
 
-    initializePIDController(mleftPIDController, kP, kI, kD, kMinOutput, kMaxOutput);
-    initializePIDController(mrightPIDController, kP, kI, kD, kMinOutput, kMaxOutput);
-
-    // double p = SmartDashboard.getNumber("P Gain", 0);
-    // double i = SmartDashboard.getNumber("I Gain", 0);
-    // double d = SmartDashboard.getNumber("D Gain", 0);
-    // double max = SmartDashboard.getNumber("Max Output", 0);
-    // double min = SmartDashboard.getNumber("Min Output", 0);
-    // if((p != kP)) { mleftPIDController.setP(p); mrightPIDController.setP(p); kP = p; }
-    // if((i != kI)) { mleftPIDController.setI(i); mrightPIDController.setI(i); kI = i; }
-    // if((d != kD)) { mleftPIDController.setD(d); mrightPIDController.setD(d); kD = d; }
-    // if((max != kMaxOutput) || (min != kMinOutput)) { 
-    //   mleftPIDController.setOutputRange(min, max); 
-    //   mrightPIDController.setOutputRange(min, max);
-    //   kMinOutput = min; kMaxOutput = max; 
-    // }
+    initializePIDController(mleftPIDController, kP_velocity, kI_velocity, kD_velocity, kMinOutput_velocity, kMaxOutput_velocity);
+    initializePIDController(mrightPIDController, kP_velocity, kI_velocity, kD_velocity, kMinOutput_velocity, kMaxOutput_velocity);
   }
 
   public void configurePositionControl(){
     mDriveControlState = DriveControlState.POSITION_CONTROL;
-    //Tuned PID values for position control
-    double kP = 0.1; 
-    double kI = 1e-4;
-    double kD = 1; 
-    double kMinOutput = -0.5;
-    double kMaxOutput = 0.5; 
 
-    initializePIDController(mleftPIDController, kP, kI, kD, kMinOutput, kMaxOutput);
-    initializePIDController(mrightPIDController, kP, kI, kD, kMinOutput, kMaxOutput);
+    initializePIDController(mleftPIDController, kP_position, kI_position, kD_position, kMinOutput_position, kMaxOutput_position);
+    initializePIDController(mrightPIDController, kP_position, kI_position, kD_position, kMinOutput_position, kMaxOutput_position);
 
-    // double p = SmartDashboard.getNumber("P Gain", 0);
-    // double i = SmartDashboard.getNumber("I Gain", 0);
-    // double d = SmartDashboard.getNumber("D Gain", 0);
-    // double max = SmartDashboard.getNumber("Max Output", 0);
-    // double min = SmartDashboard.getNumber("Min Output", 0);
-    // if((p != kP)) { mleftPIDController.setP(p); mrightPIDController.setP(p); kP = p; }
-    // if((i != kI)) { mleftPIDController.setI(i); mrightPIDController.setI(i); kI = i; }
-    // if((d != kD)) { mleftPIDController.setD(d); mrightPIDController.setD(d); kD = d; }
-    // if((max != kMaxOutput) || (min != kMinOutput)) { 
-    //   mleftPIDController.setOutputRange(min, max); 
-    //   mrightPIDController.setOutputRange(min, max);
-    //   kMinOutput = min; kMaxOutput = max; 
-    // }
     //extra step to reset the encoders
     mleftFrontEncoder.setPosition(0);
     mrightFrontEncoder.setPosition(0);
@@ -137,7 +135,6 @@ public class DriveTrain extends SubsystemBase {
 
   public void setVelocity(double left_velocity, double right_velocity){
     if (mDriveControlState == DriveControlState.VELOCITY_CONTROL){
-      System.out.println("setting velocity");
       mleftPIDController.setReference(left_velocity * Constants.DRIVE_MAX_RPM, CANSparkMax.ControlType.kVelocity);
       mrightPIDController.setReference(right_velocity * Constants.DRIVE_MAX_RPM, CANSparkMax.ControlType.kVelocity);
     }
@@ -212,6 +209,13 @@ public class DriveTrain extends SubsystemBase {
     return wheelspeeds;
   }
 
+  public WheelSpeeds getWheelSpeeds(XboxController controller){
+    // double controller_leftX = controller.getLeftX();
+    // if (Math.abs(controller_leftX) < 0.25) controller_leftX = 0;
+    return DifferentialDrive.arcadeDriveIK(controller.getRightTriggerAxis() - controller.getLeftTriggerAxis(), controller.getLeftX(), true);
+    
+  }
+
   public void setToHighGear(){
     gearRatio = Constants.GEAR_RATIO_HIGH;
   }
@@ -242,6 +246,10 @@ public class DriveTrain extends SubsystemBase {
 
   public void setOpenLoop(){
     mDriveControlState = DriveControlState.OPEN_LOOP;
+  }
+
+  public boolean isAtSetpoint(double setpoint){
+    return rotationsToMeters(mleftFrontEncoder.getPosition()) == setpoint;
   }
 
   public enum DriveControlState{

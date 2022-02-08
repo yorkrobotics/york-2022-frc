@@ -4,6 +4,7 @@
 
 package frc.robot.commands;
 
+import edu.wpi.first.wpilibj.drive.DifferentialDrive.WheelSpeeds;
 import edu.wpi.first.wpilibj2.command.CommandBase;
 import frc.robot.RobotContainer;
 import frc.robot.subsystems.DriveTrain;
@@ -11,7 +12,7 @@ import frc.robot.subsystems.DriveTrain.DriveControlState;
 
 public class DriveTeleop extends CommandBase {
   private DriveTrain mDrive;
-  private double[] arcadeDriveSpeed;
+  private WheelSpeeds mWheelSpeeds;
 
   /** Creates a new DriveWithVelocityControl. */
   public DriveTeleop(DriveTrain d) {
@@ -37,14 +38,14 @@ public class DriveTeleop extends CommandBase {
   // Called every time the scheduler runs while the command is scheduled.
   @Override
   public void execute() {
-    arcadeDriveSpeed = mDrive.mArcadeDrive(RobotContainer.mController);
+    mWheelSpeeds = mDrive.getWheelSpeeds(RobotContainer.mController);
 
     if (mDrive.getDriveControlState() == DriveControlState.OPEN_LOOP){
-      mDrive.setOpenLoop(arcadeDriveSpeed[0], arcadeDriveSpeed[1]);
+      mDrive.setOpenLoop(mWheelSpeeds.left, mWheelSpeeds.right);
       }
       
     if (mDrive.getDriveControlState() == DriveControlState.VELOCITY_CONTROL){
-      mDrive.setVelocity(arcadeDriveSpeed[0], arcadeDriveSpeed[1]);
+      mDrive.setVelocity(mWheelSpeeds.left, mWheelSpeeds.right);
     }
   }
 

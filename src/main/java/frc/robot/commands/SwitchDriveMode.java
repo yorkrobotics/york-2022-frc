@@ -16,12 +16,14 @@ public class SwitchDriveMode extends CommandBase {
     // Use addRequirements() here to declare subsystem dependencies.
     mDrive = dt;
     addRequirements(mDrive);
-    isSwitched = false;
+    
   }
 
   // Called when the command is initially scheduled.
   @Override
   public void initialize() {
+
+    isSwitched = false;
 
 
   }
@@ -29,14 +31,15 @@ public class SwitchDriveMode extends CommandBase {
   // Called every time the scheduler runs while the command is scheduled.
   @Override
   public void execute() {
-    if (mDrive.getDriveControlState() == DriveControlState.OPEN_LOOP){
-      mDrive.setToVelocityControl();
-      mDrive.configureVelocityControl();
+    if (mDrive.getDriveControlState() == DriveControlState.VELOCITY_CONTROL){
+      mDrive.setOpenLoop();
+      System.out.println("switched to open loop");
       isSwitched = true;
     }
-    if (mDrive.getDriveControlState() == DriveControlState.VELOCITY_CONTROL){
-      mDrive.setToPositionControl();
-      mDrive.configurePositionControl();
+    else if (mDrive.getDriveControlState() == DriveControlState.OPEN_LOOP){
+      mDrive.setToVelocityControl();
+      mDrive.configureVelocityControl();
+      System.out.println("switched to velocity control");
       isSwitched = true;
     }
   }
