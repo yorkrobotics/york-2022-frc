@@ -9,14 +9,9 @@ import edu.wpi.first.wpilibj.XboxController;
 import edu.wpi.first.wpilibj.XboxController.Button;
 import frc.robot.commands.DriveTeleop;
 import frc.robot.commands.DriveWithPositionControl;
-import frc.robot.commands.GearShiftDown;
-import frc.robot.commands.GearShiftUp;
-import frc.robot.commands.RunLifter;
 import frc.robot.commands.ShootBall;
 import frc.robot.commands.SwitchDriveMode;
 import frc.robot.subsystems.DriveTrain;
-import frc.robot.subsystems.GearShift;
-import frc.robot.subsystems.Lifter;
 import frc.robot.subsystems.Shooter;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.InstantCommand;
@@ -31,18 +26,13 @@ import edu.wpi.first.wpilibj2.command.button.JoystickButton;
 public class RobotContainer {
   // Subsystems
   private DriveTrain mDrive;
-  private GearShift mGearShift;
   private Shooter mShooter;
-  private Lifter mLifter;
 
   // Commands
   private DriveTeleop driveTeleop;
   private DriveWithPositionControl driveWithPositionControl;
   private SwitchDriveMode switchDriveMode;
-  private GearShiftDown gearShiftDown;
-  private GearShiftUp gearShiftUp;
   private ShootBall shootBall;
-  private RunLifter runLifter;
 
   // XboxController
   public static XboxController mController;
@@ -61,20 +51,10 @@ public class RobotContainer {
     driveWithPositionControl = new DriveWithPositionControl(mDrive);
     switchDriveMode = new SwitchDriveMode(mDrive);
 
-    // GearShift subsystem
-    mGearShift = new GearShift();
-    gearShiftDown = new GearShiftDown(mGearShift, mDrive);
-    gearShiftUp = new GearShiftUp(mGearShift, mDrive);
-
     // Shooter subsystem
     mShooter = new Shooter();
     shootBall = new ShootBall(mShooter);
     // mShooter.setDefaultCommand(shootBall);
-
-    //Lift subsystem
-    mLifter = new Lifter();
-    runLifter = new RunLifter(mLifter);
-    mLifter.setDefaultCommand(runLifter);
 
     // Configure the button bindings
     configureButtonBindings();
@@ -89,17 +69,14 @@ public class RobotContainer {
   private void configureButtonBindings() {  
     JoystickButton button_A = new JoystickButton(mController, Button.kA.value);
     button_A.whenPressed(driveWithPositionControl);
+
+    JoystickButton right_bumper = new JoystickButton(mController, Button.kRightBumper.value);
+    right_bumper.whenPressed(new InstantCommand(mDrive::shiftUp, mDrive));
+    JoystickButton left_bumper = new JoystickButton(mController, Button.kLeftBumper.value);
+    left_bumper.whenPressed(new InstantCommand(mDrive::shiftDown, mDrive));
+
     JoystickButton button_X = new JoystickButton(mController, Button.kX.value);
     button_X.whenPressed(switchDriveMode);
-
-    JoystickButton button_Y = new JoystickButton(mController, Button.kY.value);
-    button_Y.whenPressed(new InstantCommand(mLifter::switchLifterMode, mLifter));
-
-    JoystickButton leftBumper = new JoystickButton(mController, Button.kLeftBumper.value);
-    leftBumper.whenPressed(gearShiftDown);
-    JoystickButton rightBumper = new JoystickButton(mController, Button.kRightBumper.value);
-    rightBumper.whenPressed(gearShiftUp);
-
   }
 
   /**

@@ -11,7 +11,10 @@ import com.revrobotics.SparkMaxPIDController;
 import com.revrobotics.CANSparkMaxLowLevel.MotorType;
 
 import edu.wpi.first.math.MathUtil;
+import edu.wpi.first.wpilibj.DoubleSolenoid;
+import edu.wpi.first.wpilibj.PneumaticsModuleType;
 import edu.wpi.first.wpilibj.XboxController;
+import edu.wpi.first.wpilibj.DoubleSolenoid.Value;
 import edu.wpi.first.wpilibj.drive.DifferentialDrive;
 import edu.wpi.first.wpilibj.drive.DifferentialDrive.WheelSpeeds;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
@@ -22,6 +25,8 @@ public class DriveTrain extends SubsystemBase {
   //Hardware setup
   private CANSparkMax mleftFront, mleftBack, mrightFront, mrightBack;
   private RelativeEncoder mleftFrontEncoder, mrightFrontEncoder;
+  private DoubleSolenoid mShifter;
+
   //Controller setup
   private SparkMaxPIDController mleftPIDController, mrightPIDController;
   private DriveControlState mDriveControlState;
@@ -38,6 +43,8 @@ public class DriveTrain extends SubsystemBase {
     mleftBack = new CANSparkMax(2, MotorType.kBrushless);
     mrightFront = new CANSparkMax(4, MotorType.kBrushless);
     mrightBack = new CANSparkMax(3, MotorType.kBrushless);
+
+    mShifter = new DoubleSolenoid(PneumaticsModuleType.CTREPCM, 6, 1);
 
     mleftFront.restoreFactoryDefaults();
     mleftBack.restoreFactoryDefaults();
@@ -71,6 +78,12 @@ public class DriveTrain extends SubsystemBase {
     kD_position = 0; 
     kMinOutput_position = -0.5;
     kMaxOutput_position = 0.5; 
+
+    SmartDashboard.putNumber("Velocity P Gain", kP_velocity);
+    SmartDashboard.putNumber("Velocity I Gain", kI_velocity);
+    SmartDashboard.putNumber("Velocity D Gain", kD_velocity);
+    SmartDashboard.putNumber("Velocity Max Output", kMaxOutput_velocity);
+    SmartDashboard.putNumber("Velocity Min Output", kMinOutput_velocity);
   }
 
   @Override
@@ -78,17 +91,12 @@ public class DriveTrain extends SubsystemBase {
     // This method will be called once per scheduler run
     // Update and get values from the smart dashboard
     if (mDriveControlState == DriveControlState.VELOCITY_CONTROL){
-      SmartDashboard.putNumber("P Gain", kP_velocity);
-      SmartDashboard.putNumber("I Gain", kI_velocity);
-      SmartDashboard.putNumber("D Gain", kD_velocity);
-      SmartDashboard.putNumber("Max Output", kMaxOutput_velocity);
-      SmartDashboard.putNumber("Min Output", kMinOutput_velocity);
-
-      double p = SmartDashboard.getNumber("P Gain", 0);
-      double i = SmartDashboard.getNumber("I Gain", 0);
-      double d = SmartDashboard.getNumber("D Gain", 0);
-      double max = SmartDashboard.getNumber("Max Output", 0);
-      double min = SmartDashboard.getNumber("Min Output", 0);
+      
+      double p = SmartDashboard.getNumber("Velocity P Gain", 0);
+      double i = SmartDashboard.getNumber("Velocity I Gain", 0);
+      double d = SmartDashboard.getNumber("Velocity D Gain", 0);
+      double max = SmartDashboard.getNumber("Velocity Max Output", 0);
+      double min = SmartDashboard.getNumber("Velocity Min Output", 0);
 
       if((p != kP_velocity)) { mleftPIDController.setP(p); mrightPIDController.setP(p); kP_velocity = p; configureVelocityControl();}
       if((i != kI_velocity)) { mleftPIDController.setI(i); mrightPIDController.setI(i); kI_velocity = i; configureVelocityControl();}
@@ -108,15 +116,15 @@ public class DriveTrain extends SubsystemBase {
   public void configureVelocityControl(){
     mDriveControlState = DriveControlState.VELOCITY_CONTROL;    
 
-    initializePIDController(mleftPIDController, kP_velocity, kI_velocity, kD_velocity, kMinOutput_velocity, kMaxOutput_velocity);
-    initializePIDController(mrightPIDController, kP_velocity, kI_velocity, kD_velocity, kMinOutput_velocity, kMaxOutput_velocity);
+    updatePIDController(mleftPIDController, kP_velocity, kI_velocity, kD_velocity, kMinOutput_velocity, kMaxOutput_velocity);
+    updatePIDController(mrightPIDController, kP_velocity, kI_velocity, kD_velocity, kMinOutput_velocity, kMaxOutput_velocity);
   }
 
   public void configurePositionControl(){
     mDriveControlState = DriveControlState.POSITION_CONTROL;
 
-    initializePIDController(mleftPIDController, kP_position, kI_position, kD_position, kMinOutput_position, kMaxOutput_position);
-    initializePIDController(mrightPIDController, kP_position, kI_position, kD_position, kMinOutput_position, kMaxOutput_position);
+    updatePIDController(mleftPIDController, kP_position, kI_position, kD_position, kMinOutput_position, kMaxOutput_position);
+    updatePIDController(mrightPIDController, kP_position, kI_position, kD_position, kMinOutput_position, kMaxOutput_position);
 
     //extra step to reset the encoders
     mleftFrontEncoder.setPosition(0);
@@ -155,7 +163,7 @@ public class DriveTrain extends SubsystemBase {
     }
   }
 
-  public void initializePIDController(SparkMaxPIDController pidController, double p, double i, double d, double minOutput, double maxOutput){
+  public void updatePIDController(SparkMaxPIDController pidController, double p, double i, double d, double minOutput, double maxOutput){
     pidController.setP(p);
     pidController.setI(i);
     pidController.setD(d);
@@ -218,11 +226,13 @@ public class DriveTrain extends SubsystemBase {
     
   }
 
-  public void setToHighGear(){
+  public void shiftUp(){
+    mShifter.set(Value.kReverse);
     gearRatio = Constants.GEAR_RATIO_HIGH;
   }
 
-  public void setToLowGear(){
+  public void shiftDown(){
+    mShifter.set(Value.kForward);
     gearRatio = Constants.GEAR_RATIO_LOW;
   }
 
