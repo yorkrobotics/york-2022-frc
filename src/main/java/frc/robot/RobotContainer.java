@@ -19,6 +19,7 @@ import frc.robot.subsystems.GearShift;
 import frc.robot.subsystems.Lifter;
 import frc.robot.subsystems.Shooter;
 import edu.wpi.first.wpilibj2.command.Command;
+import edu.wpi.first.wpilibj2.command.InstantCommand;
 import edu.wpi.first.wpilibj2.command.button.JoystickButton;
 
 /**
@@ -88,12 +89,16 @@ public class RobotContainer {
   private void configureButtonBindings() {  
     JoystickButton button_A = new JoystickButton(mController, Button.kA.value);
     button_A.whenPressed(driveWithPositionControl);
-    JoystickButton button_B = new JoystickButton(mController, Button.kB.value);
-    button_B.whenPressed(gearShiftDown);
-    JoystickButton button_Y = new JoystickButton(mController, Button.kY.value);
-    button_Y.whenPressed(gearShiftUp);
     JoystickButton button_X = new JoystickButton(mController, Button.kX.value);
     button_X.whenPressed(switchDriveMode);
+
+    JoystickButton button_Y = new JoystickButton(mController, Button.kY.value);
+    button_Y.whenPressed(new InstantCommand(mLifter::switchLifterMode, mLifter));
+
+    JoystickButton leftBumper = new JoystickButton(mController, Button.kLeftBumper.value);
+    leftBumper.whenPressed(gearShiftDown);
+    JoystickButton rightBumper = new JoystickButton(mController, Button.kRightBumper.value);
+    rightBumper.whenPressed(gearShiftUp);
 
   }
 
