@@ -48,7 +48,7 @@ public final class Constants {
     public static final double GEAR_RATIO_LOW = 16.364;
     public static final double GEAR_RATIO_HIGH = 5.601;
       //gear ratio: 16.364, 5.601
-    public static final double TARGET_DISTANCE = 3;
+    public static final double TARGET_DISTANCE = 2;
 
     public static final double WIDTH_BETWEEN_WHEELS = 0.655; //The distance between left wheels and right wheels
 

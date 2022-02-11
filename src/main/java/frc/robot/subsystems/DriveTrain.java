@@ -83,6 +83,12 @@ public class DriveTrain extends SubsystemBase {
     SmartDashboard.putNumber("Velocity D Gain", kD_velocity);
     SmartDashboard.putNumber("Velocity Max Output", kMaxOutput_velocity);
     SmartDashboard.putNumber("Velocity Min Output", kMinOutput_velocity);
+
+    // SmartDashboard.putNumber("Position P Gain", kP_position);
+    // SmartDashboard.putNumber("Position I Gain", kI_position);
+    // SmartDashboard.putNumber("Position D Gain", kD_position);
+    // SmartDashboard.putNumber("Position Max Output", kMaxOutput_position);
+    // SmartDashboard.putNumber("Position Min Output", kMinOutput_velocity);
   }
 
   @Override
@@ -152,10 +158,11 @@ public class DriveTrain extends SubsystemBase {
   }
 
   // Setting the motors according to position control
-  public void setPosition(double setPoint){
+  public void setPosition(double setMeters){
     if (mDriveControlState == DriveControlState.POSITION_CONTROL){
-      mleftPIDController.setReference(metersToRotations(setPoint), CANSparkMax.ControlType.kPosition);
-      mrightPIDController.setReference(metersToRotations(setPoint), CANSparkMax.ControlType.kPosition);
+      double setRotations = metersToRotations(setMeters);
+      mleftPIDController.setReference(metersToRotations(setRotations), CANSparkMax.ControlType.kPosition);
+      mrightPIDController.setReference(metersToRotations(setRotations), CANSparkMax.ControlType.kPosition);
     }
     else{
       System.out.println("drive mode not in position control");
