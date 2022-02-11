@@ -6,11 +6,15 @@ package frc.robot.subsystems;
 
 import com.revrobotics.CANSparkMax;
 import com.revrobotics.RelativeEncoder;
+import com.revrobotics.SparkMaxLimitSwitch;
 import com.revrobotics.SparkMaxPIDController;
 import com.revrobotics.CANSparkMax.ControlType;
+import com.revrobotics.CANSparkMax.IdleMode;
 import com.revrobotics.CANSparkMax.SoftLimitDirection;
 import com.revrobotics.CANSparkMaxLowLevel.MotorType;
+import com.revrobotics.SparkMaxLimitSwitch.Type;
 
+import edu.wpi.first.wpilibj.DigitalInput;
 import edu.wpi.first.wpilibj.XboxController;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
@@ -18,45 +22,70 @@ import edu.wpi.first.wpilibj2.command.SubsystemBase;
 public class Lifter extends SubsystemBase {
   private CANSparkMax mLiftMotor;
   private RelativeEncoder mEncoder;
+  // private SparkMaxLimitSwitch mLimitSwitch;
+  // private DigitalInput mLimitSwitch;
 
-  private SparkMaxPIDController mLiftController;
+  private SparkMaxPIDController mLifterController;
   private LifterControlMode mLifterControlMode;
 
   private double kP, kI, kD, kIZone, kFF, kMinOutput, kMaxOutput;
+
   /** Creates a new Lifter. */
   public Lifter() {
     mLiftMotor = new CANSparkMax(5, MotorType.kBrushless);
     mLiftMotor.restoreFactoryDefaults();
+    mLiftMotor.setIdleMode(IdleMode.kBrake);
+    mLiftMotor.setInverted(true);
   
-
     mEncoder = mLiftMotor.getEncoder();
-    mLiftController = mLiftMotor.getPIDController();
+    mLifterController = mLiftMotor.getPIDController();
+
+    // mLimitSwitch = mLiftMotor.getForwardLimitSwitch(Type.kNormallyOpen);
+    // mLimitSwitch.enableLimitSwitch(true);
+
+    // mLimitSwitch = new DigitalInput(0);
+
 
     mLiftMotor.enableSoftLimit(CANSparkMax.SoftLimitDirection.kForward, true);
     mLiftMotor.enableSoftLimit(CANSparkMax.SoftLimitDirection.kReverse, true);
 
-    mLiftMotor.setSoftLimit(SoftLimitDirection.kForward, 15);
-    mLiftMotor.setSoftLimit(SoftLimitDirection.kReverse, 5);
+    mLiftMotor.setSoftLimit(SoftLimitDirection.kForward, 255); //The lifter maxes at 255 rotations
+    mLiftMotor.setSoftLimit(SoftLimitDirection.kReverse, 0);
 
     mLifterControlMode = LifterControlMode.OPEN_LOOP;
 
+    kP = 0;
+    kI = 0;
+    kD = 0;
+    kIZone = 0;
+    kFF = 0;
+    kMinOutput = -0.5;
+    kMaxOutput = -0.5;
+
     configureLifterController();
 
-    SmartDashboard.putNumber("Lift_P", mLiftController.getP());
-    SmartDashboard.putNumber("Lift_I", mLiftController.getI());
-    SmartDashboard.putNumber("Lift_D", mLiftController.getD());
+    SmartDashboard.putNumber("Lift_P", mLifterController.getP());
+    SmartDashboard.putNumber("Lift_I", mLifterController.getI());
+    SmartDashboard.putNumber("Lift_D", mLifterController.getD());
     SmartDashboard.putNumber("Lift forward limit", mLiftMotor.getSoftLimit(SoftLimitDirection.kForward));
     SmartDashboard.putNumber("Lift reverse limit", mLiftMotor.getSoftLimit(SoftLimitDirection.kReverse));
+
+    // goHome();
   }
 
   @Override
   public void periodic() {
     // This method will be called once per scheduler run
     SmartDashboard.putNumber("Lift_position", mEncoder.getPosition());
+
+    // SmartDashboard.putBoolean("Limit Switch isPressed", mLimitSwitch.get());
+
+    // stopAtHome();
+    
   }
 
   public void setPosition(double setPoint){
-    mLiftController.setReference(setPoint, ControlType.kPosition);
+    mLifterController.setReference(setPoint, ControlType.kPosition);
   }
 
   public void runLiftWithJoystick(XboxController controller){
@@ -80,11 +109,11 @@ public class Lifter extends SubsystemBase {
 
   public void switchLifterMode(){
     if (mLifterControlMode == LifterControlMode.OPEN_LOOP){
-      mLifterControlMode = LifterControlMode.POSITION_CONTROL;
+      setControlMode(LifterControlMode.POSITION_CONTROL);
       System.out.println("Lifter: switched to Position Control");
     }
-    else {
-      mLifterControlMode = LifterControlMode.OPEN_LOOP;
+    else if(mLifterControlMode == LifterControlMode.POSITION_CONTROL){
+      setControlMode(LifterControlMode.OPEN_LOOP);
       System.out.println("Lifter: switched to Open Loop");
     }
   }
@@ -94,30 +123,48 @@ public class Lifter extends SubsystemBase {
     double i = SmartDashboard.getNumber("Lift_I", 0);
     double d = SmartDashboard.getNumber("Lift_D", 0);
 
-    if(p != mLiftController.getP()) {mLiftController.setP(p);}
-    if(i != mLiftController.getI()) {mLiftController.setI(i);}
-    if(d != mLiftController.getD()) {mLiftController.setD(d);}
+    if(p != mLifterController.getP()) {mLifterController.setP(p);}
+    if(i != mLifterController.getI()) {mLifterController.setI(i);}
+    if(d != mLifterController.getD()) {mLifterController.setD(d);}
 
-    mLiftMotor.setSoftLimit(SoftLimitDirection.kForward, (float)SmartDashboard.getNumber("Lift forward limit", 15));
+    mLiftMotor.setSoftLimit(SoftLimitDirection.kForward, (float)SmartDashboard.getNumber("Lift forward limit", 255));
     mLiftMotor.setSoftLimit(SoftLimitDirection.kReverse, (float)SmartDashboard.getNumber("Lift reverse limit", 0));
   }
 
   public void configureLifterController(){
-    kP = 0;
-    kI = 0;
-    kD = 0;
-    kIZone = 0;
-    kFF = 0;
-    kMinOutput = -0.5;
-    kMaxOutput = -0.5;
-
-    mLiftController.setP(kP);
-    mLiftController.setI(kI);
-    mLiftController.setD(kD);
-    mLiftController.setIZone(kIZone);
-    mLiftController.setFF(kFF);
-    mLiftController.setOutputRange(kMinOutput, kMaxOutput);
+    mLifterController.setP(kP);
+    mLifterController.setI(kI);
+    mLifterController.setD(kD);
+    mLifterController.setIZone(kIZone);
+    mLifterController.setFF(kFF);
+    mLifterController.setOutputRange(kMinOutput, kMaxOutput);
   }
+
+  public LifterControlMode getControlMode(){
+    return mLifterControlMode;
+  }
+
+  public void setControlMode(LifterControlMode mode){
+    mLifterControlMode = mode;
+  }
+
+  // public boolean isPressed(){
+  //   return !mLimitSwitch.get();
+  // }
+
+  // public void goHome(){
+  //   if (!isAtHome()){
+  //     mLiftMotor.set(-0.2);
+  //   }
+  //   resetEncoder();
+  // }
+
+  // public void stopAtHome(){
+  //   if (isPressed()){
+  //     mLiftMotor.stopMotor();
+  //   }
+  // }
+
 
   public enum LifterControlMode{
     OPEN_LOOP, POSITION_CONTROL

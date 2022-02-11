@@ -9,9 +9,11 @@ import edu.wpi.first.wpilibj.XboxController;
 import edu.wpi.first.wpilibj.XboxController.Button;
 import frc.robot.commands.DriveTeleop;
 import frc.robot.commands.DriveWithPositionControl;
+import frc.robot.commands.RunLifter;
 import frc.robot.commands.ShootBall;
 import frc.robot.commands.SwitchDriveMode;
 import frc.robot.subsystems.DriveTrain;
+import frc.robot.subsystems.Lifter;
 import frc.robot.subsystems.Shooter;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.InstantCommand;
@@ -27,12 +29,15 @@ public class RobotContainer {
   // Subsystems
   private DriveTrain mDrive;
   private Shooter mShooter;
+  private Lifter mLifter;
+ 
 
   // Commands
   private DriveTeleop driveTeleop;
   private DriveWithPositionControl driveWithPositionControl;
   private SwitchDriveMode switchDriveMode;
   private ShootBall shootBall;
+  private RunLifter runLifter;
 
   // XboxController
   public static XboxController mController;
@@ -56,6 +61,11 @@ public class RobotContainer {
     shootBall = new ShootBall(mShooter);
     // mShooter.setDefaultCommand(shootBall);
 
+    //Lifter subsystem
+    mLifter = new Lifter();
+    runLifter = new RunLifter(mLifter);
+    mLifter.setDefaultCommand(runLifter);
+
     // Configure the button bindings
     configureButtonBindings();
   }
@@ -67,16 +77,17 @@ public class RobotContainer {
    * edu.wpi.first.wpilibj2.command.button.JoystickButton}.
    */
   private void configureButtonBindings() {  
-    JoystickButton button_A = new JoystickButton(mController, Button.kA.value);
-    button_A.whenPressed(driveWithPositionControl);
+    // new JoystickButton(mController, Button.kA.value).whenPressed(driveWithPositionControl);
 
-    JoystickButton right_bumper = new JoystickButton(mController, Button.kRightBumper.value);
-    right_bumper.whenPressed(new InstantCommand(mDrive::shiftUp, mDrive));
-    JoystickButton left_bumper = new JoystickButton(mController, Button.kLeftBumper.value);
-    left_bumper.whenPressed(new InstantCommand(mDrive::shiftDown, mDrive));
+    //right bumper to shift up and left bumper to shift down
+    new JoystickButton(mController, Button.kRightBumper.value).whenPressed(new InstantCommand(mDrive::shiftUp, mDrive));
+    new JoystickButton(mController, Button.kLeftBumper.value).whenPressed(new InstantCommand(mDrive::shiftDown, mDrive));
 
-    JoystickButton button_X = new JoystickButton(mController, Button.kX.value);
-    button_X.whenPressed(switchDriveMode);
+    new JoystickButton(mController, Button.kX.value).whenPressed(switchDriveMode);
+
+    new JoystickButton(mController, Button.kY.value).whenPressed(mLifter::switchLifterMode, mLifter);
+
+    new JoystickButton(mController, Button.kB.value).whenPressed(mLifter::resetEncoder, mLifter);
   }
 
   /**
