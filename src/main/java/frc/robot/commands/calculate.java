@@ -1,6 +1,7 @@
 package frc.robot.commands;
 
 import edu.wpi.first.wpilibj2.command.CommandBase;
+import frc.robot.subsystems.PyCamera;
 import frc.robot.subsystems.Shooter;
 
 public class calculate extends CommandBase {
@@ -19,7 +20,7 @@ public class calculate extends CommandBase {
 
     @Override
     public void execute() {
-        m_shooter.calculate_trajectory_pos(x_input, y_input, v_input);
+        System.out.println(m_shooter.calculate_trajectory_pos(x_input, y_input, v_input));
     }
 
     @Override

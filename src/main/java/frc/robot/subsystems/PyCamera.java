@@ -11,35 +11,33 @@ import edu.wpi.first.networktables.NetworkTableEntry;
 
 
 public class PyCamera extends SubsystemBase {
+  public Number[] hoop_coord;
+  public double x = hoop_coord[0].doubleValue();
+  public double y = hoop_coord[1].doubleValue();
+  public double z = hoop_coord[2].doubleValue();
+  
   /** Creates a new PyCamera. */
   public PyCamera() {
     NetworkTableInstance inst = NetworkTableInstance.getDefault();
-    NetworkTableEntry[] entries = inst.getEntries("", 0);
     NetworkTable table = inst.getTable("Vision");
-    //NetworkTable subtable = table.getSubTable("rPi Camera 0");
     inst.startClientTeam(5171);
-    Number[] default_x = new Number[]{1,2};
-    Number[] default_y = new Number[]{3,4};
-    Boolean default_bool = false;
-    Number[] x = table.getEntry("target_x").getNumberArray(default_x);
-    //Number[] y = yEntry.getNumberArray(default_y);
-    //Boolean bool = entry.getBoolean(default_bool);
-    //System.out.println(bool);
-
-    System.out.println("-----------------------X values---------------- ");
-    for (Number i : x) { // System.out.println("X: " + i);
-      System.out.println("x value: " + i);
-    }
-
-    
-    // for (NetworkTableEntry i : entries ) { // System.out.println("X: " + i);
-    //   System.out.println(i.getName());
-    // }
-
+    Number[] default_hoop_center_coord = new Number[] {0,0,0};
+    hoop_coord = table.getEntry("translation_vector").getNumberArray(default_hoop_center_coord);
   }
 
-  public Number[] getCoords() {
-    return 
+  public Number[] getHoopCenter() {
+    return hoop_coord;
+  }
+
+  public double getAngle(double v) {
+    double v_squared = Math.pow(v, 2);
+    double v_fourth = Math.pow(v, 4);
+    double z_squared = Math.pow(z, 2);
+    double g = 9.8;
+    double var_square_root = v_fourth - g * (g * z_squared + 2 * y * v_squared);
+    double equation = (v_squared + Math.sqrt(var_square_root)) / (g * z);
+    double angle = Math.atan(equation);
+    return angle;
   }
 
   @Override

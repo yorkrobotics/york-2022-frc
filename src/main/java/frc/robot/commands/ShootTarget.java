@@ -6,13 +6,16 @@ package frc.robot.commands;
 
 import edu.wpi.first.wpilibj2.command.CommandBase;
 import frc.robot.subsystems.PyCamera;
+import frc.robot.subsystems.Shooter;
 
-public class getHoopCenter extends CommandBase {
-  private PyCamera camera;
+public class ShootTarget extends CommandBase {
+  private final PyCamera pycam;
+  private final Shooter shooter;
   /** Creates a new getHoopCenter. */
-  public getHoopCenter(PyCamera cam) {
-    camera = cam;
-    addRequirements(cam);
+  public ShootTarget(PyCamera pc, Shooter st) {
+    pycam = pc;
+    shooter = st;
+    addRequirements(pycam, shooter);
     // Use addRequirements() here to declare subsystem dependencies.
   }
 
@@ -23,7 +26,9 @@ public class getHoopCenter extends CommandBase {
   // Called every time the scheduler runs while the command is scheduled.
   @Override
   public void execute() {
-
+    System.out.println(pycam.getHoopCenter());
+    double angle = pycam.getAngle(shooter.getSpeed());
+    shooter.setAngle(angle);
   }
 
   // Called once the command ends or is interrupted.
