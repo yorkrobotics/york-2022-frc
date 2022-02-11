@@ -17,6 +17,7 @@ import frc.robot.commands.feed;
 import frc.robot.subsystems.DriveTrain;
 import frc.robot.subsystems.FeedIntake;
 import frc.robot.subsystems.GearShift;
+import frc.robot.subsystems.PyCamera;
 import frc.robot.subsystems.Shooter;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.button.JoystickButton;
@@ -43,6 +44,8 @@ public class RobotContainer {
   private FeedIntake m_feed;
 
   public static XboxController m_controller;
+  //camera
+  private PyCamera pycam;
 
   /** The container for the robot. Contains subsystems, OI devices, and commands. */
   public RobotContainer() {
@@ -67,6 +70,9 @@ public class RobotContainer {
 
     //Shooter stuff
     m_shooter = new Shooter();
+
+    //pycam
+    pycam = new PyCamera();
 
     // Configure the button bindings
     configureButtonBindings();
