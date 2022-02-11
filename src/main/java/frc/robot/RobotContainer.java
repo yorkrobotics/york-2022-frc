@@ -12,6 +12,7 @@ import frc.robot.commands.DriveWithPositionControl;
 import frc.robot.commands.GearShiftDown;
 import frc.robot.commands.GearShiftUp;
 import frc.robot.commands.ShootBall;
+import frc.robot.commands.calculate;
 import frc.robot.commands.feed;
 import frc.robot.subsystems.DriveTrain;
 import frc.robot.subsystems.FeedIntake;
@@ -90,6 +91,7 @@ public class RobotContainer {
 
     // B TBD
     JoystickButton button_B = new JoystickButton(m_controller, Button.kB.value);
+    button_B.whenPressed(new calculate(m_shooter));
 
     // X to feed
     JoystickButton button_X = new JoystickButton(m_controller, Button.kX.value);

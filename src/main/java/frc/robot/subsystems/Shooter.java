@@ -41,15 +41,15 @@ public class Shooter extends SubsystemBase {
     return Math.atan(equation);
   }
 
-  public double calculate_trajectory_neg(double x, double y, double v) {
-    double v_squared = Math.pow(v, 2);
-    double v_fourth = Math.pow(v, 4);
-    double x_squared = Math.pow(x, 2);
-    double g = 9.8;
-    double var_square_root = v_fourth - g * (g * x_squared + 2 * y * v_squared);
-    double equation = (v_squared - Math.sqrt(var_square_root)) / (g * x);
-    return Math.atan(equation);
-  }
+  // public double calculate_trajectory_neg(double x, double y, double v) {
+  //   double v_squared = Math.pow(v, 2);
+  //   double v_fourth = Math.pow(v, 4);
+  //   double x_squared = Math.pow(x, 2);
+  //   double g = 9.8;
+  //   double var_square_root = v_fourth - g * (g * x_squared + 2 * y * v_squared);
+  //   double equation = (v_squared - Math.sqrt(var_square_root)) / (g * x);
+  //   return Math.atan(equation);
+  // }
 
   @Override
   public void periodic() {
