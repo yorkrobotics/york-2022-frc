@@ -97,7 +97,7 @@ public class RobotContainer {
 
     // B TBD
     JoystickButton button_B = new JoystickButton(m_controller, Button.kB.value);
-    button_B.whenPressed(new calculate(m_shooter));
+    button_B.whenPressed(new ShootTarget(pycam, m_shooter));
 
     // X to feed
     JoystickButton button_X = new JoystickButton(m_controller, Button.kX.value);
