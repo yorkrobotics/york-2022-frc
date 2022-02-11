@@ -13,9 +13,9 @@ public class DriveWithPositionControl extends CommandBase {
   private DriveTrain mDrive;
 
   /** Creates a new DriveWithPositionControl. */
-  public DriveWithPositionControl(DriveTrain v) {
+  public DriveWithPositionControl(DriveTrain d) {
     // Use addRequirements() here to declare subsystem dependencies.
-    mDrive = v;
+    mDrive = d;
     addRequirements(mDrive);
   }
 
@@ -41,6 +41,6 @@ public class DriveWithPositionControl extends CommandBase {
   // Returns true when the command should end.
   @Override
   public boolean isFinished() {
-    return false;
+    return mDrive.isAtSetpoint(Constants.TARGET_DISTANCE);
   }
 }

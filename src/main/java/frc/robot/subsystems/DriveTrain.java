@@ -10,7 +10,6 @@ import com.revrobotics.RelativeEncoder;
 import com.revrobotics.SparkMaxPIDController;
 import com.revrobotics.CANSparkMaxLowLevel.MotorType;
 
-import edu.wpi.first.math.MathUtil;
 import edu.wpi.first.wpilibj.DoubleSolenoid;
 import edu.wpi.first.wpilibj.PneumaticsModuleType;
 import edu.wpi.first.wpilibj.XboxController;
@@ -170,53 +169,6 @@ public class DriveTrain extends SubsystemBase {
     pidController.setIZone(0);
     pidController.setFF(1.5e-5);
     pidController.setOutputRange(minOutput, maxOutput);
-  }
-
-
-  public double[] mArcadeDrive(XboxController controller){
-    double xSpeed = controller.getRightTriggerAxis() - controller.getLeftTriggerAxis();
-    double zRotaion = controller.getLeftX();
-    //Bound joystick input due to crappy controller
-    if (Math.abs(zRotaion) < 0.25) zRotaion = 0;
-  
-    SmartDashboard.putNumber("Controller LeftX", controller.getLeftX());
-    SmartDashboard.putNumber("zRotation", zRotaion);
-
-    xSpeed = MathUtil.clamp(xSpeed, -1.0, 1.0);
-    zRotaion = MathUtil.clamp(zRotaion, -1.0, 1.0);
-    double leftSpeed;
-    double rightSpeed;
-    double maxInput = Math.copySign(Math.max(Math.abs(xSpeed), Math.abs(zRotaion)), xSpeed);
-    if (xSpeed >= 0.0) {
-      // First quadrant, else second quadrant
-      if (zRotaion >= 0.0) {
-        leftSpeed = maxInput;
-        rightSpeed = xSpeed - zRotaion;
-      } else {
-        leftSpeed = xSpeed + zRotaion;
-        rightSpeed = maxInput;
-      }
-    } else {
-      // Third quadrant, else fourth quadrant
-      if (zRotaion >= 0.0) {
-        leftSpeed = xSpeed + zRotaion;
-        rightSpeed = maxInput;
-      } else {
-        leftSpeed = maxInput;
-        rightSpeed = xSpeed - zRotaion;
-      }
-    }
-    // Normalize the wheelspeeds
-    double maxMagnitude = Math.max(Math.abs(leftSpeed), Math.abs(rightSpeed));
-    if (maxMagnitude > 1.0) {
-      leftSpeed /= maxMagnitude;
-      rightSpeed /= maxMagnitude;
-    }
-    SmartDashboard.putNumber("ArcadeDrive_leftSpeed", leftSpeed);
-    SmartDashboard.putNumber("ArcadeDrive_rightSpeed", rightSpeed);
-
-    double[] wheelspeeds = {leftSpeed, rightSpeed};
-    return wheelspeeds;
   }
 
   public WheelSpeeds getWheelSpeeds(XboxController controller){
