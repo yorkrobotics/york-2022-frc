@@ -7,15 +7,15 @@
 #----------------------------------------------------------------------------
 
 import json
-import time
-import sys
-import cv2
-import numpy as np
 import os
+import sys
+import time
 
-from cscore import CameraServer, VideoSource, UsbCamera, MjpegServer
+from cscore import CameraServer, MjpegServer, UsbCamera, VideoSource
+import cv2
 from networktables import NetworkTablesInstance
 import ntcore
+import numpy as np
 
 #    JSON format:
 #    {
@@ -221,25 +221,30 @@ def getCenterHSV(output_img):
 
 def sortQuadList(quad_list):
     # sort according to x
-    print("[DEBUG] old quad:", quad_list)
+    # print("[DEBUG] old quad:", quad_list)
     if len(quad_list) == 8:
         points = list(zip(quad_list[::2], quad_list[1::2]))
-        sorted(points, key=lambda t: t[0])
+        points.sort(key=lambda t: t[0])
         # sort according to y
-        if quad_list[1] < quad_list[3]:
-            quad_list[2], quad_list[0] = quad_list[0], quad_list[2]
-            quad_list[3], quad_list[1] = quad_list[1], quad_list[3]
-        if quad_list[5] < quad_list[7]:
-            quad_list[6], quad_list[4] = quad_list[4], quad_list[6]
-            quad_list[7], quad_list[5] = quad_list[5], quad_list[7]
+        y = lambda p: p[1]
+        quad_list.clear()
+        for pair in zip(points[::2], points[1::2]):
+            quad_list.extend([val for point in sorted(pair, key=y) for val in point])
+
+        # if quad_list[1] < quad_list[3]:
+        #     quad_list[2], quad_list[0] = quad_list[0], quad_list[2]
+        #     quad_list[3], quad_list[1] = quad_list[1], quad_list[3]
+        # if quad_list[5] < quad_list[7]:
+        #     quad_list[6], quad_list[4] = quad_list[4], quad_list[6]
+        #     quad_list[7], quad_list[5] = quad_list[5], quad_list[7]
 
 
 def getHoopCenter(output_img, vertice_list):
     # focal lengths
-    fx = 2000.49844
-    fy = 2000.52991
-    width2 = 900.441373
-    height2 = 540.857930
+    fx = 1875.49844
+    fy = 1875.52991
+    width2 = 953.441373
+    height2 = 565.857930
     camera_matrix = [[fx, 0, width2], [0, fy, height2], [0, 0, 1]]
     # 2D projection onto the camera
     object_points = [
@@ -281,20 +286,20 @@ def getHoopCenter(output_img, vertice_list):
             # [330.0, -30.0, .0],
 
             # imperial(inches)
-            [-12.9375, 1.0, .0],
-            [-12.9375, -1.0, .0],
-            [-7.9375, 1.0, .0],
-            [-7.9375, -1.0, .0],
+            # [-12.9375, 1.0, .0],
+            # [-12.9375, -1.0, .0],
+            # [-7.9375, 1.0, .0],
+            # [-7.9375, -1.0, .0],
 
             [-2.5, 1.0, .0],
             [-2.5, -1.0, .0],
             [2.5, 1.0, .0],
             [2.5, -1.0, .0],
 
-            [7.9375, 1.0, .0],
-            [7.9375, -1.0, .0],
-            [12.9375, 1.0, .0],
-            [12.9375, -1.0, .0],
+            # [7.9375, -1.0, .0],
+            # [7.9375, 1.0, .0],
+            # [12.9375, 1.0, .0],
+            # [12.9375, -1.0, .0],
 
 
             ]
@@ -306,14 +311,19 @@ def getHoopCenter(output_img, vertice_list):
     image_points = []
 
     # sort image points
+    idx = 0
     for quad in vertice_list:
-        sortQuadList(quad)
-        print("\n[DEBUG] Sorted Quad List: ", quad)
+        if len(quad) == 8: # TODO: put it up a level
+            image_points.append([])
+            sortQuadList(quad)
+            # print("\n[DEBUG] Sorted Quad List: ", quad)
 
-        result = list(map(list, zip(quad[::2], quad[1::2])))
-        for i in result:
-            i = list(map(float, i))
-            image_points.append(i)
+            result = list(map(list, zip(quad[::2], quad[1::2])))
+            for i in result:
+                i = list(map(float, i))
+                image_points[idx].append(i)
+            idx+=1
+    # print("image_points: ", image_points)
 
 
     # for l in vertice_list:
@@ -324,26 +334,48 @@ def getHoopCenter(output_img, vertice_list):
 
 
     hoop_coord = []
-    if len(image_points) == len(object_points):
+    camera_matrix, object_points = [np.array(x) for x in [camera_matrix, object_points ]]
+
+    idx = 0
+    for quad_points in image_points:
+    # if len(image_points) == len(object_points):
         # camera_matrix, object_points, image_points, distortion = [np.array(x) for x in [camera_matrix, object_points, image_points, distortion]]
-        camera_matrix, object_points, image_points = [np.array(x) for x in [camera_matrix, object_points, image_points]]
+        # print(quad_points)
+        quad_points = [np.array(x) for x in [quad_points ]]
+        # print(object_points)
+        # print(quad_points)
 
-        ret, rvec, T = cv2.solvePnP(object_points, image_points, camera_matrix, distortion, flags=cv2.SOLVEPNP_EPNP)
-        R, _ = cv2.Rodrigues(rvec)
+        _, rvec, tvec = cv2.solvePnP(object_points, quad_points[0], camera_matrix, distortion)#, flags=cv2.SOLVEPNP_EPNP)
+        rvec, _ = cv2.Rodrigues(rvec)
 
-        for i in T:
-            hoop_coord.append(int(i))
+        bottom_list = [[0.0, 0.0, 0.0, 1.0]]
 
-        cv2.putText(output_img, str(hoop_coord), (200, 100), 0, 3, (128, 255, 0), 3)
+        trans_matrix = np.hstack((rvec, tvec))
+        trans_matrix = np.vstack((trans_matrix, bottom_list))
 
-    print("[DEBUG] Hoop center: ", hoop_coord)
+        center_to_tape = [[.0],[.0],[-27.0], [1.0]]
+        center = trans_matrix.dot(center_to_tape)
+        print(center)
+        print()
+
+        # hoop_coord.append([])
+        # for i in tvec:
+            # hoop_coord[idx].append(int(i))
+        hoop_coord.append(center)
+
+        cv2.putText(output_img, str(hoop_coord[idx]), (200, 120 * (idx+1)), 0, 3, (128, 255, 0), 3)
+        idx+=1
+
+
+    # print("[DEBUG] Hoop centers: ", hoop_coord)
 
     # print("image_points:", image_points)
     # draw points to debug
     # print(hoop_coord)
 
-    for i in image_points:
-        cv2.circle(output_img, center = tuple(list(map(int, i))), radius = 4, color = (255, 0, 255), thickness = -1)
+    for quad in image_points:
+        for i in quad:
+            cv2.circle(output_img, center = tuple(list(map(int, i))), radius = 4, color = (255, 0, 255), thickness = -1)
     return hoop_coord
 
 
@@ -446,12 +478,15 @@ if __name__ == "__main__":
             cv2.drawContours(output_img, [quadrilateral], -1, color = (0, 0, 255), thickness = 2)
             #cv2.circle(output_img, center = center, radius = 3, color = (0, 0, 255), thickness = -1)
 
-        vision_nt.putNumberArray('translation_vector', getHoopCenter(output_img, vertice_list))
+        idx = 0
+        for i in getHoopCenter(output_img, vertice_list):
+            vision_nt.putNumberArray('translation_vector_'+ str(idx), i)
+        idx+=1
 
         processing_time = time.time() - start_time
         fps = 1 / processing_time
 
         binary_output_stream.putFrame(binary_img)
         output_stream.putFrame(output_img)
-        time.sleep(processing_time)
+        # time.sleep(processing_time)
 
