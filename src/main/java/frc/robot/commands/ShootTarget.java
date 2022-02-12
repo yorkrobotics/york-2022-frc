@@ -32,6 +32,7 @@ public class ShootTarget extends CommandBase {
     System.out.println(pycam.getHoopCenter()[1]);
     System.out.println(pycam.getHoopCenter()[2]);
     double angle = pycam.getAngle(shooter.getSpeed());
+    System.out.println(angle);
     shooter.setAngle(angle);
     isDone = true;
   }
