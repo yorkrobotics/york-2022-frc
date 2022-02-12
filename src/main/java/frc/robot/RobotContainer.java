@@ -4,10 +4,22 @@
 
 package frc.robot;
 
+import java.util.List;
+
+import edu.wpi.first.math.controller.PIDController;
+import edu.wpi.first.math.controller.RamseteController;
+import edu.wpi.first.math.geometry.Pose2d;
+import edu.wpi.first.math.geometry.Rotation2d;
+import edu.wpi.first.math.geometry.Translation2d;
+import edu.wpi.first.math.trajectory.Trajectory;
+import edu.wpi.first.math.trajectory.TrajectoryConfig;
+import edu.wpi.first.math.trajectory.TrajectoryGenerator;
+import edu.wpi.first.math.trajectory.constraint.DifferentialDriveVoltageConstraint;
 import edu.wpi.first.wpilibj.GenericHID;
 import edu.wpi.first.wpilibj.XboxController;
 import edu.wpi.first.wpilibj.XboxController.
 Button;
+import edu.wpi.first.wpilibj.shuffleboard.Shuffleboard;
 import frc.robot.commands.DriveTeleop;
 import frc.robot.commands.DriveWithPositionControl;
 import frc.robot.commands.RunLifter;
@@ -18,6 +30,7 @@ import frc.robot.subsystems.Lifter;
 import frc.robot.subsystems.Shooter;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.InstantCommand;
+import edu.wpi.first.wpilibj2.command.RamseteCommand;
 import edu.wpi.first.wpilibj2.command.button.JoystickButton;
 
 /**
@@ -39,6 +52,9 @@ public class RobotContainer {
   private SwitchDriveMode switchDriveMode;
   private ShootBall shootBall;
   private RunLifter runLifter;
+
+  // Ramsete controllers
+  private PIDController mRamseteLeftController, mRamseteRightController;
 
   // XboxController
   public static XboxController mController;
@@ -66,6 +82,15 @@ public class RobotContainer {
     mLifter = new Lifter();
     runLifter = new RunLifter(mLifter);
     mLifter.setDefaultCommand(runLifter);
+
+    // Ramsete controllers
+    mRamseteLeftController = new PIDController(10, 0, 0);
+    mRamseteRightController = new PIDController(10, 0, 0);
+
+    // Populate shuffleboard
+    var autoTab = Shuffleboard.getTab("Autonomous");
+    autoTab.add("Left Controller", mRamseteLeftController);
+    autoTab.add("Right Controller", mRamseteRightController);
 
     // Configure the button bindings
     configureButtonBindings();
@@ -98,6 +123,34 @@ public class RobotContainer {
    */
   public Command getAutonomousCommand() {
     // A command to run in autonomous
-    return driveWithPositionControl;
+    mDrive.resetEncoders();
+    mDrive.getOdometry().resetPosition(new Pose2d(), new Rotation2d());
+
+    var autoVoltageConstraint= new DifferentialDriveVoltageConstraint(mDrive.getFeedForward(), mDrive.getKinematics(), 10);
+
+    TrajectoryConfig config = new TrajectoryConfig(0.5, 1).setKinematics(mDrive.getKinematics()).addConstraint(autoVoltageConstraint);
+
+    Trajectory testTrajectory = TrajectoryGenerator.generateTrajectory(
+      new Pose2d(), 
+      List.of(), 
+      new Pose2d(3, 0, new Rotation2d()), 
+      config
+    );
+
+    RamseteController ramseteController = new RamseteController(2.0, 0.7);
+    RamseteCommand testCommand = new RamseteCommand(
+      testTrajectory, 
+      mDrive::getPose,
+      ramseteController, 
+      mDrive.getFeedForward(), 
+      mDrive.getKinematics(), 
+      mDrive::getWheelSpeeds, 
+      mRamseteLeftController, 
+      mRamseteRightController, 
+      mDrive::tankDriveVolts, 
+      mDrive
+    );
+
+    return testCommand;
   }
 }

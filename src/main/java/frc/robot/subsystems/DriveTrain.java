@@ -10,12 +10,20 @@ import com.revrobotics.RelativeEncoder;
 import com.revrobotics.SparkMaxPIDController;
 import com.revrobotics.CANSparkMaxLowLevel.MotorType;
 
+import edu.wpi.first.math.controller.SimpleMotorFeedforward;
+import edu.wpi.first.math.geometry.Pose2d;
+import edu.wpi.first.math.geometry.Rotation2d;
+import edu.wpi.first.math.kinematics.DifferentialDriveKinematics;
+import edu.wpi.first.math.kinematics.DifferentialDriveOdometry;
+import edu.wpi.first.math.kinematics.DifferentialDriveWheelSpeeds;
+import edu.wpi.first.wpilibj.ADXRS450_Gyro;
 import edu.wpi.first.wpilibj.DoubleSolenoid;
 import edu.wpi.first.wpilibj.PneumaticsModuleType;
 import edu.wpi.first.wpilibj.XboxController;
 import edu.wpi.first.wpilibj.DoubleSolenoid.Value;
 import edu.wpi.first.wpilibj.drive.DifferentialDrive;
 import edu.wpi.first.wpilibj.drive.DifferentialDrive.WheelSpeeds;
+import edu.wpi.first.wpilibj.shuffleboard.Shuffleboard;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
 import frc.robot.Constants;
@@ -30,9 +38,15 @@ public class DriveTrain extends SubsystemBase {
   private SparkMaxPIDController mleftPIDController, mrightPIDController;
   private DriveControlState mDriveControlState;
 
-  private double gearRatio;
+  private double gearRatio, kS, kV, kA;
   private double kP_velocity, kI_velocity, kD_velocity, kMinOutput_velocity, kMaxOutput_velocity;
   private double kP_position, kI_position, kD_position, kMinOutput_position, kMaxOutput_position;
+
+  private DifferentialDriveKinematics mKinematics;
+  private DifferentialDriveOdometry mOdometry;
+  private ADXRS450_Gyro mGyro;
+  private Pose2d mPose;
+  private SimpleMotorFeedforward mFeedforward;
 
 
   /** Creates a new VelocityController. */
@@ -44,6 +58,8 @@ public class DriveTrain extends SubsystemBase {
     mrightBack = new CANSparkMax(3, MotorType.kBrushless);
 
     mShifter = new DoubleSolenoid(PneumaticsModuleType.CTREPCM, 6, 1);
+    shiftDown();
+    gearRatio = Constants.GEAR_RATIO_LOW;
 
     mleftFront.restoreFactoryDefaults();
     mleftBack.restoreFactoryDefaults();
@@ -66,17 +82,21 @@ public class DriveTrain extends SubsystemBase {
     mDriveControlState = DriveControlState.OPEN_LOOP; //Default drive mode set to open loop
 
     //Store PID coefficients
-    kP_velocity = 6e-6; 
-    kI_velocity = 5e-7;
-    kD_velocity = 1e-6; 
-    kMinOutput_velocity = -0.5;  
-    kMaxOutput_velocity = 0.5; 
+    kP_velocity = 0.000097988; 
+    kI_velocity = 0;
+    kD_velocity = 0; 
+    kMinOutput_velocity = -0.7;  
+    kMaxOutput_velocity = 0.7; 
 
-    kP_position = 0; 
+    kP_position = 5.7673; 
     kI_position = 0;
     kD_position = 0; 
     kMinOutput_position = -0.5;
     kMaxOutput_position = 0.5; 
+
+    kS = 0.23123;
+    kV = 4.5288;
+    kA = 0.4136;
 
     SmartDashboard.putNumber("Velocity P Gain", kP_velocity);
     SmartDashboard.putNumber("Velocity I Gain", kI_velocity);
@@ -89,6 +109,31 @@ public class DriveTrain extends SubsystemBase {
     // SmartDashboard.putNumber("Position D Gain", kD_position);
     // SmartDashboard.putNumber("Position Max Output", kMaxOutput_position);
     // SmartDashboard.putNumber("Position Min Output", kMinOutput_velocity);
+
+    resetEncoders();
+
+    mGyro = new ADXRS450_Gyro();
+    mGyro.calibrate();
+
+    mKinematics = new DifferentialDriveKinematics(Constants.TRACK_WIDTH);
+    mOdometry = new DifferentialDriveOdometry(mGyro.getRotation2d()); //optional second arguement: starting position
+    mFeedforward = new SimpleMotorFeedforward(kS, kV, kA);
+
+    Shuffleboard.getTab("Gyro").add(mGyro);
+
+    var autoTab = Shuffleboard.getTab("Autonomous");
+    autoTab.addNumber("Pose X", () -> {
+      return this.getPose().getX();
+    });
+    autoTab.addNumber("Pose Y", () -> {
+      return this.getPose().getY();
+    });
+    autoTab.addNumber("Left Wheel Speeds", () -> {
+      return this.getWheelSpeeds().leftMetersPerSecond;
+    });
+    autoTab.addNumber("Right Wheel Speeds", () -> {
+      return this.getWheelSpeeds().rightMetersPerSecond;
+    });
   }
 
   @Override
@@ -113,9 +158,24 @@ public class DriveTrain extends SubsystemBase {
         configureVelocityControl();
       }
     }
+
+    mPose = mOdometry.update(mGyro.getRotation2d(), rotationsToMeters(mleftFrontEncoder.getPosition()), rotationsToMeters(mrightFrontEncoder.getPosition()));
+
     
-    SmartDashboard.putNumber("left_encoder", rotationsToMeters(mleftFrontEncoder.getPosition()));
-    SmartDashboard.putNumber("right_encoder", rotationsToMeters(mleftFrontEncoder.getPosition()));
+    SmartDashboard.putNumber("left_position", rotationsToMeters(mleftFrontEncoder.getPosition()));
+    SmartDashboard.putNumber("right_position", rotationsToMeters(mleftFrontEncoder.getPosition()));
+
+    SmartDashboard.putNumber("left_velocity", mleftFrontEncoder.getVelocity());
+    SmartDashboard.putNumber("right_velocity", mrightFrontEncoder.getVelocity());
+
+    SmartDashboard.putNumber("left_wheelspeed", getWheelSpeeds().leftMetersPerSecond);
+    SmartDashboard.putNumber("right_wheelspeed", getWheelSpeeds().rightMetersPerSecond);
+
+
+
+    SmartDashboard.putNumber("heading angle", mGyro.getRate());
+    SmartDashboard.putBoolean("Gyro Connected", mGyro.isConnected());
+
   }
 
   public void configureVelocityControl(){
@@ -142,7 +202,7 @@ public class DriveTrain extends SubsystemBase {
       mrightFront.set(right_velocity * Constants.MAX_OPENLOOP_SPEED);
     }
     else{
-      System.out.println("drive mode not in open loop");
+      System.out.println("[Drive] drive mode not in open loop");
     }
   }
 
@@ -153,7 +213,7 @@ public class DriveTrain extends SubsystemBase {
       mrightPIDController.setReference(right_velocity * Constants.DRIVE_MAX_RPM, CANSparkMax.ControlType.kVelocity);
     }
     else{
-      System.out.println("drive mode not in velocity control");
+      System.out.println("[Drive] drive mode not in velocity control");
     }
   }
 
@@ -165,7 +225,7 @@ public class DriveTrain extends SubsystemBase {
       mrightPIDController.setReference(metersToRotations(setRotations), CANSparkMax.ControlType.kPosition);
     }
     else{
-      System.out.println("drive mode not in position control");
+      System.out.println("[Drive] drive mode not in position control");
     }
   }
 
@@ -178,7 +238,7 @@ public class DriveTrain extends SubsystemBase {
     pidController.setOutputRange(minOutput, maxOutput);
   }
 
-  public WheelSpeeds getWheelSpeeds(XboxController controller){
+  public WheelSpeeds mArcadeDrive(XboxController controller){
     // double controller_leftX = controller.getLeftX();
     // if (Math.abs(controller_leftX) < 0.25) controller_leftX = 0;
     return DifferentialDrive.arcadeDriveIK(controller.getRightTriggerAxis() - controller.getLeftTriggerAxis(), controller.getLeftX(), true);
@@ -221,6 +281,42 @@ public class DriveTrain extends SubsystemBase {
 
   public boolean isAtSetpoint(double setpoint){
     return rotationsToMeters(mleftFrontEncoder.getPosition()) == setpoint;
+  }
+
+  public double getHeading(){
+    return mGyro.getRotation2d().getDegrees();
+  }
+
+  public SimpleMotorFeedforward getFeedForward(){
+    return mFeedforward;
+  }
+
+  public DifferentialDriveKinematics getKinematics(){
+    return mKinematics;
+  }
+
+  public DifferentialDriveOdometry getOdometry(){
+    return mOdometry;
+  }
+
+  public Pose2d getPose(){
+    return mPose;
+  }
+
+  public DifferentialDriveWheelSpeeds getWheelSpeeds(){
+    return new DifferentialDriveWheelSpeeds(
+      rotationsToMeters(mleftFrontEncoder.getVelocity()) / 60, 
+      rotationsToMeters(mrightFrontEncoder.getVelocity()) / 60);
+  }
+
+  public void resetEncoders(){
+    mleftFrontEncoder.setPosition(0);
+    mrightFrontEncoder.setPosition(0);
+  }
+
+  public void tankDriveVolts(double leftVolts, double rightVolts){
+    mleftFront.setVoltage(leftVolts);
+    mrightFront.setVoltage(rightVolts);
   }
 
   public enum DriveControlState{

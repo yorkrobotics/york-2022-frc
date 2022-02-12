@@ -13,17 +13,6 @@ package frc.robot;
  * constants are needed, to reduce verbosity.
  */
 public final class Constants {
-    // PWM wiring ports
-    public static final int LEFT_FRONT = 9;
-    public static final int RIGHT_FRONT = 8;
-    public static final int LEFT_BACK = 0;
-    public static final int RIGHT_BACK = 0;
-
-    // xbox controller
-    public static final int X_BOX_Y_AXIS = 1;
-    public static final int X_BOX_X_AXIS = 0;
-    public static final int X_BOX_LEFT_TRIGGER = 2;
-    public static final int X_BOX_RIGHT_TRIGGER = 3;
 
     public static final int CONTROLLER_NUMBER = 0;
 
@@ -32,17 +21,8 @@ public final class Constants {
 
     public static final double DRIVE_FORWARD_TIME = 0.5;
     public static final double AUTONOMOUS_SPEED = 0.5;
-    
-    public static final String DRIVE_MODE = "T";    //"J" = drive with joysticks, "T" = drive with triggers
 
-
-    public static final double DRIVE_kP = 2.5;
-    public static final double DRIVE_kI = 0.01;
-    public static final double DRIVE_kD = 0.1;
-    public static final double MAXIMUM_OUTPUT = 0.5;
-    public static final double MINIMUM_OUTPUT = -0.5;
-
-    public static final double DRIVE_MAX_RPM = 4000;
+    public static final double DRIVE_MAX_RPM = 5400;
 
 
     public static final double GEAR_RATIO_LOW = 16.364;
@@ -50,7 +30,7 @@ public final class Constants {
       //gear ratio: 16.364, 5.601
     public static final double TARGET_DISTANCE = 2;
 
-    public static final double WIDTH_BETWEEN_WHEELS = 0.655; //The distance between left wheels and right wheels
+    public static final double TRACK_WIDTH = 0.655; //The distance between left wheels and right wheels
 
 
     

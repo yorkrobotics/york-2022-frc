@@ -33,13 +33,13 @@ public class SwitchDriveMode extends CommandBase {
   public void execute() {
     if (mDrive.getDriveControlState() == DriveControlState.VELOCITY_CONTROL){
       mDrive.setOpenLoop();
-      System.out.println("switched to open loop");
+      System.out.println("[Drive] switched to open loop");
       isSwitched = true;
     }
     else if (mDrive.getDriveControlState() == DriveControlState.OPEN_LOOP){
       mDrive.setToVelocityControl();
       mDrive.configureVelocityControl();
-      System.out.println("switched to velocity control");
+      System.out.println("[Drive] switched to velocity control");
       isSwitched = true;
     }
   }
