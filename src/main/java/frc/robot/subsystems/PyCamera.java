@@ -15,20 +15,21 @@ public class PyCamera extends SubsystemBase {
   public double x;
   public double y;
   public double z;
+  public NetworkTable table;
   
   /** Creates a new PyCamera. */
   public PyCamera() {
     NetworkTableInstance inst = NetworkTableInstance.getDefault();
-    NetworkTable table = inst.getTable("Vision");
+    table = inst.getTable("Vision");
     inst.startClientTeam(5171);
+  }
+
+  public Number[] getHoopCenter() {
     Number[] default_hoop_center_coord = new Number[] {0,0,0};
     hoop_coord = table.getEntry("translation_vector").getNumberArray(default_hoop_center_coord);
     x = hoop_coord[0].doubleValue();
     y = hoop_coord[1].doubleValue();
     z = hoop_coord[2].doubleValue();
-  }
-
-  public Number[] getHoopCenter() {
     return hoop_coord;
   }
 
