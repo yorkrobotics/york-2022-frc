@@ -12,9 +12,9 @@ import edu.wpi.first.networktables.NetworkTableEntry;
 
 public class PyCamera extends SubsystemBase {
   public Number[] hoop_coord;
-  public double x = hoop_coord[0].doubleValue();
-  public double y = hoop_coord[1].doubleValue();
-  public double z = hoop_coord[2].doubleValue();
+  public double x;
+  public double y;
+  public double z;
   
   /** Creates a new PyCamera. */
   public PyCamera() {
@@ -23,6 +23,9 @@ public class PyCamera extends SubsystemBase {
     inst.startClientTeam(5171);
     Number[] default_hoop_center_coord = new Number[] {0,0,0};
     hoop_coord = table.getEntry("translation_vector").getNumberArray(default_hoop_center_coord);
+    x = hoop_coord[0].doubleValue();
+    y = hoop_coord[1].doubleValue();
+    z = hoop_coord[2].doubleValue();
   }
 
   public Number[] getHoopCenter() {
@@ -30,6 +33,7 @@ public class PyCamera extends SubsystemBase {
   }
 
   public double getAngle(double v) {
+    
     double v_squared = Math.pow(v, 2);
     double v_fourth = Math.pow(v, 4);
     double z_squared = Math.pow(z, 2);
