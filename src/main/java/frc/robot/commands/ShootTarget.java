@@ -26,7 +26,9 @@ public class ShootTarget extends CommandBase {
   // Called every time the scheduler runs while the command is scheduled.
   @Override
   public void execute() {
-    System.out.println(pycam.getHoopCenter());
+    System.out.println(pycam.getHoopCenter()[0]);
+    System.out.println(pycam.getHoopCenter()[1]);
+    System.out.println(pycam.getHoopCenter()[2]);
     double angle = pycam.getAngle(shooter.getSpeed());
     shooter.setAngle(angle);
   }
