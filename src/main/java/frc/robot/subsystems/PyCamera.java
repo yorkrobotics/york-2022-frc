@@ -34,7 +34,6 @@ public class PyCamera extends SubsystemBase {
   }
 
   public double getAngle(double v) {
-    
     double v_squared = Math.pow(v, 2);
     double v_fourth = Math.pow(v, 4);
     double z_squared = Math.pow(z, 2);

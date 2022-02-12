@@ -45,5 +45,5 @@ public class ShootTarget extends CommandBase {
   @Override
   public boolean isFinished() {
     return isDone;
-  }
+ }
 }

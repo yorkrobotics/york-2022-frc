@@ -10,6 +10,7 @@ import edu.wpi.first.wpilibj2.command.SubsystemBase;
 public class Shooter extends SubsystemBase {
   private PWMVictorSPX top, bottom;
   double speed;
+  double default_speed = 20;
 
   /** Creates a new Shooter. */
   public Shooter() {
@@ -27,7 +28,7 @@ public class Shooter extends SubsystemBase {
   }
 
   public double getSpeed() {
-    return speed;
+    return default_speed;
   }
 
   
