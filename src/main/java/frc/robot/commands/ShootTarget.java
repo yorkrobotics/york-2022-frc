@@ -11,11 +11,13 @@ import frc.robot.subsystems.Shooter;
 public class ShootTarget extends CommandBase {
   private final PyCamera pycam;
   private final Shooter shooter;
+  private boolean isDone;
   /** Creates a new getHoopCenter. */
   public ShootTarget(PyCamera pc, Shooter st) {
     pycam = pc;
     shooter = st;
     addRequirements(pycam, shooter);
+    isDone = false;
     // Use addRequirements() here to declare subsystem dependencies.
   }
 
@@ -31,6 +33,7 @@ public class ShootTarget extends CommandBase {
     System.out.println(pycam.getHoopCenter()[2]);
     double angle = pycam.getAngle(shooter.getSpeed());
     shooter.setAngle(angle);
+    isDone = true;
   }
 
   // Called once the command ends or is interrupted.
@@ -40,6 +43,6 @@ public class ShootTarget extends CommandBase {
   // Returns true when the command should end.
   @Override
   public boolean isFinished() {
-    return false;
+    return isDone;
   }
 }
