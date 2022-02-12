@@ -316,7 +316,7 @@ def getHoopCenter(output_img, vertice_list):
 def getBestCenter(hoop_centers):
     if len(hoop_centers) > 0:
         return hoop_centers[0]
-    return [0, 0, 0]
+    return [1, 2, 3]
 
 
 if __name__ == "__main__":
