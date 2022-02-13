@@ -36,7 +36,9 @@ public class DriveTrain extends SubsystemBase {
 
   //Controller setup
   private SparkMaxPIDController mleftPIDController, mrightPIDController;
-  private DriveControlState mDriveControlState;
+  private DriveControlMode
+   mDriveControlMode
+  ;
 
   private double gearRatio, kS, kV, kA;
   private double kP_velocity, kI_velocity, kD_velocity, kMinOutput_velocity, kMaxOutput_velocity;
@@ -79,7 +81,9 @@ public class DriveTrain extends SubsystemBase {
     mleftPIDController = mleftFront.getPIDController();
     mrightPIDController = mrightFront.getPIDController();
 
-    mDriveControlState = DriveControlState.OPEN_LOOP; //Default drive mode set to open loop
+    mDriveControlMode
+     = DriveControlMode
+    .OPEN_LOOP; //Default drive mode set to open loop
 
     //Store PID coefficients
     kP_velocity = 0.000097988; 
@@ -119,8 +123,7 @@ public class DriveTrain extends SubsystemBase {
     mOdometry = new DifferentialDriveOdometry(mGyro.getRotation2d()); //optional second arguement: starting position
     mFeedforward = new SimpleMotorFeedforward(kS, kV, kA);
 
-    Shuffleboard.getTab("Gyro").add(mGyro);
-
+    // Update to Shuffleboard
     var autoTab = Shuffleboard.getTab("Autonomous");
     autoTab.addNumber("Pose X", () -> {
       return this.getPose().getX();
@@ -140,7 +143,9 @@ public class DriveTrain extends SubsystemBase {
   public void periodic() {
     // This method will be called once per scheduler run
     // Update and get values from the smart dashboard
-    if (mDriveControlState == DriveControlState.VELOCITY_CONTROL){
+    if (mDriveControlMode
+     == DriveControlMode
+    .VELOCITY_CONTROL){
       
       double p = SmartDashboard.getNumber("Velocity P Gain", 0);
       double i = SmartDashboard.getNumber("Velocity I Gain", 0);
@@ -164,7 +169,6 @@ public class DriveTrain extends SubsystemBase {
     
     SmartDashboard.putNumber("left_position", rotationsToMeters(mleftFrontEncoder.getPosition()));
     SmartDashboard.putNumber("right_position", rotationsToMeters(mleftFrontEncoder.getPosition()));
-
     SmartDashboard.putNumber("left_velocity", mleftFrontEncoder.getVelocity());
     SmartDashboard.putNumber("right_velocity", mrightFrontEncoder.getVelocity());
 
@@ -179,25 +183,24 @@ public class DriveTrain extends SubsystemBase {
   }
 
   public void configureVelocityControl(){
-    mDriveControlState = DriveControlState.VELOCITY_CONTROL;    
-
+    setDriveMode(DriveControlMode.VELOCITY_CONTROL);
     updatePIDController(mleftPIDController, kP_velocity, kI_velocity, kD_velocity, kMinOutput_velocity, kMaxOutput_velocity);
     updatePIDController(mrightPIDController, kP_velocity, kI_velocity, kD_velocity, kMinOutput_velocity, kMaxOutput_velocity);
   }
 
   public void configurePositionControl(){
-    mDriveControlState = DriveControlState.POSITION_CONTROL;
-
+    setDriveMode(DriveControlMode.POSITION_CONTROL);
     updatePIDController(mleftPIDController, kP_position, kI_position, kD_position, kMinOutput_position, kMaxOutput_position);
     updatePIDController(mrightPIDController, kP_position, kI_position, kD_position, kMinOutput_position, kMaxOutput_position);
 
     //extra step to reset the encoders
-    mleftFrontEncoder.setPosition(0);
-    mrightFrontEncoder.setPosition(0);
+    resetEncoders();
   }
 
   public void setOpenLoop(double left_velocity, double right_velocity){
-    if (mDriveControlState == DriveControlState.OPEN_LOOP){
+    if (mDriveControlMode
+     == DriveControlMode
+    .OPEN_LOOP){
       mleftFront.set(left_velocity * Constants.MAX_OPENLOOP_SPEED);
       mrightFront.set(right_velocity * Constants.MAX_OPENLOOP_SPEED);
     }
@@ -208,7 +211,9 @@ public class DriveTrain extends SubsystemBase {
 
   // Setting the motors according to velocity control
   public void setVelocity(double left_velocity, double right_velocity){
-    if (mDriveControlState == DriveControlState.VELOCITY_CONTROL){
+    if (mDriveControlMode
+     == DriveControlMode
+    .VELOCITY_CONTROL){
       mleftPIDController.setReference(left_velocity * Constants.DRIVE_MAX_RPM, CANSparkMax.ControlType.kVelocity);
       mrightPIDController.setReference(right_velocity * Constants.DRIVE_MAX_RPM, CANSparkMax.ControlType.kVelocity);
     }
@@ -219,14 +224,10 @@ public class DriveTrain extends SubsystemBase {
 
   // Setting the motors according to position control
   public void setPosition(double setMeters){
-    if (mDriveControlState == DriveControlState.POSITION_CONTROL){
-      double setRotations = metersToRotations(setMeters);
-      mleftPIDController.setReference(metersToRotations(setRotations), CANSparkMax.ControlType.kPosition);
-      mrightPIDController.setReference(metersToRotations(setRotations), CANSparkMax.ControlType.kPosition);
-    }
-    else{
-      System.out.println("[Drive] drive mode not in position control");
-    }
+    configurePositionControl();
+    double setRotations = metersToRotations(setMeters);
+    mleftPIDController.setReference(setRotations, CANSparkMax.ControlType.kPosition);
+    mrightPIDController.setReference(setRotations, CANSparkMax.ControlType.kPosition);
   }
 
   public void updatePIDController(SparkMaxPIDController pidController, double p, double i, double d, double minOutput, double maxOutput){
@@ -234,7 +235,7 @@ public class DriveTrain extends SubsystemBase {
     pidController.setI(i);
     pidController.setD(d);
     pidController.setIZone(0);
-    pidController.setFF(1.5e-5);
+    pidController.setFF(0);
     pidController.setOutputRange(minOutput, maxOutput);
   }
 
@@ -263,20 +264,24 @@ public class DriveTrain extends SubsystemBase {
     return meters * gearRatio / 0.145 / Math.PI;
   }
 
-  public DriveControlState getDriveControlState(){
-    return mDriveControlState;
+  public DriveControlMode getDriveControlMode(){
+    return mDriveControlMode;
   }
 
-  public void setToVelocityControl(){
-    mDriveControlState = DriveControlState.VELOCITY_CONTROL;
+  public void setDriveMode(DriveControlMode mode){
+    mDriveControlMode = mode;
   }
 
-  public void setToPositionControl(){
-    mDriveControlState = DriveControlState.POSITION_CONTROL;
-  }
-
-  public void setOpenLoop(){
-    mDriveControlState = DriveControlState.OPEN_LOOP;
+  public void switchDriveMode(){
+    if (mDriveControlMode == DriveControlMode.POSITION_CONTROL || mDriveControlMode == DriveControlMode.VELOCITY_CONTROL){
+      setDriveMode(DriveControlMode.OPEN_LOOP);
+      System.out.println("[Drive] Set to Open Loop");
+    }
+    else if (mDriveControlMode == DriveControlMode.OPEN_LOOP){
+      setDriveMode(DriveControlMode.VELOCITY_CONTROL);
+      configureVelocityControl();
+      System.out.println("[Drive] Set to Velocity Control");
+    }
   }
 
   public boolean isAtSetpoint(double setpoint){
@@ -319,7 +324,8 @@ public class DriveTrain extends SubsystemBase {
     mrightFront.setVoltage(rightVolts);
   }
 
-  public enum DriveControlState{
+  public enum DriveControlMode
+  {
     OPEN_LOOP, VELOCITY_CONTROL, POSITION_CONTROL
   } 
 

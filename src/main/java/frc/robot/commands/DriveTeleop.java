@@ -10,7 +10,7 @@ import edu.wpi.first.wpilibj2.command.CommandBase;
 import frc.robot.Constants;
 import frc.robot.RobotContainer;
 import frc.robot.subsystems.DriveTrain;
-import frc.robot.subsystems.DriveTrain.DriveControlState;
+import frc.robot.subsystems.DriveTrain.DriveControlMode;
 
 public class DriveTeleop extends CommandBase {
   private DriveTrain mDrive;
@@ -26,7 +26,7 @@ public class DriveTeleop extends CommandBase {
   // Called when the command is initially scheduled.
   @Override
   public void initialize() {
-    switch(mDrive.getDriveControlState()){
+    switch(mDrive.getDriveControlMode()){
       case OPEN_LOOP:
         break;
       case VELOCITY_CONTROL:
@@ -46,11 +46,11 @@ public class DriveTeleop extends CommandBase {
     SmartDashboard.putNumber("right_setpoint", mWheelSpeeds.right * Constants.DRIVE_MAX_RPM);
 
 
-    if (mDrive.getDriveControlState() == DriveControlState.OPEN_LOOP){
+    if (mDrive.getDriveControlMode() == DriveControlMode.OPEN_LOOP){
       mDrive.setOpenLoop(mWheelSpeeds.left, mWheelSpeeds.right);
       }
       
-    if (mDrive.getDriveControlState() == DriveControlState.VELOCITY_CONTROL){
+    if (mDrive.getDriveControlMode() == DriveControlMode.VELOCITY_CONTROL){
       mDrive.setVelocity(mWheelSpeeds.left, mWheelSpeeds.right);
     }
   }

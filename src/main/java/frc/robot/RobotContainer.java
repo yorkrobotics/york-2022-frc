@@ -10,21 +10,17 @@ import edu.wpi.first.math.controller.PIDController;
 import edu.wpi.first.math.controller.RamseteController;
 import edu.wpi.first.math.geometry.Pose2d;
 import edu.wpi.first.math.geometry.Rotation2d;
-import edu.wpi.first.math.geometry.Translation2d;
 import edu.wpi.first.math.trajectory.Trajectory;
 import edu.wpi.first.math.trajectory.TrajectoryConfig;
 import edu.wpi.first.math.trajectory.TrajectoryGenerator;
 import edu.wpi.first.math.trajectory.constraint.DifferentialDriveVoltageConstraint;
 import edu.wpi.first.wpilibj.GenericHID;
 import edu.wpi.first.wpilibj.XboxController;
-import edu.wpi.first.wpilibj.XboxController.
-Button;
+import edu.wpi.first.wpilibj.XboxController.Button;
 import edu.wpi.first.wpilibj.shuffleboard.Shuffleboard;
 import frc.robot.commands.DriveTeleop;
-import frc.robot.commands.DriveWithPositionControl;
 import frc.robot.commands.RunLifter;
 import frc.robot.commands.ShootBall;
-import frc.robot.commands.SwitchDriveMode;
 import frc.robot.subsystems.DriveTrain;
 import frc.robot.subsystems.Lifter;
 import frc.robot.subsystems.Shooter;
@@ -48,8 +44,6 @@ public class RobotContainer {
 
   // Commands
   private DriveTeleop driveTeleop;
-  private DriveWithPositionControl driveWithPositionControl;
-  private SwitchDriveMode switchDriveMode;
   private ShootBall shootBall;
   private RunLifter runLifter;
 
@@ -70,9 +64,6 @@ public class RobotContainer {
     driveTeleop = new DriveTeleop(mDrive);
     mDrive.setDefaultCommand(driveTeleop);
 
-    driveWithPositionControl = new DriveWithPositionControl(mDrive);
-    switchDriveMode = new SwitchDriveMode(mDrive);
-
     // Shooter subsystem
     mShooter = new Shooter();
     shootBall = new ShootBall(mShooter);
@@ -84,8 +75,8 @@ public class RobotContainer {
     mLifter.setDefaultCommand(runLifter);
 
     // Ramsete controllers
-    mRamseteLeftController = new PIDController(10, 0, 0);
-    mRamseteRightController = new PIDController(10, 0, 0);
+    mRamseteLeftController = new PIDController(5.7673, 0, 0);
+    mRamseteRightController = new PIDController(5.7673, 0, 0);
 
     // Populate shuffleboard
     var autoTab = Shuffleboard.getTab("Autonomous");
@@ -109,11 +100,13 @@ public class RobotContainer {
     new JoystickButton(mController, Button.kRightBumper.value).whenPressed(new InstantCommand(mDrive::shiftUp, mDrive));
     new JoystickButton(mController, Button.kLeftBumper.value).whenPressed(new InstantCommand(mDrive::shiftDown, mDrive));
 
-    new JoystickButton(mController, Button.kX.value).whenPressed(switchDriveMode);
+    new JoystickButton(mController, Button.kX.value).whenPressed(mDrive::switchDriveMode, mDrive);
 
     new JoystickButton(mController, Button.kY.value).whenPressed(mLifter::switchLifterMode, mLifter);
 
-    new JoystickButton(mController, Button.kB.value).whenPressed(mLifter::resetEncoder, mLifter);
+    new JoystickButton(mController, Button.kB.value).whenPressed(()->{
+      mDrive.setPosition(Constants.TARGET_DISTANCE);
+    });
   }
 
   /**
@@ -126,9 +119,9 @@ public class RobotContainer {
     mDrive.resetEncoders();
     mDrive.getOdometry().resetPosition(new Pose2d(), new Rotation2d());
 
-    var autoVoltageConstraint= new DifferentialDriveVoltageConstraint(mDrive.getFeedForward(), mDrive.getKinematics(), 10);
+    var autoVoltageConstraint= new DifferentialDriveVoltageConstraint(mDrive.getFeedForward(), mDrive.getKinematics(), 12);
 
-    TrajectoryConfig config = new TrajectoryConfig(0.5, 1).setKinematics(mDrive.getKinematics()).addConstraint(autoVoltageConstraint);
+    TrajectoryConfig config = new TrajectoryConfig(1, 1).setKinematics(mDrive.getKinematics()).addConstraint(autoVoltageConstraint);
 
     Trajectory testTrajectory = TrajectoryGenerator.generateTrajectory(
       new Pose2d(), 
