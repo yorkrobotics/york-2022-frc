@@ -4,6 +4,8 @@
 
 package frc.robot;
 
+import java.io.IOException;
+import java.nio.file.Path;
 import java.util.List;
 
 import edu.wpi.first.math.controller.PIDController;
@@ -13,7 +15,10 @@ import edu.wpi.first.math.geometry.Rotation2d;
 import edu.wpi.first.math.trajectory.Trajectory;
 import edu.wpi.first.math.trajectory.TrajectoryConfig;
 import edu.wpi.first.math.trajectory.TrajectoryGenerator;
+import edu.wpi.first.math.trajectory.TrajectoryUtil;
 import edu.wpi.first.math.trajectory.constraint.DifferentialDriveVoltageConstraint;
+import edu.wpi.first.wpilibj.DriverStation;
+import edu.wpi.first.wpilibj.Filesystem;
 import edu.wpi.first.wpilibj.GenericHID;
 import edu.wpi.first.wpilibj.XboxController;
 import edu.wpi.first.wpilibj.XboxController.Button;
@@ -116,23 +121,35 @@ public class RobotContainer {
    */
   public Command getAutonomousCommand() {
     // A command to run in autonomous
-    // mDrive.resetEncoders();
-    // mDrive.getOdometry().resetPosition(new Pose2d(), new Rotation2d());
+    mDrive.resetEncoders();
+    mDrive.getOdometry().resetPosition(new Pose2d(), new Rotation2d());
 
     var autoVoltageConstraint= new DifferentialDriveVoltageConstraint(mDrive.getFeedForward(), mDrive.getKinematics(), Constants.kMaxVoltage);
 
     TrajectoryConfig config = new TrajectoryConfig(Constants.kMaxVelocity, Constants.kMaxAcceleration).setKinematics(mDrive.getKinematics()).addConstraint(autoVoltageConstraint);
 
-    Trajectory testTrajectory = TrajectoryGenerator.generateTrajectory(
+    Trajectory toHomePosition = TrajectoryGenerator.generateTrajectory(
       mDrive.getPose(), 
       List.of(), 
       new Pose2d(0, 0, new Rotation2d()), 
       config
     );
 
+    Trajectory heartTrajectory = new Trajectory();
+    
+    String heartJSON = "paths/Heart.wpilib.json";
+
+    try {
+      Path heartPath = Filesystem.getDeployDirectory().toPath().resolve(heartJSON);
+      heartTrajectory = TrajectoryUtil.fromPathweaverJson(heartPath);
+   } catch (IOException ex) {
+      DriverStation.reportError("Unable to open trajectory: " + heartJSON, ex.getStackTrace());
+      return null;
+   }
+
     RamseteController ramseteController = new RamseteController(2.0, 0.7);
     RamseteCommand testCommand = new RamseteCommand(
-      testTrajectory, 
+      heartTrajectory, 
       mDrive::getPose,
       ramseteController, 
       mDrive.getFeedForward(), 
