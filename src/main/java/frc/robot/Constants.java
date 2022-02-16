@@ -30,7 +30,12 @@ public final class Constants {
       //gear ratio: 16.364, 5.601
     public static final double TARGET_DISTANCE = 2;
 
+
     public static final double TRACK_WIDTH = 0.655; //The distance between left wheels and right wheels
+    
+    public static final double kMaxVoltage = 12;
+    public static final double kMaxVelocity = 1; // m/s
+    public static final double kMaxAcceleration = 1; // m/s^2
 
 
     

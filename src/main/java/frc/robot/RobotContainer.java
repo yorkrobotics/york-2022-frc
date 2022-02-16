@@ -116,17 +116,17 @@ public class RobotContainer {
    */
   public Command getAutonomousCommand() {
     // A command to run in autonomous
-    mDrive.resetEncoders();
-    mDrive.getOdometry().resetPosition(new Pose2d(), new Rotation2d());
+    // mDrive.resetEncoders();
+    // mDrive.getOdometry().resetPosition(new Pose2d(), new Rotation2d());
 
-    var autoVoltageConstraint= new DifferentialDriveVoltageConstraint(mDrive.getFeedForward(), mDrive.getKinematics(), 12);
+    var autoVoltageConstraint= new DifferentialDriveVoltageConstraint(mDrive.getFeedForward(), mDrive.getKinematics(), Constants.kMaxVoltage);
 
-    TrajectoryConfig config = new TrajectoryConfig(1, 1).setKinematics(mDrive.getKinematics()).addConstraint(autoVoltageConstraint);
+    TrajectoryConfig config = new TrajectoryConfig(Constants.kMaxVelocity, Constants.kMaxAcceleration).setKinematics(mDrive.getKinematics()).addConstraint(autoVoltageConstraint);
 
     Trajectory testTrajectory = TrajectoryGenerator.generateTrajectory(
-      new Pose2d(), 
+      mDrive.getPose(), 
       List.of(), 
-      new Pose2d(3, 0, new Rotation2d()), 
+      new Pose2d(0, 0, new Rotation2d()), 
       config
     );
 
