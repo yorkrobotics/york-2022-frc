@@ -7,7 +7,6 @@ package frc.robot.subsystems;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
 import edu.wpi.first.networktables.NetworkTable;
 import edu.wpi.first.networktables.NetworkTableInstance;
-import edu.wpi.first.networktables.NetworkTableEntry;
 
 
 public class PyCamera extends SubsystemBase {
@@ -42,6 +41,10 @@ public class PyCamera extends SubsystemBase {
     double equation = (v_squared + Math.sqrt(var_square_root)) / (g * z);
     double angle = Math.atan(equation);
     return angle;
+  }
+
+  public double getTurn(double x, double y) {
+    return Math.atan(x/y);
   }
 
   @Override
