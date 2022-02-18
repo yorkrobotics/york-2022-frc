@@ -5,15 +5,20 @@
 package frc.robot.commands;
 
 import edu.wpi.first.wpilibj2.command.CommandBase;
+import frc.robot.subsystems.PyCamera;
 import frc.robot.subsystems.Shooter;
 
-public class ShootBall extends CommandBase {
-  private Shooter m_shooter;
-  /** Creates a new ShootBall. */
-  public ShootBall(Shooter s) {
+public class ShootTarget extends CommandBase {
+  private final PyCamera pycam;
+  private final Shooter shooter;
+  private boolean isDone;
+  /** Creates a new getHoopCenter. */
+  public ShootTarget(PyCamera pc, Shooter st) {
+    pycam = pc;
+    shooter = st;
+    addRequirements(pycam, shooter);
+    isDone = false;
     // Use addRequirements() here to declare subsystem dependencies.
-    m_shooter = s;
-    addRequirements(m_shooter);
   }
 
   // Called when the command is initially scheduled.
@@ -23,18 +28,22 @@ public class ShootBall extends CommandBase {
   // Called every time the scheduler runs while the command is scheduled.
   @Override
   public void execute() {
-    m_shooter.setSpeed(0.5);
+    System.out.println(pycam.getHoopCenter()[0]);
+    System.out.println(pycam.getHoopCenter()[1]);
+    System.out.println(pycam.getHoopCenter()[2]);
+    double angle = pycam.getAngle(shooter.getSpeed());
+    System.out.println(angle);
+    shooter.setAngle(angle);
+    isDone = true;
   }
 
   // Called once the command ends or is interrupted.
   @Override
-  public void end(boolean interrupted) {
-    m_shooter.stopMotor();
-  }
+  public void end(boolean interrupted) {}
 
   // Returns true when the command should end.
   @Override
   public boolean isFinished() {
-    return false;
-  }
+    return isDone;
+ }
 }
