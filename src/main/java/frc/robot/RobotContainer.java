@@ -25,13 +25,9 @@ import edu.wpi.first.wpilibj.XboxController.Button;
 import edu.wpi.first.wpilibj.shuffleboard.Shuffleboard;
 import frc.robot.commands.DriveTeleop;
 import frc.robot.commands.RunLifter;
-import frc.robot.commands.ShootBall;
 import frc.robot.subsystems.DriveTrain;
 import frc.robot.subsystems.Lifter;
-import frc.robot.commands.ShootBall;
-import frc.robot.commands.feed;
 import frc.robot.commands.ShootTarget;
-import frc.robot.subsystems.DriveTrain;
 import frc.robot.subsystems.FeedIntake;
 import frc.robot.subsystems.PyCamera;
 import frc.robot.subsystems.Shooter;
@@ -51,11 +47,10 @@ public class RobotContainer {
   private DriveTrain mDrive;
   private Lifter mLifter;
   private Shooter m_shooter;
-
+  private FeedIntake m_feed;
 
   // Commands
   private DriveTeleop driveTeleop;
-  private ShootBall shootBall;
   private RunLifter runLifter;
 
   // Ramsete controllers
@@ -64,10 +59,6 @@ public class RobotContainer {
   // XboxController
   public static XboxController mController;
 
-  //Shooter
-
-  //Feed
-  private FeedIntake m_feed;
 
   public static XboxController m_controller;
   //camera
@@ -124,25 +115,27 @@ public class RobotContainer {
     new JoystickButton(mController, Button.kRightBumper.value).whenPressed(new InstantCommand(mDrive::shiftUp, mDrive));
     new JoystickButton(mController, Button.kLeftBumper.value).whenPressed(new InstantCommand(mDrive::shiftDown, mDrive));
 
-    new JoystickButton(mController, Button.kX.value).whenPressed(mDrive::switchDriveMode, mDrive);
+    new JoystickButton(mController, Button.kRightStick.value).whenPressed(mDrive::switchDriveMode, mDrive);
 
-    // new JoystickButton(mController, Button.kY.value).whenPressed(mLifter::switchLifterMode, mLifter);
+    new JoystickButton(mController, Button.kLeftStick.value).whenPressed(mLifter::switchLifterMode, mLifter);
 
-    new JoystickButton(mController, Button.kB.value).whenPressed(()->{
+    new JoystickButton(mController, Button.kA.value).whenPressed(()->{
       mDrive.setRotation(30);
     });
     
     // B TBD
-    JoystickButton button_B = new JoystickButton(m_controller, Button.kB.value);
-    button_B.whenReleased(new ShootTarget(pycam, m_shooter));
+    new JoystickButton(mController, Button.kB.value).whenReleased(new ShootTarget(pycam, m_shooter));
 
     // X to feed
-    JoystickButton button_X = new JoystickButton(m_controller, Button.kX.value);
-    button_X.whileHeld(new feed(m_feed));
+    new JoystickButton(mController, Button.kX.value).whileHeld(()->{
+      m_shooter.setSpeed(0.5);;
+    });
     
     // Y to shoot
-    JoystickButton button_Y = new JoystickButton(m_controller, Button.kY.value);
-    button_Y.whileHeld(new ShootBall(m_shooter));
+    new JoystickButton(mController, Button.kY.value).whileHeld(()->{
+      m_feed.setSpeed(0.5);
+    });
+
     }
 
   /**
