@@ -43,7 +43,7 @@ public class PyCamera extends SubsystemBase {
     return angle;
   }
 
-  public double getTurn(double x, double y) {
+  public double getTurn() {
     return Math.atan(x/y);
   }
 
