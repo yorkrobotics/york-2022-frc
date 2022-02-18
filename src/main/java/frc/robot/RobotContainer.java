@@ -110,7 +110,7 @@ public class RobotContainer {
     new JoystickButton(mController, Button.kY.value).whenPressed(mLifter::switchLifterMode, mLifter);
 
     new JoystickButton(mController, Button.kB.value).whenPressed(()->{
-      mDrive.setPosition(Constants.TARGET_DISTANCE);
+      mDrive.setRotation(30);
     });
   }
 

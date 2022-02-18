@@ -35,9 +35,7 @@ public class DriveTrain extends SubsystemBase {
 
   //Controller setup
   private SparkMaxPIDController mleftPIDController, mrightPIDController;
-  private DriveControlMode
-   mDriveControlMode
-  ;
+  private DriveControlMode mDriveControlMode;
 
   private double gearRatio, kS, kV, kA;
   private double kP_velocity, kI_velocity, kD_velocity, kMinOutput_velocity, kMaxOutput_velocity;
@@ -57,8 +55,9 @@ public class DriveTrain extends SubsystemBase {
     mleftBack = new CANSparkMax(2, MotorType.kBrushless);
     mrightFront = new CANSparkMax(4, MotorType.kBrushless);
     mrightBack = new CANSparkMax(3, MotorType.kBrushless);
-
     mShifter = new DoubleSolenoid(PneumaticsModuleType.CTREPCM, 6, 1);
+    
+    // Always set to low gear at the start
     shiftDown();
     gearRatio = Constants.GEAR_RATIO_LOW;
 
@@ -80,9 +79,7 @@ public class DriveTrain extends SubsystemBase {
     mleftPIDController = mleftFront.getPIDController();
     mrightPIDController = mrightFront.getPIDController();
 
-    mDriveControlMode
-     = DriveControlMode
-    .OPEN_LOOP; //Default drive mode set to open loop
+    mDriveControlMode = DriveControlMode.OPEN_LOOP; //Default drive mode set to open loop
 
     //Store PID coefficients
     kP_velocity = 0.000097988; 
@@ -142,9 +139,7 @@ public class DriveTrain extends SubsystemBase {
   public void periodic() {
     // This method will be called once per scheduler run
     // Update and get values from the smart dashboard
-    if (mDriveControlMode
-     == DriveControlMode
-    .VELOCITY_CONTROL){
+    if (mDriveControlMode == DriveControlMode.VELOCITY_CONTROL){
       
       double p = SmartDashboard.getNumber("Velocity P Gain", 0);
       double i = SmartDashboard.getNumber("Velocity I Gain", 0);
@@ -174,11 +169,8 @@ public class DriveTrain extends SubsystemBase {
     SmartDashboard.putNumber("left_wheelspeed", getWheelSpeeds().leftMetersPerSecond);
     SmartDashboard.putNumber("right_wheelspeed", getWheelSpeeds().rightMetersPerSecond);
 
-
-
     SmartDashboard.putNumber("heading angle", mGyro.getRate());
     SmartDashboard.putBoolean("Gyro Connected", mGyro.isConnected());
-
   }
 
   public void configureVelocityControl(){
@@ -191,15 +183,12 @@ public class DriveTrain extends SubsystemBase {
     setDriveMode(DriveControlMode.POSITION_CONTROL);
     updatePIDController(mleftPIDController, kP_position, kI_position, kD_position, kMinOutput_position, kMaxOutput_position);
     updatePIDController(mrightPIDController, kP_position, kI_position, kD_position, kMinOutput_position, kMaxOutput_position);
-
     //extra step to reset the encoders
     resetEncoders();
   }
 
   public void setOpenLoop(double left_velocity, double right_velocity){
-    if (mDriveControlMode
-     == DriveControlMode
-    .OPEN_LOOP){
+    if (mDriveControlMode == DriveControlMode.OPEN_LOOP){
       mleftFront.set(left_velocity * Constants.MAX_OPENLOOP_SPEED);
       mrightFront.set(right_velocity * Constants.MAX_OPENLOOP_SPEED);
     }
@@ -210,9 +199,7 @@ public class DriveTrain extends SubsystemBase {
 
   // Setting the motors according to velocity control
   public void setVelocity(double left_velocity, double right_velocity){
-    if (mDriveControlMode
-     == DriveControlMode
-    .VELOCITY_CONTROL){
+    if (mDriveControlMode == DriveControlMode.VELOCITY_CONTROL){
       mleftPIDController.setReference(left_velocity * Constants.DRIVE_MAX_RPM, CANSparkMax.ControlType.kVelocity);
       mrightPIDController.setReference(right_velocity * Constants.DRIVE_MAX_RPM, CANSparkMax.ControlType.kVelocity);
     }
@@ -227,6 +214,13 @@ public class DriveTrain extends SubsystemBase {
     double setRotations = metersToRotations(setMeters);
     mleftPIDController.setReference(setRotations, CANSparkMax.ControlType.kPosition);
     mrightPIDController.setReference(setRotations, CANSparkMax.ControlType.kPosition);
+  }
+
+  public void setRotation(double setAngle){
+    configurePositionControl();
+    double setMeters = setAngle / 360 * Math.PI * Constants.TRACK_WIDTH;
+    mleftPIDController.setReference(metersToRotations(setMeters), CANSparkMax.ControlType.kPosition);
+    mrightPIDController.setReference(-metersToRotations(setMeters), CANSparkMax.ControlType.kPosition);
   }
 
   public void updatePIDController(SparkMaxPIDController pidController, double p, double i, double d, double minOutput, double maxOutput){
