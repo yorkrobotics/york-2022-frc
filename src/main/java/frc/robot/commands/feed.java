@@ -4,16 +4,20 @@
 
 package frc.robot.commands;
 
+import frc.robot.subsystems.FeedIntake;
 import edu.wpi.first.wpilibj2.command.CommandBase;
-import frc.robot.subsystems.Shooter;
 
-public class ShootBall extends CommandBase {
-  private Shooter m_shooter;
-  /** Creates a new ShootBall. */
-  public ShootBall(Shooter s) {
+public class feed extends CommandBase {
+  private FeedIntake feedSystem;
+
+  /**
+   *
+   * @param sub The subsystem used by this command.
+   */
+  public feed(FeedIntake sub) {
+    feedSystem = sub;
     // Use addRequirements() here to declare subsystem dependencies.
-    m_shooter = s;
-    addRequirements(m_shooter);
+    addRequirements(feedSystem);
   }
 
   // Called when the command is initially scheduled.
@@ -23,13 +27,13 @@ public class ShootBall extends CommandBase {
   // Called every time the scheduler runs while the command is scheduled.
   @Override
   public void execute() {
-    m_shooter.setSpeed(0.5);
+    feedSystem.setSpeed(0.5);
   }
 
   // Called once the command ends or is interrupted.
   @Override
   public void end(boolean interrupted) {
-    m_shooter.stopMotor();
+    feedSystem.stopMotor();
   }
 
   // Returns true when the command should end.

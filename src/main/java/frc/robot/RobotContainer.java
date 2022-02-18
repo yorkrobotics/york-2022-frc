@@ -28,6 +28,12 @@ import frc.robot.commands.RunLifter;
 import frc.robot.commands.ShootBall;
 import frc.robot.subsystems.DriveTrain;
 import frc.robot.subsystems.Lifter;
+import frc.robot.commands.ShootBall;
+import frc.robot.commands.feed;
+import frc.robot.commands.ShootTarget;
+import frc.robot.subsystems.DriveTrain;
+import frc.robot.subsystems.FeedIntake;
+import frc.robot.subsystems.PyCamera;
 import frc.robot.subsystems.Shooter;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.InstantCommand;
@@ -43,9 +49,9 @@ import edu.wpi.first.wpilibj2.command.button.JoystickButton;
 public class RobotContainer {
   // Subsystems
   private DriveTrain mDrive;
-  private Shooter mShooter;
   private Lifter mLifter;
- 
+  private Shooter m_shooter;
+
 
   // Commands
   private DriveTeleop driveTeleop;
@@ -58,6 +64,15 @@ public class RobotContainer {
   // XboxController
   public static XboxController mController;
 
+  //Shooter
+
+  //Feed
+  private FeedIntake m_feed;
+
+  public static XboxController m_controller;
+  //camera
+  private PyCamera pycam;
+
   /** The container for the robot. Contains subsystems, OI devices, and commands. */
   public RobotContainer() {
 
@@ -68,11 +83,6 @@ public class RobotContainer {
     mDrive = new DriveTrain();
     driveTeleop = new DriveTeleop(mDrive);
     mDrive.setDefaultCommand(driveTeleop);
-
-    // Shooter subsystem
-    mShooter = new Shooter();
-    shootBall = new ShootBall(mShooter);
-    // mShooter.setDefaultCommand(shootBall);
 
     //Lifter subsystem
     mLifter = new Lifter();
@@ -87,6 +97,15 @@ public class RobotContainer {
     var autoTab = Shuffleboard.getTab("Autonomous");
     autoTab.add("Left Controller", mRamseteLeftController);
     autoTab.add("Right Controller", mRamseteRightController);
+    
+    //feed
+    m_feed = new FeedIntake();
+
+    //Shooter stuff
+    m_shooter = new Shooter();
+
+    //pycam
+    pycam = new PyCamera();
 
     // Configure the button bindings
     configureButtonBindings();
@@ -107,12 +126,23 @@ public class RobotContainer {
 
     new JoystickButton(mController, Button.kX.value).whenPressed(mDrive::switchDriveMode, mDrive);
 
-    new JoystickButton(mController, Button.kY.value).whenPressed(mLifter::switchLifterMode, mLifter);
+    // new JoystickButton(mController, Button.kY.value).whenPressed(mLifter::switchLifterMode, mLifter);
 
     new JoystickButton(mController, Button.kB.value).whenPressed(()->{
       mDrive.setRotation(30);
     });
-  }
+          // B TBD
+    JoystickButton button_B = new JoystickButton(m_controller, Button.kB.value);
+    button_B.whenReleased(new ShootTarget(pycam, m_shooter));
+
+    // X to feed
+    JoystickButton button_X = new JoystickButton(m_controller, Button.kX.value);
+    button_X.whileHeld(new ShootBall(m_shooter));
+    
+    // Y to shoot
+    JoystickButton button_Y = new JoystickButton(m_controller, Button.kY.value);
+    button_Y.whileHeld(new feed(m_feed));
+    }
 
   /**
    * Use this to pass the autonomous command to the main {@link Robot} class.
