@@ -131,17 +131,18 @@ public class RobotContainer {
     new JoystickButton(mController, Button.kB.value).whenPressed(()->{
       mDrive.setPosition(Constants.TARGET_DISTANCE);
     });
-          // B TBD
+    
+    // B TBD
     JoystickButton button_B = new JoystickButton(m_controller, Button.kB.value);
     button_B.whenReleased(new ShootTarget(pycam, m_shooter));
 
     // X to feed
     JoystickButton button_X = new JoystickButton(m_controller, Button.kX.value);
-    button_X.whileHeld(new ShootBall(m_shooter));
+    button_X.whileHeld(new feed(m_feed));
     
     // Y to shoot
     JoystickButton button_Y = new JoystickButton(m_controller, Button.kY.value);
-    button_Y.whileHeld(new feed(m_feed));
+    button_Y.whileHeld(new ShootBall(m_shooter));
     }
 
   /**
