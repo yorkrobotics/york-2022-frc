@@ -245,7 +245,7 @@ def verticesFromBin(binary_img, output_img):
     vertice_list = []
     for contour in contour_list:
         # Ignore small contours that could be because of noise/bad thresholding
-        if cv2.contourArea(contour) < 15:
+        if cv2.contourArea(contour) < 25:
             continue
 
         epsilon = 0.1 * cv2.arcLength(contour, True)
@@ -321,7 +321,7 @@ def getHoopCenter(output_img, vertice_list):
         quad_points = [np.array(x) for x in [quad_points ]] # convert to numpy array
         _, rvec, tvec = cv2.solvePnP(object_points, quad_points[0], camera_matrix, distortion)#, flags=cv2.SOLVEPNP_EPNP)
         rvec, _ = cv2.Rodrigues(rvec)
-        center = calcShooterToCenter(rvec, tvec)
+        center = calcHoopCenter(rvec, tvec)
         hoop_coords.append([])
         for i in range(3):
             hoop_coords[idx].append(int(center[i][0]))
@@ -338,10 +338,12 @@ def getHoopCenter(output_img, vertice_list):
 def reduceSigma(coords):
     sigma = np.std(coords)
     mean = np.mean(coords)
-    if (sigma < 15):
-        return int(mean)
-    else:
-        return "NaN"
+    median = np.median(coords)
+    # if (sigma < 15):
+    #     return int(mean)
+    # else:
+        # return "NaN"
+    return median
 
 def getBestCenter(hoop_centers):
     coords = [np.array(x) for x in [hoop_centers]]
@@ -369,8 +371,9 @@ if __name__ == "__main__":
             continue
 
         # Convert to HSV and threshold image
+        # input_img = cv2.GaussianBlur(input_img, (7,7), cv2.BORDER_CONSTANT)
         hsv_img = cv2.cvtColor(input_img, cv2.COLOR_BGR2HSV)
-        binary_img = cv2.inRange(hsv_img, (40, 100, 120), (100, 255, 255))
+        binary_img = cv2.inRange(hsv_img, (70, 90, 120), (90, 255, 255))
         output_img = np.copy(input_img)
 
         # getCenterHSV(output_img) # for tuning binary image range
