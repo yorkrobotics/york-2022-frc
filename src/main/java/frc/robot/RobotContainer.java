@@ -115,20 +115,18 @@ public class RobotContainer {
     new JoystickButton(mController, Button.kRightBumper.value).whenPressed(new InstantCommand(mDrive::shiftUp, mDrive));
     new JoystickButton(mController, Button.kLeftBumper.value).whenPressed(new InstantCommand(mDrive::shiftDown, mDrive));
 
-    new JoystickButton(mController, Button.kRightStick.value).whenPressed(mDrive::switchDriveMode, mDrive);
+    new JoystickButton(mController, Button.kLeftStick.value).whenPressed(mDrive::switchDriveMode, mDrive);
 
-    new JoystickButton(mController, Button.kLeftStick.value).whenPressed(mLifter::switchLifterMode, mLifter);
+    new JoystickButton(mController, Button.kRightStick.value).whenPressed(mLifter::switchLifterMode, mLifter);
 
-    new JoystickButton(mController, Button.kA.value).whenPressed(()->{
-      mDrive.setRotation(30);
-    });
+    new JoystickButton(mController, Button.kA.value).whenPressed(()->{mDrive.setPosition(2);}, mDrive);
     
     // B TBD
     new JoystickButton(mController, Button.kB.value).whenReleased(new ShootTarget(pycam, m_shooter));
 
     // X to feed
     new JoystickButton(mController, Button.kX.value).whileHeld(()->{
-      m_shooter.setSpeed(0.5);;
+      m_shooter.setSpeed(0.5);
     });
     
     // Y to shoot

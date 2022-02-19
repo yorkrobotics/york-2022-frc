@@ -3,6 +3,10 @@
 // the WPILib BSD license file in the root directory of this project.
 
 package frc.robot;
+
+import edu.wpi.first.math.geometry.Rotation2d;
+import edu.wpi.first.math.geometry.Translation2d;
+
 //hello
 /**
  * The Constants class provides a convenient place for teams to hold robot-wide numerical or boolean
@@ -36,6 +40,15 @@ public final class Constants {
     public static final double kMaxVoltage = 12;
     public static final double kMaxVelocity = 1; // m/s
     public static final double kMaxAcceleration = 1; // m/s^2
+
+
+    public static final double STARTING_ANGLE = 0;
+
+
+    public static final double STARTING_X = 0;
+
+
+    public static final double STARTING_Y = 0;
 
 
     

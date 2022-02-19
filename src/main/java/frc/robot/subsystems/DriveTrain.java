@@ -12,6 +12,7 @@ import com.revrobotics.CANSparkMaxLowLevel.MotorType;
 
 import edu.wpi.first.math.controller.SimpleMotorFeedforward;
 import edu.wpi.first.math.geometry.Pose2d;
+import edu.wpi.first.math.geometry.Rotation2d;
 import edu.wpi.first.math.kinematics.DifferentialDriveKinematics;
 import edu.wpi.first.math.kinematics.DifferentialDriveOdometry;
 import edu.wpi.first.math.kinematics.DifferentialDriveWheelSpeeds;
@@ -88,7 +89,7 @@ public class DriveTrain extends SubsystemBase {
     kMinOutput_velocity = -0.7;  
     kMaxOutput_velocity = 0.7; 
 
-    kP_position = 5.7673; 
+    kP_position = 0.3; 
     kI_position = 0;
     kD_position = 0; 
     kMinOutput_position = -0.5;
@@ -116,7 +117,7 @@ public class DriveTrain extends SubsystemBase {
     mGyro.calibrate();
 
     mKinematics = new DifferentialDriveKinematics(Constants.TRACK_WIDTH);
-    mOdometry = new DifferentialDriveOdometry(mGyro.getRotation2d()); //optional second arguement: starting position
+    mOdometry = new DifferentialDriveOdometry(new Rotation2d(Constants.STARTING_ANGLE), new Pose2d(Constants.STARTING_X, Constants.STARTING_Y, new Rotation2d(Constants.STARTING_ANGLE))); //optional second arguement: starting position
     mFeedforward = new SimpleMotorFeedforward(kS, kV, kA);
 
     // Update to Shuffleboard
