@@ -51,7 +51,17 @@ object_points = [
 # convert to numpy array
 camera_matrix, object_points = [np.array(x) for x in [camera_matrix, object_points ]]
 
+rMatShooter = [
+        [1.0, 0.0, 0.0],
+        [0.0, 1.0, 0.0],
+        [0.0, 0.0, 1.0],
+        ]
 
+tMatShooter = [
+        [0.0],
+        [-50.0],
+        [0.0]
+        ]
 
 def parseError(str):
     """Report parse error."""
@@ -222,7 +232,7 @@ def setupCameras():
         startSwitchedCamera(config)
 
     os.system("v4l2-ctl -c auto_exposure=1")
-    os.system("v4l2-ctl -c exposure_time_absolute=30")
+    os.system("v4l2-ctl -c exposure_time_absolute=15")
 
 def framePerSecond(start_time):
     processing_time = time.time() - start_time
@@ -264,6 +274,18 @@ def sortQuadList(quad_list):
         for pair in zip(points[::2], points[1::2]):
             quad_list.extend([val for point in sorted(pair, key=y) for val in point])
 
+def calcShooterToCenter(rvec, tvec):
+    bottom_list = [[0.0, 0.0, 0.0, 1.0]]
+    trans_matrix = np.hstack((rvec, tvec))
+    trans_matrix = np.vstack((trans_matrix, bottom_list))
+    shooter_to_cam_matrix = np.hstack((rMatShooter, tMatShooter))
+    shooter_to_cam_matrix = np.vstack((shooter_to_cam_matrix, bottom_list))
+    center_to_tape = [[.0],[.0],[-27.0], [1.0]]
+    center = trans_matrix.dot(center_to_tape)
+    center = shooter_to_cam_matrix.dot(center)
+    center = center.tolist()
+    return center
+
 def calcHoopCenter(rvec, tvec):
     bottom_list = [[0.0, 0.0, 0.0, 1.0]]
     trans_matrix = np.hstack((rvec, tvec))
@@ -299,25 +321,34 @@ def getHoopCenter(output_img, vertice_list):
         quad_points = [np.array(x) for x in [quad_points ]] # convert to numpy array
         _, rvec, tvec = cv2.solvePnP(object_points, quad_points[0], camera_matrix, distortion)#, flags=cv2.SOLVEPNP_EPNP)
         rvec, _ = cv2.Rodrigues(rvec)
-        center = calcHoopCenter(rvec, tvec)
+        center = calcShooterToCenter(rvec, tvec)
         hoop_coords.append([])
         for i in range(3):
             hoop_coords[idx].append(int(center[i][0]))
         idx+=1
 
     # show corners and coords
-    cv2.putText(output_img, str(hoop_coords), (200, 120), 0, 3, (128, 255, 0), 3)
+    # cv2.putText(output_img, str(hoop_coords), (200, 120), 0, 3, (128, 255, 0), 3)
     for quad in image_points:
         for i in quad:
             cv2.circle(output_img, center = tuple(list(map(int, i))), radius = 4, color = (255, 0, 255), thickness = -1)
     
     return hoop_coords
 
-def getBestCenter(hoop_centers):
-    if len(hoop_centers) > 0:
-        return hoop_centers[0]
-    return [0, 0, 0]
+def reduceSigma(coords):
+    sigma = np.std(coords)
+    mean = np.mean(coords)
+    if (sigma < 15):
+        return int(mean)
+    else:
+        return "NaN"
 
+def getBestCenter(hoop_centers):
+    coords = [np.array(x) for x in [hoop_centers]]
+    coords = coords[0]
+    if len(hoop_centers) > 0:
+        return [reduceSigma(coords[:,0]), reduceSigma(coords[:,1]), reduceSigma(coords[:,2])]
+    return ["NaN", "NaN", "NaN"]
 
 if __name__ == "__main__":
     setupCameras()
@@ -339,7 +370,7 @@ if __name__ == "__main__":
 
         # Convert to HSV and threshold image
         hsv_img = cv2.cvtColor(input_img, cv2.COLOR_BGR2HSV)
-        binary_img = cv2.inRange(hsv_img, (55, 100, 120), (95, 255, 255))
+        binary_img = cv2.inRange(hsv_img, (40, 100, 120), (100, 255, 255))
         output_img = np.copy(input_img)
 
         # getCenterHSV(output_img) # for tuning binary image range
@@ -348,6 +379,8 @@ if __name__ == "__main__":
         vertice_list = verticesFromBin(binary_img, output_img)
         hoop_centers = getHoopCenter(output_img, vertice_list)
         center = getBestCenter(hoop_centers)
+
+        cv2.putText(output_img, str(center), (200, 120), 0, 3, (128, 255, 0), 3)
         vision_nt.putNumberArray('translation_vector', center)
 
         binary_output_stream.putFrame(binary_img)
