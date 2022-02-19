@@ -45,10 +45,10 @@ public final class Constants {
     public static final double STARTING_ANGLE = 0;
 
 
-    public static final double STARTING_X = 0;
+    public static final double STARTING_X = 4.11;
 
 
-    public static final double STARTING_Y = 0;
+    public static final double STARTING_Y = 2.055;
 
 
     

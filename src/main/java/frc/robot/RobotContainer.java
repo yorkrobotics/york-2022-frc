@@ -119,7 +119,9 @@ public class RobotContainer {
 
     new JoystickButton(mController, Button.kRightStick.value).whenPressed(mLifter::switchLifterMode, mLifter);
 
-    new JoystickButton(mController, Button.kA.value).whenPressed(()->{mDrive.setPosition(2);}, mDrive);
+    new JoystickButton(mController, Button.kA.value).whenPressed(()->{
+      mDrive.setRotation(30);
+    });
     
     // B TBD
     new JoystickButton(mController, Button.kB.value).whenReleased(new ShootTarget(pycam, m_shooter));
@@ -130,9 +132,10 @@ public class RobotContainer {
     });
     
     // Y to shoot
-    new JoystickButton(mController, Button.kY.value).whileHeld(()->{
-      m_feed.setSpeed(0.5);
-    });
+    new JoystickButton(mController, Button.kY.value).whenPressed(mDrive::turnToTarget, mDrive);
+    // new JoystickButton(mController, Button.kY.value).whileHeld(()->{
+    //   m_feed.setSpeed(0.5);
+    // });
 
     }
 
