@@ -170,7 +170,7 @@ public class DriveTrain extends SubsystemBase {
     SmartDashboard.putNumber("left_wheelspeed", getWheelSpeeds().leftMetersPerSecond);
     SmartDashboard.putNumber("right_wheelspeed", getWheelSpeeds().rightMetersPerSecond);
 
-    SmartDashboard.putNumber("heading angle", mGyro.getRate());
+    SmartDashboard.putNumber("heading angle", mGyro.getAngle());
     SmartDashboard.putBoolean("Gyro Connected", mGyro.isConnected());
   }
 
@@ -330,13 +330,13 @@ public class DriveTrain extends SubsystemBase {
     double turnAngle;
 
     if (x > 0 && y > 0) {
-      turnAngle = Math.atan(x / y) + 180.0 - theta;
+      turnAngle = Math.atan(x / y) + 90.0 - theta;
     } else if (x < 0 && y > 0) {
-      turnAngle = -Math.atan(x / y) + 180.0 - theta;
+      turnAngle = -Math.atan(x / y) + 90.0 - theta;
     } else if (x < 0 && y < 0) {
-      turnAngle = Math.atan(x / y) - theta;
+      turnAngle = Math.atan(x / y) - theta - 90;
     } else { // if (x > 0 && y < 0)
-      turnAngle = -Math.atan(x / y) - theta;
+      turnAngle = -Math.atan(x / y) - theta - 90;
     }
 
     setRotation(turnAngle);
