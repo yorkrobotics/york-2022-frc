@@ -326,17 +326,17 @@ public class DriveTrain extends SubsystemBase {
   public void turnToTarget() {
     double x = mPose.getX() - 4.11;
     double y = mPose.getY() - 2.055;
-    double theta = mGyro.getAngle() % 360; // self angle
+    double theta = mGyro.getAngle() % 360.0; // self angle
     double turnAngle;
 
     if (x > 0 && y > 0) {
-      turnAngle = Math.atan(x / y) + 90.0 - theta;
+      turnAngle = Math.atan(x / y) / Math.pi * 180.0 + 90.0 - theta;
     } else if (x < 0 && y > 0) {
-      turnAngle = -Math.atan(x / y) + 90.0 - theta;
+      turnAngle = -Math.atan(x / y) / Math.pi * 180.0 + 90.0 - theta;
     } else if (x < 0 && y < 0) {
-      turnAngle = Math.atan(x / y) - theta - 90;
+      turnAngle = Math.atan(x / y) / Math.pi * 180.0 - theta - 90.0;
     } else { // if (x > 0 && y < 0)
-      turnAngle = -Math.atan(x / y) - theta - 90;
+      turnAngle = -Math.atan(x / y) / Math.pi * 180.0 - theta - 90.0;
     }
 
     setRotation(turnAngle);
