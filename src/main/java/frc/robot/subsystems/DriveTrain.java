@@ -170,7 +170,7 @@ public class DriveTrain extends SubsystemBase {
     SmartDashboard.putNumber("left_wheelspeed", getWheelSpeeds().leftMetersPerSecond);
     SmartDashboard.putNumber("right_wheelspeed", getWheelSpeeds().rightMetersPerSecond);
 
-    SmartDashboard.putNumber("heading angle", mGyro.getAngle());
+    SmartDashboard.putNumber("heading angle", mGyro.getAngle ());
     SmartDashboard.putBoolean("Gyro Connected", mGyro.isConnected());
   }
 
