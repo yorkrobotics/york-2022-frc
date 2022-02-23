@@ -330,13 +330,9 @@ public class DriveTrain extends SubsystemBase {
     double theta = mGyro.getAngle() % 360.0; // self angle
     double turnAngle;
 
-    if (x > 0 && y > 0) {
+    if (y > 0) {
       turnAngle = Math.atan(x / y) / Math.PI * 180.0 + 90.0 - theta;
-    } else if (x < 0 && y > 0) {
-      turnAngle = Math.atan(x / y) / Math.PI * 180.0 + 90.0 - theta;
-    } else if (x < 0 && y < 0) {
-      turnAngle = Math.atan(x / y) / Math.PI * 180.0 - theta - 90.0;
-    } else { // if (x > 0 && y < 0)
+    } else {
       turnAngle = Math.atan(x / y) / Math.PI * 180.0 - theta - 90.0;
     }
     
