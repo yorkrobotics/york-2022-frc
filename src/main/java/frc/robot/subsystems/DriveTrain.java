@@ -185,7 +185,7 @@ public class DriveTrain extends SubsystemBase {
     updatePIDController(mleftPIDController, kP_position, kI_position, kD_position, kMinOutput_position, kMaxOutput_position);
     updatePIDController(mrightPIDController, kP_position, kI_position, kD_position, kMinOutput_position, kMaxOutput_position);
     //extra step to reset the encoders
-    resetEncoders();
+    // resetEncoders();
   }
 
   public void setOpenLoop(double left_velocity, double right_velocity){
@@ -219,9 +219,10 @@ public class DriveTrain extends SubsystemBase {
 
   public void setRotation(double setAngle){
     configurePositionControl();
+
     double setMeters = setAngle / 360 * Math.PI * Constants.TRACK_WIDTH;
-    mleftPIDController.setReference(metersToRotations(setMeters), CANSparkMax.ControlType.kPosition);
-    mrightPIDController.setReference(-metersToRotations(setMeters), CANSparkMax.ControlType.kPosition);
+    mleftPIDController.setReference(mleftFrontEncoder.getPosition() + metersToRotations(setMeters), CANSparkMax.ControlType.kPosition);
+    mrightPIDController.setReference(mrightFrontEncoder.getPosition() - metersToRotations(setMeters), CANSparkMax.ControlType.kPosition);
   }
 
   public void updatePIDController(SparkMaxPIDController pidController, double p, double i, double d, double minOutput, double maxOutput){
