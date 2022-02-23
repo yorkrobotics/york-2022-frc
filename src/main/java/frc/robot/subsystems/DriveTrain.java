@@ -339,6 +339,10 @@ public class DriveTrain extends SubsystemBase {
     } else { // if (x > 0 && y < 0)
       turnAngle = Math.atan(x / y) / Math.PI * 180.0 - theta - 90.0;
     }
+    
+    if (turnAngle > 180.0) {
+      turnAngle = - 360.0 + turnAngle;
+    }
 
     setRotation(turnAngle);
   }
