@@ -47,6 +47,11 @@ public class DriveTrain extends SubsystemBase {
   private ADXRS450_Gyro mGyro;
   private Pose2d mPose;
   private SimpleMotorFeedforward mFeedforward;
+  private double leftWheelDistance = 0;
+  private double rightWheelDistance = 0;
+  private double lastLeftEncoderPos = 0;
+  private double lastRightEncoderPos = 0;
+  private double diffLeft, diffRight, leftMeters, rightMeters;
 
 
   /** Creates a new VelocityController. */
@@ -159,8 +164,21 @@ public class DriveTrain extends SubsystemBase {
       }
     }
 
-    mPose = mOdometry.update(mGyro.getRotation2d(), rotationsToMeters(mleftFrontEncoder.getPosition()), rotationsToMeters(mrightFrontEncoder.getPosition()));
+    
 
+    diffLeft = mleftFrontEncoder.getPosition() - lastLeftEncoderPos;
+    diffRight = mrightFrontEncoder.getPosition() - lastRightEncoderPos;
+
+    leftMeters = rotationsToMeters(diffLeft);
+    rightMeters = rotationsToMeters(diffRight);
+
+    leftWheelDistance += leftMeters;
+    rightWheelDistance += rightMeters;
+
+    mPose = mOdometry.update(mGyro.getRotation2d(), leftWheelDistance, rightWheelDistance);
+    
+    lastLeftEncoderPos = mleftFrontEncoder.getPosition();
+    lastRightEncoderPos = mrightFrontEncoder.getPosition();
     
     SmartDashboard.putNumber("left_position", rotationsToMeters(mleftFrontEncoder.getPosition()));
     SmartDashboard.putNumber("right_position", rotationsToMeters(mleftFrontEncoder.getPosition()));
