@@ -5,9 +5,7 @@
 package frc.robot.commands;
 
 import edu.wpi.first.wpilibj.drive.DifferentialDrive.WheelSpeeds;
-import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.CommandBase;
-import frc.robot.Constants;
 import frc.robot.RobotContainer;
 import frc.robot.subsystems.DriveTrain;
 import frc.robot.subsystems.DriveTrain.DriveControlMode;
@@ -41,10 +39,6 @@ public class DriveTeleop extends CommandBase {
   @Override
   public void execute() {
     mWheelSpeeds = mDrive.mArcadeDrive(RobotContainer.mController);
-
-    SmartDashboard.putNumber("left_setpoint", mWheelSpeeds.left * Constants.DRIVE_MAX_RPM);
-    SmartDashboard.putNumber("right_setpoint", mWheelSpeeds.right * Constants.DRIVE_MAX_RPM);
-
 
     if (mDrive.getDriveControlMode() == DriveControlMode.OPEN_LOOP){
       mDrive.setOpenLoop(mWheelSpeeds.left, mWheelSpeeds.right);
