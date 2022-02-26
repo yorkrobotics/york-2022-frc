@@ -28,6 +28,7 @@ import frc.robot.commands.RunLifter;
 import frc.robot.subsystems.DriveTrain;
 import frc.robot.subsystems.Lifter;
 import frc.robot.commands.ShootTarget;
+import frc.robot.commands.TurnToTargetByVision;
 import frc.robot.subsystems.FeedIntake;
 import frc.robot.subsystems.PyCamera;
 import frc.robot.subsystems.Shooter;
@@ -124,7 +125,8 @@ public class RobotContainer {
     });
     
     // B TBD
-    new JoystickButton(mController, Button.kB.value).whenReleased(new ShootTarget(pycam, m_shooter));
+    // new JoystickButton(mController, Button.kB.value).whenReleased(new ShootTarget(pycam, m_shooter));
+    new JoystickButton(mController, Button.kB.value).whenReleased(new TurnToTargetByVision(pycam, mDrive));
 
     // X to feed
     new JoystickButton(mController, Button.kX.value).whileHeld(()->{

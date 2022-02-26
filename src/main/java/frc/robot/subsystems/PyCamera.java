@@ -5,9 +5,11 @@
 package frc.robot.subsystems;
 
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
+import edu.wpi.first.networktables.EntryListenerFlags;
 import edu.wpi.first.networktables.NetworkTable;
 import edu.wpi.first.networktables.NetworkTableInstance;
 import edu.wpi.first.networktables.NetworkTableEntry;
+import java.lang.Double;
 
 
 public class PyCamera extends SubsystemBase {
@@ -18,14 +20,22 @@ public class PyCamera extends SubsystemBase {
   
   /** Creates a new PyCamera. */
   public PyCamera() {
-    NetworkTableInstance inst = NetworkTableInstance.getDefault();
+    NetworkTableInstance inst = NetworkTableInstance.getDefault(); 
     NetworkTable table = inst.getTable("Vision");
     inst.startClientTeam(5171);
-    Number[] default_hoop_center_coord = new Number[] {0,0,0};
-    hoop_coord = table.getEntry("translation_vector").getNumberArray(default_hoop_center_coord);
-    x = hoop_coord[0].doubleValue();
-    y = hoop_coord[1].doubleValue();
-    z = hoop_coord[2].doubleValue();
+    // Number[] default_hoop_center_coord = new Number[] {0,0,0};
+    // hoop_coord = table.getEntry("translation_vector").getNumberArray(default_hoop_center_coord);
+    table.addEntryListener("translation_vector", (tbl, key, entry, value, flags) -> {
+      double[] hoop_coord = value.getDoubleArray();
+      if (!(Double.valueOf(hoop_coord[0]).isNaN() || Double.valueOf(hoop_coord[1]).isNaN() || Double.valueOf(hoop_coord[2]).isNaN())) {
+        x = hoop_coord[0];
+        y = hoop_coord[1];
+        z = hoop_coord[2];
+      }
+    }, EntryListenerFlags.kNew | EntryListenerFlags.kUpdate);
+    // x = hoop_coord[0].doubleValue();
+    // y = hoop_coord[1].doubleValue();
+    // z = hoop_coord[2].doubleValue();
   }
 
   public Number[] getHoopCenter() {
@@ -41,6 +51,14 @@ public class PyCamera extends SubsystemBase {
     double var_square_root = v_fourth - g * (g * z_squared + 2 * y * v_squared);
     double equation = (v_squared + Math.sqrt(var_square_root)) / (g * z);
     double angle = Math.atan(equation);
+    return angle;
+  }
+
+  public double getHorizontalAngle() {
+    
+
+    double angle = Math.atan(x / z) / Math.PI * 180;
+
     return angle;
   }
 
