@@ -25,6 +25,7 @@ import edu.wpi.first.wpilibj.drive.DifferentialDrive;
 import edu.wpi.first.wpilibj.drive.DifferentialDrive.WheelSpeeds;
 import edu.wpi.first.wpilibj.shuffleboard.Shuffleboard;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
+import edu.wpi.first.wpilibj.smartdashboard.Field2d;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
 import frc.robot.Constants;
 
@@ -46,6 +47,7 @@ public class DriveTrain extends SubsystemBase {
   private DifferentialDriveOdometry mOdometry;
   private ADXRS450_Gyro mGyro;
   private Pose2d mPose;
+  private final Field2d mField = new Field2d();
   private SimpleMotorFeedforward mFeedforward;
   private double leftWheelDistance = 0;
   private double rightWheelDistance = 0;
@@ -104,6 +106,7 @@ public class DriveTrain extends SubsystemBase {
     kV = 4.5288;
     kA = 0.4136;
 
+    SmartDashboard.putData("Field", mField);
     SmartDashboard.putNumber("Velocity P Gain", kP_velocity);
     SmartDashboard.putNumber("Velocity I Gain", kI_velocity);
     SmartDashboard.putNumber("Velocity D Gain", kD_velocity);
@@ -152,7 +155,7 @@ public class DriveTrain extends SubsystemBase {
       double d = SmartDashboard.getNumber("Velocity D Gain", 0);
       double max = SmartDashboard.getNumber("Velocity Max Output", 0);
       double min = SmartDashboard.getNumber("Velocity Min Output", 0);
-
+      
       if((p != kP_velocity)) { mleftPIDController.setP(p); mrightPIDController.setP(p); kP_velocity = p; configureVelocityControl();}
       if((i != kI_velocity)) { mleftPIDController.setI(i); mrightPIDController.setI(i); kI_velocity = i; configureVelocityControl();}
       if((d != kD_velocity)) { mleftPIDController.setD(d); mrightPIDController.setD(d); kD_velocity = d; configureVelocityControl();}
@@ -163,19 +166,20 @@ public class DriveTrain extends SubsystemBase {
         configureVelocityControl();
       }
     }
-
     
-
+    
+    
     diffLeft = mleftFrontEncoder.getPosition() - lastLeftEncoderPos;
     diffRight = mrightFrontEncoder.getPosition() - lastRightEncoderPos;
-
+    
     leftMeters = rotationsToMeters(diffLeft);
     rightMeters = rotationsToMeters(diffRight);
-
+    
     leftWheelDistance += leftMeters;
     rightWheelDistance += rightMeters;
-
+    
     mPose = mOdometry.update(mGyro.getRotation2d(), leftWheelDistance, rightWheelDistance);
+    mField.setRobotPose(mOdometry.getPoseMeters());
     
     lastLeftEncoderPos = mleftFrontEncoder.getPosition();
     lastRightEncoderPos = mrightFrontEncoder.getPosition();
