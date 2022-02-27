@@ -7,15 +7,18 @@ package frc.robot.commands;
 import edu.wpi.first.networktables.EntryListenerFlags;
 import edu.wpi.first.networktables.NetworkTableEntry;
 import edu.wpi.first.networktables.NetworkTableInstance;
+import edu.wpi.first.wpilibj.Timer;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.CommandBase;
 import frc.robot.subsystems.DriveTrain;
 import frc.robot.subsystems.PyCamera;
 
+
 public class TurnToTargetByVision extends CommandBase {
-  private final PyCamera pycam;
+  private PyCamera pycam;
   private DriveTrain mDrive;
   private boolean isFinished = false, isEnabled = false;
+  private Timer timer = new Timer();
   /** Creates a new TurnToTargetByVision. */
   public TurnToTargetByVision(PyCamera pc, DriveTrain d) {
     pycam = pc;
@@ -27,22 +30,37 @@ public class TurnToTargetByVision extends CommandBase {
   // Called when the command is initially scheduled.
   @Override
   public void initialize() {
-    mDrive.configurePositionControl();
+    timer.start();
+    // mDrive.configurePositionControl();
 
-    NetworkTableEntry hoopCenterEntry = NetworkTableInstance.getDefault().getTable("Vision").getEntry("translation_vector");
-    hoopCenterEntry.addListener(event -> {
-      if (isEnabled) mDrive.setRotation(pycam.getHorizontalAngle());
-      double angle = pycam.getHorizontalAngle();
-      SmartDashboard.putNumber("target rel angle", angle);
-    }, EntryListenerFlags.kNew | EntryListenerFlags.kUpdate);
+    // NetworkTableEntry hoopCenterEntry = NetworkTableInstance.getDefault().getTable("Vision").getEntry("translation_vector");
+    // hoopCenterEntry.addListener(event -> {
+    //   if (isEnabled) mDrive.setRotation(pycam.getHorizontalAngle());
+    //   double angle = pycam.getHorizontalAngle();
+    //   SmartDashboard.putNumber("target rel angle", angle);
+    // }, EntryListenerFlags.kNew | EntryListenerFlags.kUpdate);
 
   }
 
   // Called every time the scheduler runs while the command is scheduled.
   @Override
   public void execute() {
-    isEnabled = Math.abs(pycam.getHorizontalAngle()) > 2;
-    isFinished = !isEnabled;
+    double angle = pycam.getHorizontalAngle();
+    double currentHeading = mDrive.getHeading();
+    double headingAngle = currentHeading + angle;
+    if (headingAngle < 0) {
+      headingAngle += 360;
+    }
+
+    if (timer.hasElapsed(1)) {
+      mDrive.turnToHeadingAngle(headingAngle);
+      timer.reset();
+    }
+    SmartDashboard.putNumber("target rel angle", angle);
+    SmartDashboard.putNumber("target heading angle", headingAngle);
+    // isEnabled = Math.abs(pycam.getHorizontalAngle()) > 2;
+    // isFinished = !isEnabled;
+    // isFinished = true;
   }
 
   // Called once the command ends or is interrupted.
@@ -52,6 +70,6 @@ public class TurnToTargetByVision extends CommandBase {
   // Returns true when the command should end.
   @Override
   public boolean isFinished() {
-    return isFinished;
+    return false;
   }
 }

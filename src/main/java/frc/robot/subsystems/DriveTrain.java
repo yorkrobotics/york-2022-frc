@@ -190,6 +190,10 @@ public class DriveTrain extends SubsystemBase {
 
     SmartDashboard.putNumber("heading angle", mGyro.getAngle ());
     SmartDashboard.putBoolean("Gyro Connected", mGyro.isConnected());
+
+    SmartDashboard.putNumber("current heading angle", getHeading());
+    // SmartDashboard.putNumber("left_setpoint", mleftPIDController* Constants.DRIVE_MAX_RPM);
+    // SmartDashboard.putNumber("right_setpoint", mWheelSpeeds.right * Constants.DRIVE_MAX_RPM);
   }
 
   public void configureVelocityControl(){
@@ -237,10 +241,28 @@ public class DriveTrain extends SubsystemBase {
 
   public void setRotation(double setAngle){
     configurePositionControl();
+    mleftPIDController.setOutputRange(-0.5, 0.5);
+    mleftPIDController.setP(.3);
+    mrightPIDController.setOutputRange(-0.5, 0.5);
+    mrightPIDController.setP(.3);
 
-    double setMeters = setAngle / 360 * Math.PI * Constants.TRACK_WIDTH;
-    mleftPIDController.setReference(mleftFrontEncoder.getPosition() + metersToRotations(setMeters), CANSparkMax.ControlType.kPosition);
-    mrightPIDController.setReference(mrightFrontEncoder.getPosition() - metersToRotations(setMeters), CANSparkMax.ControlType.kPosition);
+    mleftPIDController.setD(10);
+    mrightPIDController.setD(10);
+
+    SmartDashboard.putNumber("set angle", setAngle);
+    if (setAngle != 0 ) {
+      double setMeters = setAngle / 360 * Math.PI * Constants.TRACK_WIDTH;
+      mleftPIDController.setReference(mleftFrontEncoder.getPosition() + metersToRotations(setMeters), CANSparkMax.ControlType.kPosition);
+      mrightPIDController.setReference(mrightFrontEncoder.getPosition() - metersToRotations(setMeters), CANSparkMax.ControlType.kPosition);
+      SmartDashboard.putNumber("set reference left", mleftFrontEncoder.getPosition() + metersToRotations(setMeters));
+      SmartDashboard.putNumber("set reference right", mrightFrontEncoder.getPosition() - metersToRotations(setMeters));
+    } else {
+      mleftPIDController.setReference(mleftFrontEncoder.getPosition() , CANSparkMax.ControlType.kPosition);
+      mrightPIDController.setReference(mrightFrontEncoder.getPosition(), CANSparkMax.ControlType.kPosition);
+      SmartDashboard.putNumber("set reference left", mleftFrontEncoder.getPosition());
+      SmartDashboard.putNumber("set reference right", mrightFrontEncoder.getPosition());
+
+    }
   }
 
   public void updatePIDController(SparkMaxPIDController pidController, double p, double i, double d, double minOutput, double maxOutput){
@@ -302,7 +324,14 @@ public class DriveTrain extends SubsystemBase {
   }
 
   public double getHeading(){
-    return mGyro.getRotation2d().getDegrees();
+    double headingAngle = mGyro.getAngle();
+    while (headingAngle < 0) {
+      headingAngle += 360;
+    }
+    while (headingAngle > 360) {
+      headingAngle -= 360;
+    }
+    return headingAngle;
   }
 
   public SimpleMotorFeedforward getFeedForward(){
@@ -341,6 +370,16 @@ public class DriveTrain extends SubsystemBase {
   {
     OPEN_LOOP, VELOCITY_CONTROL, POSITION_CONTROL
   } 
+  
+  public void turnToHeadingAngle(double headingAngle) {
+    double turnAngle = headingAngle - mGyro.getAngle() % 360;
+
+    if (turnAngle > 180.0) {
+      turnAngle = - 360.0 + turnAngle;
+    }
+
+    setRotation(turnAngle);
+  }
 
   public void turnToTarget() {
     double x = mPose.getX() - 4.11;

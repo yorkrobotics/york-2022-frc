@@ -5,6 +5,7 @@
 package frc.robot.subsystems;
 
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
+import edu.wpi.first.math.filter.LinearFilter;
 import edu.wpi.first.networktables.EntryListenerFlags;
 import edu.wpi.first.networktables.NetworkTable;
 import edu.wpi.first.networktables.NetworkTableInstance;
@@ -14,9 +15,11 @@ import java.lang.Double;
 
 public class PyCamera extends SubsystemBase {
   public Number[] hoop_coord;
-  public double x;
-  public double y;
-  public double z;
+  public double x = 0;
+  public double y = 0;
+  public double z = 0;
+  public double filteredAngle = 0;
+  // public LinearFilter filter = LinearFilter.singlePoleIIR(0, 0.02);
   
   /** Creates a new PyCamera. */
   public PyCamera() {
@@ -55,15 +58,17 @@ public class PyCamera extends SubsystemBase {
   }
 
   public double getHorizontalAngle() {
-    
 
-    double angle = Math.atan(x / z) / Math.PI * 180;
-
-    return angle;
+    return filteredAngle;
   }
 
   @Override
   public void periodic() {
+    if (!(Double.valueOf(x).isNaN() || z == 0)) {
+      double angle = Math.atan(x / z) / Math.PI * 180;
+      filteredAngle = angle;
+    }
+    // filteredAngle = filter.calculate(angle);
     // This method will be called once per scheduler run
 
   }

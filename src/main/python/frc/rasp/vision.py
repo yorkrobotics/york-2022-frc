@@ -32,10 +32,10 @@ height = config2['cameras'][0]['height']
 ntinst = NetworkTablesInstance.getDefault()
 vision_nt = ntinst.getTable('Vision')
 
-fx = 1875.49844
-fy = 1875.52991
-cam_center_x = 953.441373
-cam_center_y = 565.857930
+fx = 1875.49844 / 1920 * 640
+fy = 1875.52991 / 1080 * 480
+cam_center_x = 953.441373 /1920 * 640
+cam_center_y = 565.857930 / 1080 * 480
 camera_matrix = [[fx, 0, cam_center_x], [0, fy, cam_center_y], [0, 0, 1]]
 distortion = None
 # 2D projection onto the camera
@@ -240,7 +240,7 @@ def framePerSecond(start_time):
     return fps
 
 def verticesFromBin(binary_img, output_img):
-    _, contour_list, _ = cv2.findContours(binary_img, mode=cv2.RETR_EXTERNAL, method=cv2.CHAIN_APPROX_SIMPLE)
+    _, contour_list, _ = cv2.findContours(binary_img, mode=cv2.RETR_EXTERNAL, method=cv2.CHAIN_APPROX_TC89_L1)
 
     vertice_list = []
     for contour in contour_list:
@@ -248,13 +248,17 @@ def verticesFromBin(binary_img, output_img):
         if cv2.contourArea(contour) < 25:
             continue
 
-        epsilon = 0.1 * cv2.arcLength(contour, True)
+        epsilon = 0.09 * cv2.arcLength(contour, True)
         quadrilateral = cv2.approxPolyDP(contour, epsilon, True)
         vertices = quadrilateral.ravel().tolist() # 4 corners of the quadrilateral
         vertice_list.append(vertices)
 
         # Draw rectangle
         cv2.drawContours(output_img, [quadrilateral], -1, color = (0, 0, 255), thickness = 2)
+        for point in contour:
+            # print(point)
+            # print(tuple(point[0]))
+            cv2.circle(output_img, center=tuple(point[0]), radius = 1, color = (0,0,255), thickness = 1)
     return vertice_list
 
 def getCenterHSV(output_img):
@@ -371,9 +375,9 @@ if __name__ == "__main__":
             continue
 
         # Convert to HSV and threshold image
-        # input_img = cv2.GaussianBlur(input_img, (7,7), cv2.BORDER_CONSTANT)
+        # input_img = cv2.GaussianBlur(input_img, (3,3), cv2.BORDER_CONSTANT)
         hsv_img = cv2.cvtColor(input_img, cv2.COLOR_BGR2HSV)
-        binary_img = cv2.inRange(hsv_img, (70, 90, 120), (90, 255, 255))
+        binary_img = cv2.inRange(hsv_img, (60, 100, 120), (90, 255, 255))
         output_img = np.copy(input_img)
 
         # getCenterHSV(output_img) # for tuning binary image range
@@ -383,7 +387,7 @@ if __name__ == "__main__":
         hoop_centers = getHoopCenter(output_img, vertice_list)
         center = getBestCenter(hoop_centers)
 
-        cv2.putText(output_img, str(center), (200, 120), 0, 3, (128, 255, 0), 3)
+        cv2.putText(output_img, str(center), (int(200 * width / 1920), int(120 * width / 1920)), 0, (3 * width / 1920), (128, 255, 0), int(3 * width / 1920))
         vision_nt.putNumberArray('translation_vector', center)
 
         binary_output_stream.putFrame(binary_img)

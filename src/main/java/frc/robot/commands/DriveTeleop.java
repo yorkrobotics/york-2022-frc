@@ -42,8 +42,6 @@ public class DriveTeleop extends CommandBase {
   public void execute() {
     mWheelSpeeds = mDrive.mArcadeDrive(RobotContainer.mController);
 
-    SmartDashboard.putNumber("left_setpoint", mWheelSpeeds.left * Constants.DRIVE_MAX_RPM);
-    SmartDashboard.putNumber("right_setpoint", mWheelSpeeds.right * Constants.DRIVE_MAX_RPM);
 
 
     if (mDrive.getDriveControlMode() == DriveControlMode.OPEN_LOOP){
