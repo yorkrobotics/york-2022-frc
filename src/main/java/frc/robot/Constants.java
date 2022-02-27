@@ -4,10 +4,6 @@
 
 package frc.robot;
 
-import edu.wpi.first.math.geometry.Rotation2d;
-import edu.wpi.first.math.geometry.Translation2d;
-
-//hello
 /**
  * The Constants class provides a convenient place for teams to hold robot-wide numerical or boolean
  * constants. This class should not be used for any other purpose. All constants should be declared
@@ -23,7 +19,6 @@ public final class Constants {
 
     public static final double MAX_OPENLOOP_SPEED = 0.5;
 
-    public static final double DRIVE_FORWARD_TIME = 0.5;
     public static final double AUTONOMOUS_SPEED = 0.5;
 
     public static final double DRIVE_MAX_RPM = 5400;
@@ -46,7 +41,6 @@ public final class Constants {
 
 
     public static final double STARTING_X = 4.11;
-
 
     public static final double STARTING_Y = 2.055;
 
