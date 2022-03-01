@@ -38,10 +38,10 @@ public class DriveTrain extends SubsystemBase {
   //Controller setup
   private SparkMaxPIDController mleftPIDController, mrightPIDController;
   private DriveControlMode mDriveControlMode;
+  private GearMode mGearMode;
 
   private double gearRatio, kS, kV, kA;
-  private double kP_velocity, kI_velocity, kD_velocity, kMinOutput_velocity, kMaxOutput_velocity;
-  private double kP_position, kI_position, kD_position, kMinOutput_position, kMaxOutput_position;
+  private double kP, kI, kD, kMinOutput, kMaxOutput;
 
   private DifferentialDriveKinematics mKinematics;
   private DifferentialDriveOdometry mOdometry;
@@ -64,10 +64,6 @@ public class DriveTrain extends SubsystemBase {
     mrightFront = new CANSparkMax(4, MotorType.kBrushless);
     mrightBack = new CANSparkMax(3, MotorType.kBrushless);
     mShifter = new DoubleSolenoid(PneumaticsModuleType.CTREPCM, 6, 1);
-    
-    // Always set to low gear at the start
-    shiftDown();
-    gearRatio = Constants.GEAR_RATIO_LOW;
 
     mleftFront.restoreFactoryDefaults();
     mleftBack.restoreFactoryDefaults();
@@ -87,37 +83,14 @@ public class DriveTrain extends SubsystemBase {
     mleftPIDController = mleftFront.getPIDController();
     mrightPIDController = mrightFront.getPIDController();
 
-    mDriveControlMode = DriveControlMode.OPEN_LOOP; //Default drive mode set to open loop
-
-    //Store PID coefficients
-    kP_velocity = 0.000097988; 
-    kI_velocity = 0;
-    kD_velocity = 0; 
-    kMinOutput_velocity = -0.7;  
-    kMaxOutput_velocity = 0.7; 
-
-    kP_position = 0.3; 
-    kI_position = 0;
-    kD_position = 0; 
-    kMinOutput_position = -0.5;
-    kMaxOutput_position = 0.5; 
+    setDriveMode(DriveControlMode.OPEN_LOOP); //Default drive mode set to open loop
+    shiftDown(); // Always set to low gear at the start
 
     kS = 0.23123;
     kV = 4.5288;
     kA = 0.4136;
 
     SmartDashboard.putData("Field", mField);
-    SmartDashboard.putNumber("Velocity P Gain", kP_velocity);
-    SmartDashboard.putNumber("Velocity I Gain", kI_velocity);
-    SmartDashboard.putNumber("Velocity D Gain", kD_velocity);
-    SmartDashboard.putNumber("Velocity Max Output", kMaxOutput_velocity);
-    SmartDashboard.putNumber("Velocity Min Output", kMinOutput_velocity);
-
-    // SmartDashboard.putNumber("Position P Gain", kP_position);
-    // SmartDashboard.putNumber("Position I Gain", kI_position);
-    // SmartDashboard.putNumber("Position D Gain", kD_position);
-    // SmartDashboard.putNumber("Position Max Output", kMaxOutput_position);
-    // SmartDashboard.putNumber("Position Min Output", kMinOutput_velocity);
 
     resetEncoders();
 
@@ -147,27 +120,6 @@ public class DriveTrain extends SubsystemBase {
   @Override
   public void periodic() {
     // This method will be called once per scheduler run
-    // Update and get values from the smart dashboard
-    if (mDriveControlMode == DriveControlMode.VELOCITY_CONTROL){
-      
-      double p = SmartDashboard.getNumber("Velocity P Gain", 0);
-      double i = SmartDashboard.getNumber("Velocity I Gain", 0);
-      double d = SmartDashboard.getNumber("Velocity D Gain", 0);
-      double max = SmartDashboard.getNumber("Velocity Max Output", 0);
-      double min = SmartDashboard.getNumber("Velocity Min Output", 0);
-      
-      if((p != kP_velocity)) { mleftPIDController.setP(p); mrightPIDController.setP(p); kP_velocity = p; configureVelocityControl();}
-      if((i != kI_velocity)) { mleftPIDController.setI(i); mrightPIDController.setI(i); kI_velocity = i; configureVelocityControl();}
-      if((d != kD_velocity)) { mleftPIDController.setD(d); mrightPIDController.setD(d); kD_velocity = d; configureVelocityControl();}
-      if((max != kMaxOutput_velocity) || (min != kMinOutput_velocity)) { 
-        mleftPIDController.setOutputRange(min, max); 
-        mrightPIDController.setOutputRange(min, max);
-        kMinOutput_velocity = min; kMaxOutput_velocity = max; 
-        configureVelocityControl();
-      }
-    }
-    
-    
     
     diffLeft = mleftFrontEncoder.getPosition() - lastLeftEncoderPos;
     diffRight = mrightFrontEncoder.getPosition() - lastRightEncoderPos;
@@ -202,14 +154,42 @@ public class DriveTrain extends SubsystemBase {
 
   public void configureVelocityControl(){
     setDriveMode(DriveControlMode.VELOCITY_CONTROL);
-    updatePIDController(mleftPIDController, kP_velocity, kI_velocity, kD_velocity, kMinOutput_velocity, kMaxOutput_velocity);
-    updatePIDController(mrightPIDController, kP_velocity, kI_velocity, kD_velocity, kMinOutput_velocity, kMaxOutput_velocity);
+    if (mGearMode == GearMode.LOW_GEAR){
+      kP = 0.000097988;
+      kI = 0;
+      kD = 0;
+      kMinOutput = -0.7;
+      kMaxOutput = 0.7;
+    }
+    if (mGearMode == GearMode.HIGH_GEAR){
+      kP = 0.000097988;
+      kI = 0;
+      kD = 0;
+      kMinOutput = -0.7;
+      kMaxOutput = 0.7;
+    }
+    updatePIDController(mleftPIDController, kP, kI, kD, kMinOutput, kMaxOutput);
+    updatePIDController(mrightPIDController, kP, kI, kD, kMinOutput, kMaxOutput);
   }
 
   public void configurePositionControl(){
     setDriveMode(DriveControlMode.POSITION_CONTROL);
-    updatePIDController(mleftPIDController, kP_position, kI_position, kD_position, kMinOutput_position, kMaxOutput_position);
-    updatePIDController(mrightPIDController, kP_position, kI_position, kD_position, kMinOutput_position, kMaxOutput_position);
+    if (mGearMode == GearMode.LOW_GEAR){
+      kP = 0.3;
+      kI = 0;
+      kD = 0;
+      kMinOutput = -0.5;
+      kMaxOutput = 0.5;
+    }
+    if (mGearMode == GearMode.HIGH_GEAR){
+      kP = 0.3;
+      kI = 0;
+      kD = 0;
+      kMinOutput = -0.5;
+      kMaxOutput = 0.5;
+    }
+    updatePIDController(mleftPIDController, kP, kI, kD, kMinOutput, kMaxOutput);
+    updatePIDController(mrightPIDController, kP, kI, kD, kMinOutput, kMaxOutput);
     //extra step to reset the encoders
     // resetEncoders();
   }
@@ -288,11 +268,13 @@ public class DriveTrain extends SubsystemBase {
   public void shiftUp(){
     mShifter.set(Value.kReverse);
     gearRatio = Constants.GEAR_RATIO_HIGH;
+    setGearMode(GearMode.HIGH_GEAR);
   }
 
   public void shiftDown(){
     mShifter.set(Value.kForward);
     gearRatio = Constants.GEAR_RATIO_LOW;
+    setGearMode(GearMode.LOW_GEAR);
   }
 
   public double rotationsToMeters(double rotations){
@@ -309,6 +291,10 @@ public class DriveTrain extends SubsystemBase {
 
   public void setDriveMode(DriveControlMode mode){
     mDriveControlMode = mode;
+  }
+
+  public void setGearMode(GearMode mode){
+    mGearMode = mode;
   }
 
   public void switchDriveMode(){
@@ -369,11 +355,6 @@ public class DriveTrain extends SubsystemBase {
     mleftFront.setVoltage(leftVolts);
     mrightFront.setVoltage(rightVolts);
   }
-
-  public enum DriveControlMode
-  {
-    OPEN_LOOP, VELOCITY_CONTROL, POSITION_CONTROL
-  } 
   
   public void turnToHeadingAngle(double headingAngle) {
     double turnAngle = headingAngle - mGyro.getAngle() % 360;
@@ -402,6 +383,14 @@ public class DriveTrain extends SubsystemBase {
     }
 
     setRotation(turnAngle);
+  }
+
+  public enum DriveControlMode{
+    OPEN_LOOP, VELOCITY_CONTROL, POSITION_CONTROL
+  } 
+
+  public enum GearMode{
+    HIGH_GEAR, LOW_GEAR
   }
 
 }
