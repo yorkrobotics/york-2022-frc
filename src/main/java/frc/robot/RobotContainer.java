@@ -24,6 +24,7 @@ import edu.wpi.first.wpilibj.XboxController;
 import edu.wpi.first.wpilibj.XboxController.Button;
 import edu.wpi.first.wpilibj.shuffleboard.Shuffleboard;
 import frc.robot.commands.DriveTeleop;
+import frc.robot.commands.RotateToTarget;
 import frc.robot.commands.RunLifter;
 import frc.robot.subsystems.DriveTrain;
 import frc.robot.subsystems.Lifter;
@@ -126,7 +127,7 @@ public class RobotContainer {
     
     // B TBD
     // new JoystickButton(mController, Button.kB.value).whenReleased(new ShootTarget(pycam, m_shooter));
-    new JoystickButton(mController, Button.kB.value).whenReleased(new TurnToTargetByVision(pycam, mDrive));
+    new JoystickButton(mController, Button.kB.value).whileHeld(new RotateToTarget(mDrive, pycam));
 
     // X to feed
     new JoystickButton(mController, Button.kX.value).whileHeld(()->{

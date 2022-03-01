@@ -327,6 +327,10 @@ public class DriveTrain extends SubsystemBase {
     return rotationsToMeters(mleftFrontEncoder.getPosition()) == setpoint;
   }
 
+  public double getGyroAngle() {
+    return mGyro.getAngle();
+  }
+
   public double getHeading(){
     double headingAngle = mGyro.getAngle();
     while (headingAngle < 0) {
