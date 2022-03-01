@@ -4,7 +4,6 @@
 
 package frc.robot.subsystems;
 
-
 import com.revrobotics.CANSparkMax;
 import com.revrobotics.RelativeEncoder;
 import com.revrobotics.SparkMaxPIDController;
@@ -16,6 +15,7 @@ import edu.wpi.first.math.geometry.Rotation2d;
 import edu.wpi.first.math.kinematics.DifferentialDriveKinematics;
 import edu.wpi.first.math.kinematics.DifferentialDriveOdometry;
 import edu.wpi.first.math.kinematics.DifferentialDriveWheelSpeeds;
+import edu.wpi.first.networktables.NetworkTableEntry;
 import edu.wpi.first.wpilibj.ADXRS450_Gyro;
 import edu.wpi.first.wpilibj.DoubleSolenoid;
 import edu.wpi.first.wpilibj.PneumaticsModuleType;
@@ -24,6 +24,7 @@ import edu.wpi.first.wpilibj.DoubleSolenoid.Value;
 import edu.wpi.first.wpilibj.drive.DifferentialDrive;
 import edu.wpi.first.wpilibj.drive.DifferentialDrive.WheelSpeeds;
 import edu.wpi.first.wpilibj.shuffleboard.Shuffleboard;
+import edu.wpi.first.wpilibj.shuffleboard.ShuffleboardTab;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj.smartdashboard.Field2d;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
@@ -42,6 +43,7 @@ public class DriveTrain extends SubsystemBase {
 
   private double gearRatio, kS, kV, kA;
   private double kP, kI, kD, kMinOutput, kMaxOutput;
+  private NetworkTableEntry kPEntry, kIEntry, kDEntry, kMinOutputEntry, kMaxOutputEntry;
 
   private DifferentialDriveKinematics mKinematics;
   private DifferentialDriveOdometry mOdometry;
@@ -55,6 +57,7 @@ public class DriveTrain extends SubsystemBase {
   private double lastRightEncoderPos = 0;
   private double diffLeft, diffRight, leftMeters, rightMeters;
 
+  private ShuffleboardTab driveTab;
 
   /** Creates a new VelocityController. */
   public DriveTrain() {
@@ -100,21 +103,36 @@ public class DriveTrain extends SubsystemBase {
     mKinematics = new DifferentialDriveKinematics(Constants.TRACK_WIDTH);
     mOdometry = new DifferentialDriveOdometry(new Rotation2d(Constants.STARTING_ANGLE), new Pose2d(Constants.STARTING_X, Constants.STARTING_Y, new Rotation2d(Constants.STARTING_ANGLE))); //optional second arguement: starting position
     mFeedforward = new SimpleMotorFeedforward(kS, kV, kA);
+    mPose = new Pose2d();
 
     // Update to Shuffleboard
-    var autoTab = Shuffleboard.getTab("Autonomous");
-    autoTab.addNumber("Pose X", () -> {
+    driveTab = Shuffleboard.getTab("Drive");
+
+    driveTab.addNumber("Pose X", () -> {
       return this.getPose().getX();
     });
-    autoTab.addNumber("Pose Y", () -> {
+    driveTab.addNumber("Pose Y", () -> {
       return this.getPose().getY();
     });
-    autoTab.addNumber("Left Wheel Speeds", () -> {
+    driveTab.addNumber("Left Wheel Speeds", () -> {
       return this.getWheelSpeeds().leftMetersPerSecond;
     });
-    autoTab.addNumber("Right Wheel Speeds", () -> {
+    driveTab.addNumber("Right Wheel Speeds", () -> {
       return this.getWheelSpeeds().rightMetersPerSecond;
     });
+    driveTab.addNumber("Left Encoder Meters", ()->{
+      return this.rotationsToMeters(mleftFrontEncoder.getPosition());
+    });
+    driveTab.addNumber("right Encoder Meters", ()->{
+      return this.rotationsToMeters(mrightFrontEncoder.getPosition());
+    });
+    driveTab.add(mGyro);
+
+    kPEntry = driveTab.add("P Gain", kP).getEntry();
+    kIEntry = driveTab.add("I Gain", kI).getEntry();
+    kDEntry = driveTab.add("D Gain", kD).getEntry();
+    kMinOutputEntry = driveTab.add("Min Output", kMinOutput).getEntry();
+    kMaxOutputEntry = driveTab.add("Max Output", kMaxOutput).getEntry();
   }
 
   @Override
@@ -135,21 +153,6 @@ public class DriveTrain extends SubsystemBase {
     
     lastLeftEncoderPos = mleftFrontEncoder.getPosition();
     lastRightEncoderPos = mrightFrontEncoder.getPosition();
-    
-    SmartDashboard.putNumber("left_position", rotationsToMeters(mleftFrontEncoder.getPosition()));
-    SmartDashboard.putNumber("right_position", rotationsToMeters(mleftFrontEncoder.getPosition()));
-    SmartDashboard.putNumber("left_velocity", mleftFrontEncoder.getVelocity());
-    SmartDashboard.putNumber("right_velocity", mrightFrontEncoder.getVelocity());
-
-    SmartDashboard.putNumber("left_wheelspeed", getWheelSpeeds().leftMetersPerSecond);
-    SmartDashboard.putNumber("right_wheelspeed", getWheelSpeeds().rightMetersPerSecond);
-
-    SmartDashboard.putNumber("heading angle", mGyro.getAngle ());
-    SmartDashboard.putBoolean("Gyro Connected", mGyro.isConnected());
-
-    SmartDashboard.putNumber("current heading angle", getHeading());
-    // SmartDashboard.putNumber("left_setpoint", mleftPIDController* Constants.DRIVE_MAX_RPM);
-    // SmartDashboard.putNumber("right_setpoint", mWheelSpeeds.right * Constants.DRIVE_MAX_RPM);
   }
 
   public void configureVelocityControl(){
@@ -168,6 +171,12 @@ public class DriveTrain extends SubsystemBase {
       kMinOutput = -0.7;
       kMaxOutput = 0.7;
     }
+    if(kPEntry.getDouble(0) != kP) kP = kPEntry.getDouble(0);
+    if(kIEntry.getDouble(0) != kI) kI = kIEntry.getDouble(0);
+    if(kDEntry.getDouble(0) != kD) kD = kDEntry.getDouble(0);
+    if(kMaxOutputEntry.getDouble(0) != kMaxOutput) kMaxOutput = kMaxOutputEntry.getDouble(0);
+    if(kMinOutputEntry.getDouble(0) != kMinOutput) kMinOutput = kMinOutputEntry.getDouble(0);
+
     updatePIDController(mleftPIDController, kP, kI, kD, kMinOutput, kMaxOutput);
     updatePIDController(mrightPIDController, kP, kI, kD, kMinOutput, kMaxOutput);
   }
@@ -188,6 +197,12 @@ public class DriveTrain extends SubsystemBase {
       kMinOutput = -0.5;
       kMaxOutput = 0.5;
     }
+    if(kPEntry.getDouble(0) != kP) kP = kPEntry.getDouble(0);
+    if(kIEntry.getDouble(0) != kI) kI = kIEntry.getDouble(0);
+    if(kDEntry.getDouble(0) != kD) kD = kDEntry.getDouble(0);
+    if(kMaxOutputEntry.getDouble(0) != kMaxOutput) kMaxOutput = kMaxOutputEntry.getDouble(0);
+    if(kMinOutputEntry.getDouble(0) != kMinOutput) kMinOutput = kMinOutputEntry.getDouble(0);
+
     updatePIDController(mleftPIDController, kP, kI, kD, kMinOutput, kMaxOutput);
     updatePIDController(mrightPIDController, kP, kI, kD, kMinOutput, kMaxOutput);
     //extra step to reset the encoders
@@ -313,10 +328,6 @@ public class DriveTrain extends SubsystemBase {
     return rotationsToMeters(mleftFrontEncoder.getPosition()) == setpoint;
   }
 
-  public double getGyroAngle() {
-    return mGyro.getAngle();
-  }
-
   public double getHeading(){
     double headingAngle = mGyro.getAngle();
     while (headingAngle < 0) {
@@ -358,6 +369,10 @@ public class DriveTrain extends SubsystemBase {
   public void tankDriveVolts(double leftVolts, double rightVolts){
     mleftFront.setVoltage(leftVolts);
     mrightFront.setVoltage(rightVolts);
+  }
+
+  public double getGyroAngle(){
+    return mGyro.getAngle();
   }
   
   public void turnToHeadingAngle(double headingAngle) {
