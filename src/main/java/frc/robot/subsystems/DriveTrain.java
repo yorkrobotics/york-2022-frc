@@ -9,12 +9,15 @@ import com.revrobotics.RelativeEncoder;
 import com.revrobotics.SparkMaxPIDController;
 import com.revrobotics.CANSparkMaxLowLevel.MotorType;
 
+import edu.wpi.first.math.controller.PIDController;
+import edu.wpi.first.math.controller.RamseteController;
 import edu.wpi.first.math.controller.SimpleMotorFeedforward;
 import edu.wpi.first.math.geometry.Pose2d;
 import edu.wpi.first.math.geometry.Rotation2d;
 import edu.wpi.first.math.kinematics.DifferentialDriveKinematics;
 import edu.wpi.first.math.kinematics.DifferentialDriveOdometry;
 import edu.wpi.first.math.kinematics.DifferentialDriveWheelSpeeds;
+import edu.wpi.first.math.trajectory.Trajectory;
 import edu.wpi.first.networktables.NetworkTableEntry;
 import edu.wpi.first.wpilibj.ADXRS450_Gyro;
 import edu.wpi.first.wpilibj.DoubleSolenoid;
@@ -27,6 +30,10 @@ import edu.wpi.first.wpilibj.shuffleboard.Shuffleboard;
 import edu.wpi.first.wpilibj.shuffleboard.ShuffleboardTab;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj.smartdashboard.Field2d;
+import edu.wpi.first.wpilibj2.command.Command;
+import edu.wpi.first.wpilibj2.command.InstantCommand;
+import edu.wpi.first.wpilibj2.command.RamseteCommand;
+import edu.wpi.first.wpilibj2.command.SequentialCommandGroup;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
 import frc.robot.Constants;
 
@@ -58,6 +65,9 @@ public class DriveTrain extends SubsystemBase {
   private double diffLeft, diffRight, leftMeters, rightMeters;
 
   private ShuffleboardTab driveTab;
+
+  private PIDController mLeftAutoController = new PIDController(Constants.kP_AUTO, 0, 0), 
+  mRightAutoController = new PIDController(Constants.kP_AUTO, 0, 0);
 
   /** Creates a new VelocityController. */
   public DriveTrain() {
@@ -111,9 +121,7 @@ public class DriveTrain extends SubsystemBase {
     driveTab.addNumber("Pose X", () -> {
       return this.getPose().getX();
     });
-    driveTab.addNumber("Pose Y", () -> {
-      return this.getPose().getY();
-    });
+    driveTab.addNumber("Pose Y", () -> this.getPose().getY());
     driveTab.addNumber("Left Wheel Speeds", () -> {
       return this.getWheelSpeeds().leftMetersPerSecond;
     });
@@ -408,6 +416,25 @@ public class DriveTrain extends SubsystemBase {
 
     setRotation(turnAngle);
   }
+
+  public Command makeTrajectoryToCommand(Trajectory trajectory, Boolean resetOdometry){
+    RamseteCommand command =  new RamseteCommand(
+        trajectory, 
+        this::getPose, 
+        new RamseteController(2.0, 0.7), 
+        this.getFeedForward(), 
+        this.getKinematics(), 
+        this::getWheelSpeeds, 
+        mLeftAutoController, 
+        mRightAutoController, 
+        this::tankDriveVolts, 
+        this);
+    return resetOdometry ? 
+        new SequentialCommandGroup(
+            new InstantCommand(()-> this.resetOdometry(trajectory.getInitialPose()), this), 
+            command.andThen(()->this.tankDriveVolts(0, 0)))
+            : command.andThen(()->this.tankDriveVolts(0, 0));
+}
 
   public enum DriveControlMode{
     OPEN_LOOP, VELOCITY_CONTROL, POSITION_CONTROL

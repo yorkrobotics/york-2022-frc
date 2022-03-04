@@ -5,26 +5,17 @@ import java.io.IOException;
 import java.util.HashMap;
 import java.util.Map;
 
-import edu.wpi.first.math.controller.PIDController;
-import edu.wpi.first.math.controller.RamseteController;
+
 import edu.wpi.first.math.trajectory.Trajectory;
 import edu.wpi.first.math.trajectory.TrajectoryUtil;
 import edu.wpi.first.wpilibj.Filesystem;
-import edu.wpi.first.wpilibj2.command.Command;
-import edu.wpi.first.wpilibj2.command.InstantCommand;
-import edu.wpi.first.wpilibj2.command.RamseteCommand;
-import edu.wpi.first.wpilibj2.command.SequentialCommandGroup;
-import frc.robot.Constants;
-import frc.robot.subsystems.DriveTrain;
+
 import edu.wpi.first.wpilibj.DriverStation;
 
 
 public class TrajectoryBuilder {
 
     private Map<String, Trajectory>  mTrajectoryMap = new HashMap<String, Trajectory>();
-    private DriveTrain mDrive = new DriveTrain();
-    private PIDController mLeftAutoController = new PIDController(Constants.kP_AUTO, 0, 0), 
-    mRightAutoController = new PIDController(Constants.kP_AUTO, 0, 0);
 
     public TrajectoryBuilder (String pathSubDir){
 
@@ -53,24 +44,7 @@ public class TrajectoryBuilder {
         return mTrajectoryMap.get(name);
     }
 
-    public Command makeTrajectoryToCommand(Trajectory trajectory, Boolean resetOdometry){
-        RamseteCommand command =  new RamseteCommand(
-            trajectory, 
-            mDrive::getPose, 
-            new RamseteController(2.0, 0.7), 
-            mDrive.getFeedForward(), 
-            mDrive.getKinematics(), 
-            mDrive::getWheelSpeeds, 
-            mLeftAutoController, 
-            mRightAutoController, 
-            mDrive::tankDriveVolts, 
-            mDrive);
-        return resetOdometry ? 
-            new SequentialCommandGroup(
-                new InstantCommand(()-> mDrive.resetOdometry(trajectory.getInitialPose()), mDrive)).andThen( 
-                command.andThen(()->mDrive.tankDriveVolts(0, 0)))
-                : command.andThen(()->mDrive.tankDriveVolts(0, 0));
-    }
+
 
     private Trajectory makeTrajectoryFromJSON(File trajectotyJSON){
 
