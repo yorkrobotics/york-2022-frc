@@ -366,6 +366,11 @@ public class DriveTrain extends SubsystemBase {
     mrightFrontEncoder.setPosition(0);
   }
 
+  public void resetOdometry(Pose2d pose){
+    resetEncoders();
+    mOdometry.resetPosition(pose, Rotation2d.fromDegrees(getGyroAngle()));
+  }
+
   public void tankDriveVolts(double leftVolts, double rightVolts){
     mleftFront.setVoltage(leftVolts);
     mrightFront.setVoltage(rightVolts);

@@ -36,6 +36,7 @@ public final class Constants {
     public static final double kMaxVelocity = 1; // m/s
     public static final double kMaxAcceleration = 1; // m/s^2
 
+    public static final double kP_AUTO = 5.7673;
 
     public static final double STARTING_ANGLE = 0;
 
@@ -44,6 +45,6 @@ public final class Constants {
 
     public static final double STARTING_Y = 2.055;
 
-
+    public static final String PATH_FOLDER = "paths/output";
     
 }

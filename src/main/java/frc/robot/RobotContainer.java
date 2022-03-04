@@ -23,6 +23,8 @@ import edu.wpi.first.wpilibj.GenericHID;
 import edu.wpi.first.wpilibj.XboxController;
 import edu.wpi.first.wpilibj.XboxController.Button;
 import edu.wpi.first.wpilibj.shuffleboard.Shuffleboard;
+import frc.robot.autonomous.TrajectoryBuilder;
+import frc.robot.autonomous.routines.DriveForwardBackward2m;
 import frc.robot.commands.DriveTeleop;
 import frc.robot.commands.RotateToTarget;
 import frc.robot.commands.RunLifter;
@@ -65,6 +67,10 @@ public class RobotContainer {
   public static XboxController m_controller;
   //camera
   private PyCamera pycam;
+
+  //Test AutoRoutine
+  private DriveForwardBackward2m autoCommand = new DriveForwardBackward2m();
+  private TrajectoryBuilder trajectoryBuilder = new TrajectoryBuilder(Constants.PATH_FOLDER);
 
   /** The container for the robot. Contains subsystems, OI devices, and commands. */
   public RobotContainer() {
@@ -149,46 +155,46 @@ public class RobotContainer {
    */
   public Command getAutonomousCommand() {
     // A command to run in autonomous
-    mDrive.resetEncoders();
-    mDrive.getOdometry().resetPosition(new Pose2d(), new Rotation2d());
+    // mDrive.resetEncoders();
+    // mDrive.getOdometry().resetPosition(new Pose2d(), new Rotation2d());
 
-    var autoVoltageConstraint= new DifferentialDriveVoltageConstraint(mDrive.getFeedForward(), mDrive.getKinematics(), Constants.kMaxVoltage);
+    // var autoVoltageConstraint= new DifferentialDriveVoltageConstraint(mDrive.getFeedForward(), mDrive.getKinematics(), Constants.kMaxVoltage);
 
-    TrajectoryConfig config = new TrajectoryConfig(Constants.kMaxVelocity, Constants.kMaxAcceleration).setKinematics(mDrive.getKinematics()).addConstraint(autoVoltageConstraint);
+    // TrajectoryConfig config = new TrajectoryConfig(Constants.kMaxVelocity, Constants.kMaxAcceleration).setKinematics(mDrive.getKinematics()).addConstraint(autoVoltageConstraint);
 
-    Trajectory toHomePosition = TrajectoryGenerator.generateTrajectory(
-      mDrive.getPose(), 
-      List.of(), 
-      new Pose2d(0, 0, new Rotation2d()), 
-      config
-    );
+    // Trajectory toHomePosition = TrajectoryGenerator.generateTrajectory(
+    //   mDrive.getPose(), 
+    //   List.of(), 
+    //   new Pose2d(0, 0, new Rotation2d()), 
+    //   config
+    // );
 
-    Trajectory heartTrajectory = new Trajectory();
+  //   Trajectory heartTrajectory = new Trajectory();
     
-    String heartJSON = "paths/Heart.wpilib.json";
+  //   String heartJSON = "paths/Heart.wpilib.json";
 
-    try {
-      Path heartPath = Filesystem.getDeployDirectory().toPath().resolve(heartJSON);
-      heartTrajectory = TrajectoryUtil.fromPathweaverJson(heartPath);
-   } catch (IOException ex) {
-      DriverStation.reportError("Unable to open trajectory: " + heartJSON, ex.getStackTrace());
-      return null;
-   }
+  //   try {
+  //     Path heartPath = Filesystem.getDeployDirectory().toPath().resolve(heartJSON);
+  //     heartTrajectory = TrajectoryUtil.fromPathweaverJson(heartPath);
+  //  } catch (IOException ex) {
+  //     DriverStation.reportError("Unable to open trajectory: " + heartJSON, ex.getStackTrace());
+  //     return null;
+  //  }
 
-    RamseteController ramseteController = new RamseteController(2.0, 0.7);
-    RamseteCommand testCommand = new RamseteCommand(
-      heartTrajectory, 
-      mDrive::getPose,
-      ramseteController, 
-      mDrive.getFeedForward(), 
-      mDrive.getKinematics(), 
-      mDrive::getWheelSpeeds, 
-      mRamseteLeftController, 
-      mRamseteRightController, 
-      mDrive::tankDriveVolts, 
-      mDrive
-    );
+  //   RamseteController ramseteController = new RamseteController(2.0, 0.7);
+  //   RamseteCommand testCommand = new RamseteCommand(
+  //     heartTrajectory, 
+  //     mDrive::getPose,
+  //     ramseteController, 
+  //     mDrive.getFeedForward(), 
+  //     mDrive.getKinematics(), 
+  //     mDrive::getWheelSpeeds, 
+  //     mRamseteLeftController, 
+  //     mRamseteRightController, 
+  //     mDrive::tankDriveVolts, 
+  //     mDrive
+  //   );
 
-    return testCommand;
+    return autoCommand.getCommand(trajectoryBuilder);
   }
 }
