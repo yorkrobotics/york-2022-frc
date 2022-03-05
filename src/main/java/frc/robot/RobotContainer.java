@@ -4,13 +4,15 @@
 
 package frc.robot;
 
-import edu.wpi.first.math.controller.PIDController;
 import edu.wpi.first.wpilibj.GenericHID;
 import edu.wpi.first.wpilibj.XboxController;
 import edu.wpi.first.wpilibj.XboxController.Button;
 import edu.wpi.first.wpilibj.shuffleboard.Shuffleboard;
+import edu.wpi.first.wpilibj.shuffleboard.ShuffleboardTab;
+import edu.wpi.first.wpilibj.smartdashboard.SendableChooser;
+import frc.robot.autonomous.AutoRoutine;
+import frc.robot.autonomous.CommandBuilder;
 import frc.robot.autonomous.TrajectoryBuilder;
-import frc.robot.autonomous.routines.DriveForwardBackward2m;
 import frc.robot.commands.DriveTeleop;
 import frc.robot.commands.RotateToTarget;
 import frc.robot.commands.RunLifter;
@@ -40,9 +42,6 @@ public class RobotContainer {
   private DriveTeleop driveTeleop;
   private RunLifter runLifter;
 
-  // Ramsete controllers
-  private PIDController mRamseteLeftController, mRamseteRightController;
-
   // XboxController
   public static XboxController mController;
 
@@ -52,8 +51,9 @@ public class RobotContainer {
   private PyCamera pycam;
 
   //Test AutoRoutine
-  private DriveForwardBackward2m autoCommand = new DriveForwardBackward2m();
-  private TrajectoryBuilder trajectoryBuilder = new TrajectoryBuilder(Constants.PATH_FOLDER);
+  private TrajectoryBuilder mTrajectoryBuilder = new TrajectoryBuilder(Constants.PATH_FOLDER);
+  private CommandBuilder mCommandBuilder = new CommandBuilder();
+  private SendableChooser<AutoRoutine> mAutoChooser = new SendableChooser<AutoRoutine>();
 
   /** The container for the robot. Contains subsystems, OI devices, and commands. */
   public RobotContainer() {
@@ -70,15 +70,6 @@ public class RobotContainer {
     mLifter = new Lifter();
     runLifter = new RunLifter(mLifter);
     mLifter.setDefaultCommand(runLifter);
-
-    // Ramsete controllers
-    mRamseteLeftController = new PIDController(5.7673, 0, 0);
-    mRamseteRightController = new PIDController(5.7673, 0, 0);
-
-    // Populate shuffleboard
-    var autoTab = Shuffleboard.getTab("Autonomous");
-    autoTab.add("Left Controller", mRamseteLeftController);
-    autoTab.add("Right Controller", mRamseteRightController);
     
     //feed
     m_feed = new FeedIntake();
@@ -88,6 +79,11 @@ public class RobotContainer {
 
     //pycam
     pycam = new PyCamera();
+
+    // Populate shuffleboard
+    ShuffleboardTab autoTab = Shuffleboard.getTab("Autonomous");
+    autoTab.add(mAutoChooser);
+    mCommandBuilder.displayRoutines(mAutoChooser);
 
     // Configure the button bindings
     configureButtonBindings();
@@ -138,6 +134,6 @@ public class RobotContainer {
    */
   public Command getAutonomousCommand() {
     // A command to run in autonomous
-    return autoCommand.getCommand(trajectoryBuilder, mDrive::makeTrajectoryToCommand);
+    return mAutoChooser.getSelected().getCommand(mTrajectoryBuilder, mDrive::makeTrajectoryToCommand);
   }
 }

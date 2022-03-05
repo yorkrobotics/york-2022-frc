@@ -5,6 +5,10 @@ import java.util.function.BiFunction;
 import edu.wpi.first.math.trajectory.Trajectory;
 import edu.wpi.first.wpilibj2.command.Command;
 
+/**
+ * Inspired by team 6357
+ * credit: github.com/frc6357/robot_code_2022
+ */
 public interface AutoRoutine {
     /**
      * A method that returns the name of the AutoRoutine

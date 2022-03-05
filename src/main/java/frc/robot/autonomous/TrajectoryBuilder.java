@@ -12,7 +12,10 @@ import edu.wpi.first.wpilibj.Filesystem;
 
 import edu.wpi.first.wpilibj.DriverStation;
 
-
+/**
+ * Inspired by team 6357
+ * credit: github.com/frc6357/robot_code_2022
+ */
 public class TrajectoryBuilder {
 
     private Map<String, Trajectory>  mTrajectoryMap = new HashMap<String, Trajectory>();
