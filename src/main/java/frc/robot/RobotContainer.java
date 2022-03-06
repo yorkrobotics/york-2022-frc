@@ -22,7 +22,6 @@ import frc.robot.subsystems.FeedIntake;
 import frc.robot.subsystems.PyCamera;
 import frc.robot.subsystems.Shooter;
 import edu.wpi.first.wpilibj2.command.Command;
-import edu.wpi.first.wpilibj2.command.InstantCommand;
 import edu.wpi.first.wpilibj2.command.button.JoystickButton;
 
 /**
@@ -51,9 +50,9 @@ public class RobotContainer {
   private PyCamera pycam;
 
   //Test AutoRoutine
-  private TrajectoryBuilder mTrajectoryBuilder = new TrajectoryBuilder(Constants.PATH_FOLDER);
-  private CommandBuilder mCommandBuilder = new CommandBuilder();
-  private SendableChooser<AutoRoutine> mAutoChooser = new SendableChooser<AutoRoutine>();
+  private TrajectoryBuilder mTrajectoryBuilder;
+  private CommandBuilder mCommandBuilder;
+  private SendableChooser<AutoRoutine> mAutoChooser;
 
   /** The container for the robot. Contains subsystems, OI devices, and commands. */
   public RobotContainer() {
@@ -80,10 +79,17 @@ public class RobotContainer {
     //pycam
     pycam = new PyCamera();
 
+    // Autonomous
+    mTrajectoryBuilder = new TrajectoryBuilder(Constants.PATH_FOLDER);
+    mCommandBuilder = new CommandBuilder();
+    mAutoChooser = new SendableChooser<AutoRoutine>();
+
     // Populate shuffleboard
     ShuffleboardTab autoTab = Shuffleboard.getTab("Autonomous");
     autoTab.add(mAutoChooser);
+
     mCommandBuilder.displayRoutines(mAutoChooser);
+
 
     // Configure the button bindings
     configureButtonBindings();
@@ -99,8 +105,8 @@ public class RobotContainer {
     // new JoystickButton(mController, Button.kA.value).whenPressed(driveWithPositionControl);
 
     //right bumper to shift up and left bumper to shift down
-    new JoystickButton(mController, Button.kRightBumper.value).whenPressed(new InstantCommand(mDrive::shiftUp, mDrive));
-    new JoystickButton(mController, Button.kLeftBumper.value).whenPressed(new InstantCommand(mDrive::shiftDown, mDrive));
+    new JoystickButton(mController, Button.kRightBumper.value).whenPressed(mDrive::shiftUp, mDrive);
+    new JoystickButton(mController, Button.kLeftBumper.value).whenPressed(mDrive::shiftDown, mDrive);
 
     new JoystickButton(mController, Button.kLeftStick.value).whenPressed(mDrive::switchDriveMode, mDrive);
 
@@ -126,6 +132,8 @@ public class RobotContainer {
     // });
 
     }
+  
+
 
   /**
    * Use this to pass the autonomous command to the main {@link Robot} class.

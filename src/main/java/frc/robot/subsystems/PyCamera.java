@@ -9,6 +9,7 @@ import edu.wpi.first.math.filter.LinearFilter;
 import edu.wpi.first.networktables.EntryListenerFlags;
 import edu.wpi.first.networktables.NetworkTable;
 import edu.wpi.first.networktables.NetworkTableInstance;
+import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.networktables.NetworkTableEntry;
 import java.lang.Double;
 
@@ -70,6 +71,9 @@ public class PyCamera extends SubsystemBase {
     }
     // filteredAngle = filter.calculate(angle);
     // This method will be called once per scheduler run
-
+    SmartDashboard.putNumber("x", x);
+    SmartDashboard.putNumber("y", y);
+    SmartDashboard.putNumber("z", z);
+    SmartDashboard.putNumber("filteredAngle", filteredAngle);
   }
 }

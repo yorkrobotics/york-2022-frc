@@ -122,18 +122,10 @@ public class DriveTrain extends SubsystemBase {
       return this.getPose().getX();
     });
     driveTab.addNumber("Pose Y", () -> this.getPose().getY());
-    driveTab.addNumber("Left Wheel Speeds", () -> {
-      return this.getWheelSpeeds().leftMetersPerSecond;
-    });
-    driveTab.addNumber("Right Wheel Speeds", () -> {
-      return this.getWheelSpeeds().rightMetersPerSecond;
-    });
-    driveTab.addNumber("Left Encoder Meters", ()->{
-      return this.rotationsToMeters(mleftFrontEncoder.getPosition());
-    });
-    driveTab.addNumber("right Encoder Meters", ()->{
-      return this.rotationsToMeters(mrightFrontEncoder.getPosition());
-    });
+    driveTab.addNumber("Left Wheel Speeds", () -> this.getWheelSpeeds().leftMetersPerSecond);
+    driveTab.addNumber("Right Wheel Speeds", () -> this.getWheelSpeeds().rightMetersPerSecond);
+    driveTab.addNumber("Left Encoder Meters", ()-> this.rotationsToMeters(mleftFrontEncoder.getPosition()));
+    driveTab.addNumber("right Encoder Meters", ()-> this.rotationsToMeters(mrightFrontEncoder.getPosition()));
     driveTab.add(mGyro);
 
     kPEntry = driveTab.add("P Gain", kP).getEntry();
@@ -179,11 +171,11 @@ public class DriveTrain extends SubsystemBase {
       kMinOutput = -0.7;
       kMaxOutput = 0.7;
     }
-    if(kPEntry.getDouble(0) != kP) kP = kPEntry.getDouble(0);
-    if(kIEntry.getDouble(0) != kI) kI = kIEntry.getDouble(0);
-    if(kDEntry.getDouble(0) != kD) kD = kDEntry.getDouble(0);
-    if(kMaxOutputEntry.getDouble(0) != kMaxOutput) kMaxOutput = kMaxOutputEntry.getDouble(0);
-    if(kMinOutputEntry.getDouble(0) != kMinOutput) kMinOutput = kMinOutputEntry.getDouble(0);
+    // if(kPEntry.getDouble(0) != kP) kP = kPEntry.getDouble(0);
+    // if(kIEntry.getDouble(0) != kI) kI = kIEntry.getDouble(0);
+    // if(kDEntry.getDouble(0) != kD) kD = kDEntry.getDouble(0);
+    // if(kMaxOutputEntry.getDouble(0) != kMaxOutput) kMaxOutput = kMaxOutputEntry.getDouble(0);
+    // if(kMinOutputEntry.getDouble(0) != kMinOutput) kMinOutput = kMinOutputEntry.getDouble(0);
 
     updatePIDController(mleftPIDController, kP, kI, kD, kMinOutput, kMaxOutput);
     updatePIDController(mrightPIDController, kP, kI, kD, kMinOutput, kMaxOutput);
@@ -205,11 +197,11 @@ public class DriveTrain extends SubsystemBase {
       kMinOutput = -0.5;
       kMaxOutput = 0.5;
     }
-    if(kPEntry.getDouble(0) != kP) kP = kPEntry.getDouble(0);
-    if(kIEntry.getDouble(0) != kI) kI = kIEntry.getDouble(0);
-    if(kDEntry.getDouble(0) != kD) kD = kDEntry.getDouble(0);
-    if(kMaxOutputEntry.getDouble(0) != kMaxOutput) kMaxOutput = kMaxOutputEntry.getDouble(0);
-    if(kMinOutputEntry.getDouble(0) != kMinOutput) kMinOutput = kMinOutputEntry.getDouble(0);
+    // if(kPEntry.getDouble(0) != kP) kP = kPEntry.getDouble(0);
+    // if(kIEntry.getDouble(0) != kI) kI = kIEntry.getDouble(0);
+    // if(kDEntry.getDouble(0) != kD) kD = kDEntry.getDouble(0);
+    // if(kMaxOutputEntry.getDouble(0) != kMaxOutput) kMaxOutput = kMaxOutputEntry.getDouble(0);
+    // if(kMinOutputEntry.getDouble(0) != kMinOutput) kMinOutput = kMinOutputEntry.getDouble(0);
 
     updatePIDController(mleftPIDController, kP, kI, kD, kMinOutput, kMaxOutput);
     updatePIDController(mrightPIDController, kP, kI, kD, kMinOutput, kMaxOutput);
