@@ -13,6 +13,7 @@ import edu.wpi.first.wpilibj.smartdashboard.SendableChooser;
 import frc.robot.autonomous.AutoRoutine;
 import frc.robot.autonomous.CommandBuilder;
 import frc.robot.autonomous.TrajectoryBuilder;
+import frc.robot.commands.CorrectOdometry;
 import frc.robot.commands.DriveTeleop;
 import frc.robot.commands.RotateToTarget;
 import frc.robot.commands.RunLifter;
@@ -121,6 +122,7 @@ public class RobotContainer {
     
     // Y to shoot
     new JoystickButton(mController, Button.kY.value).whenPressed(mDrive::turnToTarget, mDrive);
+    // new JoystickButton(mController, Button.kY.value).whenPressed(new CorrectOdometry(pycam, mDrive));
     // new JoystickButton(mController, Button.kY.value).whileHeld(()->{
     //   m_feed.setSpeed(0.5);
     // });
