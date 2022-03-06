@@ -37,10 +37,10 @@ public class RotateToTarget extends PIDCommand {
 
         // Install a listener for the translation_vector entry in the Vision subtable
         NetworkTable visionTable = NetworkTableInstance.getDefault().getTable("Vision");
-        NetworkTableEntry translationVectorEntry = visionTable.getEntry("translation_vector");
-        translationVectorEntry.addListener((ev) -> {
-            targetAngle = getNewAngle();
-        }, EntryListenerFlags.kUpdate);
+        // NetworkTableEntry translationVectorEntry = visionTable.getEntry("translation_vector");
+        // translationVectorEntry.addListener((ev) -> {
+        //     targetAngle = getNewAngle();
+        // }, EntryListenerFlags.kUpdate);
     }
 
     private double getTargetAngle() {
@@ -52,6 +52,11 @@ public class RotateToTarget extends PIDCommand {
         return drive.getGyroAngle() + pycam.getHorizontalAngle();
     }
 
+    @Override
+    public void execute() {
+        targetAngle = getNewAngle();
+        super.execute();
+    }
     private void useOutput(double output) {
         // Saturate the output between -1 and 1
         if (output > 1) output = 1;

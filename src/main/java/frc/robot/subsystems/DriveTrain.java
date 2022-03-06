@@ -4,6 +4,8 @@
 
 package frc.robot.subsystems;
 
+import javax.xml.crypto.dsig.spec.C14NMethodParameterSpec;
+
 import com.revrobotics.CANSparkMax;
 import com.revrobotics.RelativeEncoder;
 import com.revrobotics.SparkMaxPIDController;
@@ -391,11 +393,12 @@ public class DriveTrain extends SubsystemBase {
   }
 
   public void turnToTarget() {
-    double x = mPose.getX() - 4.11;
-    double y = mPose.getY() - 2.055;
+    double x = mPose.getX() - Constants.FIELD_CENTER_X;
+    double y = mPose.getY() - Constants.FIELD_CENTER_Y;
     double theta = mGyro.getAngle() % 360.0; // self angle
     double turnAngle;
 
+    
     if (y > 0) {
       turnAngle = Math.atan(x / y) / Math.PI * 180.0 + 90.0 - theta;
     } else {
