@@ -6,6 +6,7 @@ package frc.robot.subsystems;
 
 import javax.xml.crypto.dsig.spec.C14NMethodParameterSpec;
 
+import com.fasterxml.jackson.annotation.OptBoolean;
 import com.revrobotics.CANSparkMax;
 import com.revrobotics.RelativeEncoder;
 import com.revrobotics.SparkMaxPIDController;
@@ -410,6 +411,7 @@ public class DriveTrain extends SubsystemBase {
     }
 
     setRotation(turnAngle);
+    setDriveMode(DriveControlMode.OPEN_LOOP);
   }
 
   public Command makeTrajectoryToCommand(Trajectory trajectory, Boolean resetOdometry){
