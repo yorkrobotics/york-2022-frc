@@ -6,51 +6,69 @@ package frc.robot.subsystems;
 
 import com.revrobotics.CANSparkMax;
 import com.revrobotics.RelativeEncoder;
-import com.revrobotics.SparkMaxLimitSwitch;
 import com.revrobotics.SparkMaxPIDController;
 import com.revrobotics.CANSparkMax.ControlType;
 import com.revrobotics.CANSparkMax.IdleMode;
 import com.revrobotics.CANSparkMax.SoftLimitDirection;
 import com.revrobotics.CANSparkMaxLowLevel.MotorType;
-import com.revrobotics.SparkMaxLimitSwitch.Type;
-
-import edu.wpi.first.wpilibj.DigitalInput;
 import edu.wpi.first.wpilibj.XboxController;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
 
 public class Lifter extends SubsystemBase {
-  private CANSparkMax mLiftMotor;
+  private CANSparkMax mLeftPrimaryMotor, mRightPrimaryMotor, mLeftSecondaryMotor, mRightSecondaryMotor;
+  private SparkMaxPIDController mLeftPrimaryController, mRightPrimaryController;
   private RelativeEncoder mEncoder;
   // private SparkMaxLimitSwitch mLimitSwitch;
   // private DigitalInput mLimitSwitch;
 
-  private SparkMaxPIDController mLifterController;
+  
   private LifterControlMode mLifterControlMode;
 
   private double kP, kI, kD, kIZone, kFF, kMinOutput, kMaxOutput;
 
   /** Creates a new Lifter. */
   public Lifter() {
-    mLiftMotor = new CANSparkMax(5, MotorType.kBrushless);
-    mLiftMotor.restoreFactoryDefaults();
-    mLiftMotor.setIdleMode(IdleMode.kBrake);
-    mLiftMotor.setInverted(true);
+    //first motor
+    mLeftPrimaryMotor = new CANSparkMax(1, MotorType.kBrushless);
+    mLeftPrimaryMotor.restoreFactoryDefaults();
+    mLeftPrimaryMotor.setIdleMode(IdleMode.kBrake);
+    mLeftPrimaryMotor.setInverted(true);
   
-    mEncoder = mLiftMotor.getEncoder();
-    mLifterController = mLiftMotor.getPIDController();
+    mEncoder = mLeftPrimaryMotor.getEncoder();
+    mLeftPrimaryController = mLeftPrimaryMotor.getPIDController();
+
+    //second motor
+    mRightPrimaryMotor = new CANSparkMax(2, MotorType.kBrushless);
+    mRightPrimaryMotor.restoreFactoryDefaults();
+    mRightPrimaryMotor.setIdleMode(IdleMode.kBrake);
+    mRightPrimaryMotor.setInverted(true);
+  
+    mEncoder = mRightPrimaryMotor.getEncoder();
+    mRightPrimaryController = mRightPrimaryMotor.getPIDController();
+
+    //third motor
+    mLeftSecondaryMotor = new CANSparkMax(1, MotorType.kBrushless);
+    mLeftSecondaryMotor.restoreFactoryDefaults();
+    mEncoder = mLeftSecondaryMotor.getEncoder();
+    mLeftSecondaryMotor.follow(mLeftPrimaryMotor);
+
+    //fourth motor
+    mRightSecondaryMotor = new CANSparkMax(1, MotorType.kBrushless);
+    mRightSecondaryMotor.restoreFactoryDefaults();  
+    mEncoder = mRightSecondaryMotor.getEncoder();
+    mRightSecondaryMotor.follow(mRightPrimaryMotor);
 
     // mLimitSwitch = mLiftMotor.getForwardLimitSwitch(Type.kNormallyOpen);
     // mLimitSwitch.enableLimitSwitch(true);
 
     // mLimitSwitch = new DigitalInput(0);
 
+    mLeftPrimaryMotor.enableSoftLimit(CANSparkMax.SoftLimitDirection.kForward, true);
+    mLeftPrimaryMotor.enableSoftLimit(CANSparkMax.SoftLimitDirection.kReverse, true);
 
-    mLiftMotor.enableSoftLimit(CANSparkMax.SoftLimitDirection.kForward, true);
-    mLiftMotor.enableSoftLimit(CANSparkMax.SoftLimitDirection.kReverse, true);
-
-    mLiftMotor.setSoftLimit(SoftLimitDirection.kForward, 255); //The lifter maxes at 255 rotations
-    mLiftMotor.setSoftLimit(SoftLimitDirection.kReverse, 0);
+    mLeftPrimaryMotor.setSoftLimit(SoftLimitDirection.kForward, 255); //The lifter maxes at 255 rotations
+    mLeftPrimaryMotor.setSoftLimit(SoftLimitDirection.kReverse, 0);
 
     mLifterControlMode = LifterControlMode.OPEN_LOOP;
 
@@ -64,11 +82,11 @@ public class Lifter extends SubsystemBase {
 
     configureLifterController();
 
-    SmartDashboard.putNumber("Lift_P", mLifterController.getP());
-    SmartDashboard.putNumber("Lift_I", mLifterController.getI());
-    SmartDashboard.putNumber("Lift_D", mLifterController.getD());
-    SmartDashboard.putNumber("Lift forward limit", mLiftMotor.getSoftLimit(SoftLimitDirection.kForward));
-    SmartDashboard.putNumber("Lift reverse limit", mLiftMotor.getSoftLimit(SoftLimitDirection.kReverse));
+    SmartDashboard.putNumber("Lift_P", mLeftPrimaryController.getP());
+    SmartDashboard.putNumber("Lift_I", mLeftPrimaryController.getI());
+    SmartDashboard.putNumber("Lift_D", mLeftPrimaryController.getD());
+    SmartDashboard.putNumber("Lift forward limit", mLeftPrimaryMotor.getSoftLimit(SoftLimitDirection.kForward));
+    SmartDashboard.putNumber("Lift reverse limit", mLeftPrimaryMotor.getSoftLimit(SoftLimitDirection.kReverse));
 
     // goHome();
   }
@@ -85,7 +103,7 @@ public class Lifter extends SubsystemBase {
   }
 
   public void setPosition(double setPoint){
-    mLifterController.setReference(setPoint, ControlType.kPosition);
+    mLeftPrimaryController.setReference(setPoint, ControlType.kPosition);
   }
 
   public void runLiftWithJoystick(XboxController controller){
@@ -95,7 +113,7 @@ public class Lifter extends SubsystemBase {
       setPosition(controller.getRightY() * 50);
     }
     if (mLifterControlMode == LifterControlMode.OPEN_LOOP){
-      mLiftMotor.set(controller.getRightY() * 0.2);
+      mLeftPrimaryMotor.set(controller.getRightY() * 0.2);
     }
   }
 
@@ -123,21 +141,21 @@ public class Lifter extends SubsystemBase {
     double i = SmartDashboard.getNumber("Lift_I", 0);
     double d = SmartDashboard.getNumber("Lift_D", 0);
 
-    if(p != mLifterController.getP()) {mLifterController.setP(p);}
-    if(i != mLifterController.getI()) {mLifterController.setI(i);}
-    if(d != mLifterController.getD()) {mLifterController.setD(d);}
+    if(p != mLeftPrimaryController.getP()) {mLeftPrimaryController.setP(p);}
+    if(i != mLeftPrimaryController.getI()) {mLeftPrimaryController.setI(i);}
+    if(d != mLeftPrimaryController.getD()) {mLeftPrimaryController.setD(d);}
 
-    mLiftMotor.setSoftLimit(SoftLimitDirection.kForward, (float)SmartDashboard.getNumber("Lift forward limit", 255));
-    mLiftMotor.setSoftLimit(SoftLimitDirection.kReverse, (float)SmartDashboard.getNumber("Lift reverse limit", 0));
+    mLeftPrimaryMotor.setSoftLimit(SoftLimitDirection.kForward, (float)SmartDashboard.getNumber("Lift forward limit", 255));
+    mLeftPrimaryMotor.setSoftLimit(SoftLimitDirection.kReverse, (float)SmartDashboard.getNumber("Lift reverse limit", 0));
   }
 
   public void configureLifterController(){
-    mLifterController.setP(kP);
-    mLifterController.setI(kI);
-    mLifterController.setD(kD);
-    mLifterController.setIZone(kIZone);
-    mLifterController.setFF(kFF);
-    mLifterController.setOutputRange(kMinOutput, kMaxOutput);
+    mLeftPrimaryController.setP(kP);
+    mLeftPrimaryController.setI(kI);
+    mLeftPrimaryController.setD(kD);
+    mLeftPrimaryController.setIZone(kIZone);
+    mLeftPrimaryController.setFF(kFF);
+    mLeftPrimaryController.setOutputRange(kMinOutput, kMaxOutput);
   }
 
   public LifterControlMode getControlMode(){
@@ -164,7 +182,6 @@ public class Lifter extends SubsystemBase {
   //     mLiftMotor.stopMotor();
   //   }
   // }
-
 
   public enum LifterControlMode{
     OPEN_LOOP, POSITION_CONTROL
