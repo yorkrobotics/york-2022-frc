@@ -5,18 +5,22 @@
 package frc.robot.subsystems;
 
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
+import edu.wpi.first.wpilibj.DoubleSolenoid;
+import edu.wpi.first.wpilibj.PneumaticsModuleType;
 import edu.wpi.first.wpilibj.motorcontrol.PWMMotorController;
 import edu.wpi.first.wpilibj.motorcontrol.PWMVictorSPX;
 
 public class FeedIntake extends SubsystemBase {
   double speed;
   PWMMotorController intake;
+  private DoubleSolenoid mSolenoid;
 
   /** Creates a new ExampleSubsystem. */
   public FeedIntake() {
     speed = 0;
-    intake = new PWMVictorSPX(2);
+    intake = new PWMVictorSPX(2); //channel number 2
     intake.setInverted(false);
+    mSolenoid = new DoubleSolenoid(PneumaticsModuleType.CTREPCM, 1, 1);
   }
 
   @Override
@@ -25,7 +29,6 @@ public class FeedIntake extends SubsystemBase {
   }
 
   public void setSpeed(double spd) {
-    speed = spd;
     intake.set(spd);
   }
 
@@ -37,6 +40,10 @@ public class FeedIntake extends SubsystemBase {
     setSpeed(0);
   }
 
+  public void disableMotor() {
+    intake.disable();
+  }
+  
   @Override
   public void simulationPeriodic() {
     // This method will be called once per scheduler run during simulation
