@@ -24,15 +24,6 @@ public class DriveTeleop extends CommandBase {
   // Called when the command is initially scheduled.
   @Override
   public void initialize() {
-    switch(mDrive.getDriveControlMode()){
-      case OPEN_LOOP:
-        break;
-      case VELOCITY_CONTROL:
-        mDrive.configureVelocityControl();
-        break;
-      case POSITION_CONTROL:
-        break;
-    }
   }
 
   // Called every time the scheduler runs while the command is scheduled.

@@ -67,9 +67,9 @@ public class RobotContainer {
     mDrive.setDefaultCommand(driveTeleop);
 
     //Lifter subsystem
-    mLifter = new Lifter();
-    runLifter = new RunLifter(mLifter);
-    mLifter.setDefaultCommand(runLifter);
+    // mLifter = new Lifter();
+    // runLifter = new RunLifter(mLifter);
+    // mLifter.setDefaultCommand(runLifter);
     
     //feed
     m_feed = new FeedIntake();
@@ -106,12 +106,12 @@ public class RobotContainer {
     // new JoystickButton(mController, Button.kA.value).whenPressed(driveWithPositionControl);
 
     //right bumper to shift up and left bumper to shift down
-    new JoystickButton(mController, Button.kRightBumper.value).whenPressed(mDrive::shiftUp, mDrive);
-    new JoystickButton(mController, Button.kLeftBumper.value).whenPressed(mDrive::shiftDown, mDrive);
+    new JoystickButton(mController, Button.kRightBumper.value).whenPressed(mDrive::shiftToHighGear, mDrive);
+    new JoystickButton(mController, Button.kLeftBumper.value).whenPressed(mDrive::shiftToLowGear, mDrive);
 
     new JoystickButton(mController, Button.kLeftStick.value).whenPressed(mDrive::switchDriveMode, mDrive);
 
-    new JoystickButton(mController, Button.kRightStick.value).whenPressed(mLifter::switchLifterMode, mLifter);
+    // new JoystickButton(mController, Button.kRightStick.value).whenPressed(mLifter::switchLifterMode, mLifter);
 
     new JoystickButton(mController, Button.kA.value).whenPressed(()->{
       mDrive.setRotation(30);
