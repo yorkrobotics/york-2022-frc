@@ -19,7 +19,7 @@ import frc.robot.commands.RotateToTarget;
 import frc.robot.commands.RunLifter;
 import frc.robot.subsystems.DriveTrain;
 import frc.robot.subsystems.Lifter;
-import frc.robot.subsystems.FeedIntake;
+import frc.robot.subsystems.Intake;
 import frc.robot.subsystems.PyCamera;
 import frc.robot.subsystems.Shooter;
 import edu.wpi.first.wpilibj2.command.Command;
@@ -36,7 +36,7 @@ public class RobotContainer {
   private DriveTrain mDrive;
   private Lifter mLifter;
   private Shooter m_shooter;
-  private FeedIntake m_feed;
+  private Intake mIntake;
 
   // Commands
   private DriveTeleop driveTeleop;
@@ -45,8 +45,6 @@ public class RobotContainer {
   // XboxController
   public static XboxController mController;
 
-
-  public static XboxController m_controller;
   //camera
   private PyCamera pycam;
 
@@ -59,23 +57,23 @@ public class RobotContainer {
   public RobotContainer() {
 
     // Driver's controller
-    mController = new XboxController(Constants.CONTROLLER_NUMBER);
+    mController = new XboxController(Constants.CONTROLLER_PORT);
 
     // DriveTrain subsystem
-    mDrive = new DriveTrain();
+    mDrive = DriveTrain.getInstance();
     driveTeleop = new DriveTeleop(mDrive);
     mDrive.setDefaultCommand(driveTeleop);
 
     //Lifter subsystem
-    // mLifter = new Lifter();
+    // mLifter = Lifter.getInstance();
     // runLifter = new RunLifter(mLifter);
     // mLifter.setDefaultCommand(runLifter);
     
     //feed
-    m_feed = new FeedIntake();
+    // mIntake = Intake.getInstance();
 
     //Shooter stuff
-    m_shooter = new Shooter();
+    // m_shooter = Shooter.getInstance();
 
     //pycam
     pycam = new PyCamera();
@@ -123,7 +121,7 @@ public class RobotContainer {
 
     // X to feed
     new JoystickButton(mController, Button.kX.value).whileHeld(()->{
-      m_shooter.setSpeed(0.5);
+      m_shooter.runShooter(0.5);
     });
     
     // Y to shoot
@@ -132,11 +130,8 @@ public class RobotContainer {
     // new JoystickButton(mController, Button.kY.value).whileHeld(()->{
     //   m_feed.setSpeed(0.5);
     // });
-
     }
   
-
-
   /**
    * Use this to pass the autonomous command to the main {@link Robot} class.
    *

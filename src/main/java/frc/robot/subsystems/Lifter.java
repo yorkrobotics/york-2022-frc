@@ -14,50 +14,48 @@ import com.revrobotics.CANSparkMaxLowLevel.MotorType;
 import edu.wpi.first.wpilibj.XboxController;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
+import frc.robot.Constants;
 
 public class Lifter extends SubsystemBase {
+  private static final Lifter mLifter = new Lifter();
+  public static Lifter getInstance(){
+    return mLifter;
+  }
+
   private CANSparkMax mLeftPrimaryMotor, mRightPrimaryMotor, mLeftSecondaryMotor, mRightSecondaryMotor;
   private SparkMaxPIDController mLeftPrimaryController, mRightPrimaryController;
-  private RelativeEncoder mEncoder;
+  private RelativeEncoder mLeftEncoder, mRightEncoder;
   // private SparkMaxLimitSwitch mLimitSwitch;
   // private DigitalInput mLimitSwitch;
 
   
   private LifterControlMode mLifterControlMode;
 
-  private double kP, kI, kD, kIZone, kFF, kMinOutput, kMaxOutput;
+  private double kP, kI, kD, kMinOutput, kMaxOutput;
 
   /** Creates a new Lifter. */
   public Lifter() {
-    //first motor
-    mLeftPrimaryMotor = new CANSparkMax(1, MotorType.kBrushless);
-    mLeftPrimaryMotor.restoreFactoryDefaults();
-    mLeftPrimaryMotor.setIdleMode(IdleMode.kBrake);
-    mLeftPrimaryMotor.setInverted(true);
-  
-    mEncoder = mLeftPrimaryMotor.getEncoder();
-    mLeftPrimaryController = mLeftPrimaryMotor.getPIDController();
+    mLeftPrimaryMotor = new CANSparkMax(Constants.CAN.SHOOTER_LEFT_PRIMARY, MotorType.kBrushless);
+    mRightPrimaryMotor = new CANSparkMax(Constants.CAN.SHOOTER_RIGHT_PRIMARY, MotorType.kBrushless);
+    // mLeftSecondaryMotor = new CANSparkMax(1, MotorType.kBrushless);
+    // mRightSecondaryMotor = new CANSparkMax(1, MotorType.kBrushless);
 
-    //second motor
-    mRightPrimaryMotor = new CANSparkMax(2, MotorType.kBrushless);
+    mLeftPrimaryMotor.restoreFactoryDefaults();
     mRightPrimaryMotor.restoreFactoryDefaults();
+    // mLeftSecondaryMotor.restoreFactoryDefaults();
+    // mRightSecondaryMotor.restoreFactoryDefaults();  
+
+    mLeftPrimaryMotor.setIdleMode(IdleMode.kBrake);
     mRightPrimaryMotor.setIdleMode(IdleMode.kBrake);
+
+    mLeftPrimaryMotor.setInverted(true);
     mRightPrimaryMotor.setInverted(true);
   
-    mEncoder = mRightPrimaryMotor.getEncoder();
+    mLeftEncoder = mLeftPrimaryMotor.getEncoder();
+    mRightEncoder = mRightPrimaryMotor.getEncoder();
+
+    mLeftPrimaryController = mLeftPrimaryMotor.getPIDController();
     mRightPrimaryController = mRightPrimaryMotor.getPIDController();
-
-    //third motor
-    mLeftSecondaryMotor = new CANSparkMax(1, MotorType.kBrushless);
-    mLeftSecondaryMotor.restoreFactoryDefaults();
-    mEncoder = mLeftSecondaryMotor.getEncoder();
-    mLeftSecondaryMotor.follow(mLeftPrimaryMotor);
-
-    //fourth motor
-    mRightSecondaryMotor = new CANSparkMax(1, MotorType.kBrushless);
-    mRightSecondaryMotor.restoreFactoryDefaults();  
-    mEncoder = mRightSecondaryMotor.getEncoder();
-    mRightSecondaryMotor.follow(mRightPrimaryMotor);
 
     // mLimitSwitch = mLiftMotor.getForwardLimitSwitch(Type.kNormallyOpen);
     // mLimitSwitch.enableLimitSwitch(true);
@@ -75,8 +73,6 @@ public class Lifter extends SubsystemBase {
     kP = 0;
     kI = 0;
     kD = 0;
-    kIZone = 0;
-    kFF = 0;
     kMinOutput = -0.5;
     kMaxOutput = -0.5;
 
@@ -94,7 +90,6 @@ public class Lifter extends SubsystemBase {
   @Override
   public void periodic() {
     // This method will be called once per scheduler run
-    SmartDashboard.putNumber("Lift_position", mEncoder.getPosition());
 
     // SmartDashboard.putBoolean("Limit Switch isPressed", mLimitSwitch.get());
 
@@ -117,8 +112,9 @@ public class Lifter extends SubsystemBase {
     }
   }
 
-  public void resetEncoder(){
-    mEncoder.setPosition(0);
+  public void resetEncoders(){
+    mLeftEncoder.setPosition(0);
+    mRightEncoder.setPosition(0);
   }
 
   public double rotationsToMeters(double rotations){
@@ -153,8 +149,6 @@ public class Lifter extends SubsystemBase {
     mLeftPrimaryController.setP(kP);
     mLeftPrimaryController.setI(kI);
     mLeftPrimaryController.setD(kD);
-    mLeftPrimaryController.setIZone(kIZone);
-    mLeftPrimaryController.setFF(kFF);
     mLeftPrimaryController.setOutputRange(kMinOutput, kMaxOutput);
   }
 

@@ -38,12 +38,18 @@ import edu.wpi.first.wpilibj2.command.SubsystemBase;
 import frc.robot.Constants;
 
 public class DriveTrain extends SubsystemBase {
+  private static final DriveTrain mDrive = new DriveTrain();
+  public static DriveTrain getInstance() {
+    return mDrive;
+  }
+
   //Hardware setup
-  private CANSparkMax mleftFront, mleftBack, mrightFront, mrightBack;
-  private RelativeEncoder mleftFrontEncoder, mrightFrontEncoder;
+  private CANSparkMax mLeftFront, mLeftBack, mRightFront, mRightBack;
+  private RelativeEncoder mLeftFrontEncoder, mRightFrontEncoder;
   private DoubleSolenoid mShifter;
 
   //Controller setup
+  private PIDController mLeftAutoController, mRightAutoController;
   private SparkMaxPIDController mleftPIDController, mrightPIDController;
   private DriveControlMode mDriveControlMode;
   private GearMode mGearMode;
@@ -51,47 +57,47 @@ public class DriveTrain extends SubsystemBase {
   private double gearRatio, kS, kV, kA;
   private double kP, kI, kD, kMinOutput, kMaxOutput;
   private NetworkTableEntry kPEntry, kIEntry, kDEntry, kMinOutputEntry, kMaxOutputEntry;
+  private double totalDistanceLeft = 0, totalDistanceRight = 0;
+  private double lastLeftEncoderPos = 0, lastRightEncoderPos = 0;
 
   private DifferentialDriveKinematics mKinematics;
   private DifferentialDriveOdometry mOdometry;
   private ADXRS450_Gyro mGyro;
-  private Pose2d mPose;
-  private final Field2d mField = new Field2d();
   private SimpleMotorFeedforward mFeedforward;
-  private double totalDistanceLeft = 0, totalDistanceRight = 0;
-  private double lastLeftEncoderPos = 0, lastRightEncoderPos = 0;
 
   private ShuffleboardTab driveTab;
+  private final Field2d mField = new Field2d();
 
-  private PIDController mLeftAutoController = new PIDController(Constants.kP_AUTO, 0, 0), 
-  mRightAutoController = new PIDController(Constants.kP_AUTO, 0, 0);
 
-  /** Creates a new VelocityController. */
   public DriveTrain() {
     //Hardware
-    mleftFront = new CANSparkMax(1, MotorType.kBrushless);
-    mleftBack = new CANSparkMax(2, MotorType.kBrushless);
-    mrightFront = new CANSparkMax(4, MotorType.kBrushless);
-    mrightBack = new CANSparkMax(3, MotorType.kBrushless);
-    mShifter = new DoubleSolenoid(PneumaticsModuleType.CTREPCM, 6, 1);
+    mLeftFront = new CANSparkMax(Constants.CAN.DRIVE_LEFT_FRONT, MotorType.kBrushless);
+    mLeftBack = new CANSparkMax(Constants.CAN.DRIVE_LEFT_BACK, MotorType.kBrushless);
+    mRightFront = new CANSparkMax(Constants.CAN.DRIVE_RIGHT_FRONT, MotorType.kBrushless);
+    mRightBack = new CANSparkMax(Constants.CAN.DRIVE_RIGHT_BACK, MotorType.kBrushless);
+    mShifter = new DoubleSolenoid(PneumaticsModuleType.CTREPCM, Constants.PCM.DRIVE_GEAR_SHIFT_FORWARD, Constants.PCM.DRIVE_GEAR_SHIFT_REVERSE);
 
-    mleftFront.restoreFactoryDefaults();
-    mleftBack.restoreFactoryDefaults();
-    mrightFront.restoreFactoryDefaults();
-    mrightBack.restoreFactoryDefaults();
+    mLeftFront.restoreFactoryDefaults();
+    mLeftBack.restoreFactoryDefaults();
+    mRightFront.restoreFactoryDefaults();
+    mRightBack.restoreFactoryDefaults();
 
-    mleftBack.follow(mleftFront);
-    mrightBack.follow(mrightFront);
+    mLeftBack.follow(mLeftFront);
+    mRightBack.follow(mRightFront);
 
-    mleftFront.setInverted(false);
-    mrightFront.setInverted(true);
+    mLeftFront.setInverted(false);
+    mRightFront.setInverted(true);
 
-    mleftFrontEncoder = mleftFront.getEncoder();
-    mrightFrontEncoder = mrightFront.getEncoder();
+    mLeftFrontEncoder = mLeftFront.getEncoder();
+    mRightFrontEncoder = mRightFront.getEncoder();
     
     //Controller
-    mleftPIDController = mleftFront.getPIDController();
-    mrightPIDController = mrightFront.getPIDController();
+    mleftPIDController = mLeftFront.getPIDController();
+    mrightPIDController = mRightFront.getPIDController();
+
+    mLeftAutoController = new PIDController(Constants.kP_AUTO, 0, 0);
+    mRightAutoController = new PIDController(Constants.kP_AUTO, 0, 0);
+    
 
     setToOpenLoopMode(); //Default drive mode set to open loop
     mGearMode = GearMode.UNKNOWN;
@@ -103,15 +109,12 @@ public class DriveTrain extends SubsystemBase {
 
     SmartDashboard.putData("Field", mField);
 
-    resetEncoders();
-
     mGyro = new ADXRS450_Gyro();
     mGyro.calibrate();
 
     mKinematics = new DifferentialDriveKinematics(Constants.TRACK_WIDTH);
-    mOdometry = new DifferentialDriveOdometry(new Rotation2d(Constants.STARTING_ANGLE), new Pose2d(Constants.STARTING_X, Constants.STARTING_Y, new Rotation2d(Constants.STARTING_ANGLE))); //optional second arguement: starting position
+    mOdometry = new DifferentialDriveOdometry(Rotation2d.fromDegrees(this.getGyroAngle()));
     mFeedforward = new SimpleMotorFeedforward(kS, kV, kA);
-    mPose = new Pose2d();
 
     // Update to Shuffleboard
     driveTab = Shuffleboard.getTab("Drive");
@@ -120,8 +123,8 @@ public class DriveTrain extends SubsystemBase {
     driveTab.addNumber("Pose Y", () -> this.getPose().getY());
     driveTab.addNumber("Left Wheel Speeds", () -> this.getWheelSpeeds().leftMetersPerSecond);
     driveTab.addNumber("Right Wheel Speeds", () -> this.getWheelSpeeds().rightMetersPerSecond);
-    driveTab.addNumber("Left Encoder Meters", ()-> this.rotationsToMeters(mleftFrontEncoder.getPosition()));
-    driveTab.addNumber("right Encoder Meters", ()-> this.rotationsToMeters(mrightFrontEncoder.getPosition()));
+    driveTab.addNumber("Left Encoder Meters", ()-> this.rotationsToMeters(mLeftFrontEncoder.getPosition()));
+    driveTab.addNumber("right Encoder Meters", ()-> this.rotationsToMeters(mRightFrontEncoder.getPosition()));
     driveTab.add(mGyro);
 
     kPEntry = driveTab.add("P Gain", kP).getEntry();
@@ -135,14 +138,14 @@ public class DriveTrain extends SubsystemBase {
   public void periodic() {
     // This method will be called once per scheduler run
     if (mGearMode == GearMode.UNKNOWN){
-      lastLeftEncoderPos = mleftFrontEncoder.getPosition();
-      lastRightEncoderPos = mrightFrontEncoder.getPosition();
+      lastLeftEncoderPos = mLeftFrontEncoder.getPosition();
+      lastRightEncoderPos = mRightFrontEncoder.getPosition();
     }
     else{
       updateOdometry();
     }
     
-    mPose = mOdometry.update(mGyro.getRotation2d(), totalDistanceLeft, totalDistanceRight);
+    mOdometry.update(mGyro.getRotation2d(), totalDistanceLeft, totalDistanceRight);
     mField.setRobotPose(mOdometry.getPoseMeters());
   
   }
@@ -154,8 +157,8 @@ public class DriveTrain extends SubsystemBase {
    */
   public void setOpenLoop(double left_velocity, double right_velocity){
     if (mDriveControlMode == DriveControlMode.OPEN_LOOP){
-      mleftFront.set(left_velocity * Constants.MAX_OPENLOOP_SPEED);
-      mrightFront.set(right_velocity * Constants.MAX_OPENLOOP_SPEED);
+      mLeftFront.set(left_velocity * Constants.MAX_OPENLOOP_SPEED);
+      mRightFront.set(right_velocity * Constants.MAX_OPENLOOP_SPEED);
     }
     else{
       System.out.println("[Drive] drive mode not in open loop");
@@ -203,15 +206,15 @@ public class DriveTrain extends SubsystemBase {
     SmartDashboard.putNumber("set angle", setAngle);
     if (setAngle != 0 ) {
       double setMeters = setAngle / 360 * Math.PI * Constants.TRACK_WIDTH;
-      mleftPIDController.setReference(mleftFrontEncoder.getPosition() + metersToRotations(setMeters), CANSparkMax.ControlType.kPosition);
-      mrightPIDController.setReference(mrightFrontEncoder.getPosition() - metersToRotations(setMeters), CANSparkMax.ControlType.kPosition);
-      SmartDashboard.putNumber("set reference left", mleftFrontEncoder.getPosition() + metersToRotations(setMeters));
-      SmartDashboard.putNumber("set reference right", mrightFrontEncoder.getPosition() - metersToRotations(setMeters));
+      mleftPIDController.setReference(mLeftFrontEncoder.getPosition() + metersToRotations(setMeters), CANSparkMax.ControlType.kPosition);
+      mrightPIDController.setReference(mRightFrontEncoder.getPosition() - metersToRotations(setMeters), CANSparkMax.ControlType.kPosition);
+      SmartDashboard.putNumber("set reference left", mLeftFrontEncoder.getPosition() + metersToRotations(setMeters));
+      SmartDashboard.putNumber("set reference right", mRightFrontEncoder.getPosition() - metersToRotations(setMeters));
     } else {
-      mleftPIDController.setReference(mleftFrontEncoder.getPosition() , CANSparkMax.ControlType.kPosition);
-      mrightPIDController.setReference(mrightFrontEncoder.getPosition(), CANSparkMax.ControlType.kPosition);
-      SmartDashboard.putNumber("set reference left", mleftFrontEncoder.getPosition());
-      SmartDashboard.putNumber("set reference right", mrightFrontEncoder.getPosition());
+      mleftPIDController.setReference(mLeftFrontEncoder.getPosition() , CANSparkMax.ControlType.kPosition);
+      mrightPIDController.setReference(mRightFrontEncoder.getPosition(), CANSparkMax.ControlType.kPosition);
+      SmartDashboard.putNumber("set reference left", mLeftFrontEncoder.getPosition());
+      SmartDashboard.putNumber("set reference right", mRightFrontEncoder.getPosition());
     }
   }
 
@@ -221,8 +224,8 @@ public class DriveTrain extends SubsystemBase {
    * @param rightVolts right motor voltage
    */
   public void tankDriveVolts(double leftVolts, double rightVolts){
-    mleftFront.setVoltage(leftVolts);
-    mrightFront.setVoltage(rightVolts);
+    mLeftFront.setVoltage(leftVolts);
+    mRightFront.setVoltage(rightVolts);
   }
 
   /**
@@ -381,7 +384,7 @@ public class DriveTrain extends SubsystemBase {
    * @return current pose
    */
   public Pose2d getPose(){
-    return mPose;
+    return mOdometry.getPoseMeters();
   }
 
   /**
@@ -390,16 +393,16 @@ public class DriveTrain extends SubsystemBase {
    */
   public DifferentialDriveWheelSpeeds getWheelSpeeds(){
     return new DifferentialDriveWheelSpeeds(
-      rotationsToMeters(mleftFrontEncoder.getVelocity()) / 60, 
-      rotationsToMeters(mrightFrontEncoder.getVelocity()) / 60);
+      rotationsToMeters(mLeftFrontEncoder.getVelocity()) / 60, 
+      rotationsToMeters(mRightFrontEncoder.getVelocity()) / 60);
   }
 
   /**
    * Reset the encoders, the stored last encoder positions and total distance travelled
    */
   public void resetEncoders(){
-    mleftFrontEncoder.setPosition(0);
-    mrightFrontEncoder.setPosition(0);
+    mLeftFrontEncoder.setPosition(0);
+    mRightFrontEncoder.setPosition(0);
 
     lastLeftEncoderPos = 0;
     lastRightEncoderPos = 0;
@@ -413,7 +416,7 @@ public class DriveTrain extends SubsystemBase {
    */
   public void resetOdometry(Pose2d pose){
     resetEncoders();
-    mOdometry.resetPosition(pose, Rotation2d.fromDegrees(getGyroAngle()));
+    mOdometry.resetPosition(pose, Rotation2d.fromDegrees(this.getGyroAngle()));
   }
 
   /**
@@ -441,8 +444,8 @@ public class DriveTrain extends SubsystemBase {
    * Turn to the center hub of the field
    */
   public void turnToTarget() {
-    double x = mPose.getX() - Constants.FIELD_CENTER_X;
-    double y = mPose.getY() - Constants.FIELD_CENTER_Y;
+    double x = this.getPose().getX() - Constants.FIELD_CENTER_X;
+    double y = this.getPose().getY() - Constants.FIELD_CENTER_Y;
     double theta = mGyro.getAngle() % 360.0; // self angle
     double turnAngle;
     
@@ -490,8 +493,8 @@ public class DriveTrain extends SubsystemBase {
    * 2. the distance traveled by each encoder since the last update
    */
   public void updateOdometry(){
-    double diffLeft = mleftFrontEncoder.getPosition() - lastLeftEncoderPos;
-    double diffRight = mrightFrontEncoder.getPosition() - lastRightEncoderPos;
+    double diffLeft = mLeftFrontEncoder.getPosition() - lastLeftEncoderPos;
+    double diffRight = mRightFrontEncoder.getPosition() - lastRightEncoderPos;
     
     double leftMeters = rotationsToMeters(diffLeft);
     double rightMeters = rotationsToMeters(diffRight);
@@ -499,8 +502,8 @@ public class DriveTrain extends SubsystemBase {
     totalDistanceLeft += leftMeters;
     totalDistanceRight += rightMeters;
 
-    lastLeftEncoderPos = mleftFrontEncoder.getPosition();
-    lastRightEncoderPos = mrightFrontEncoder.getPosition();
+    lastLeftEncoderPos = mLeftFrontEncoder.getPosition();
+    lastRightEncoderPos = mRightFrontEncoder.getPosition();
   }
 
   /**

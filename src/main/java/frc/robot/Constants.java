@@ -14,12 +14,10 @@ package frc.robot;
  */
 public final class Constants {
 
-    public static final int CONTROLLER_NUMBER = 0;
+    public static final int CONTROLLER_PORT = 0;
 
 
     public static final double MAX_OPENLOOP_SPEED = 0.5;
-
-    public static final double AUTONOMOUS_SPEED = 0.5;
 
     public static final double DRIVE_MAX_RPM = 5400;
 
@@ -27,8 +25,6 @@ public final class Constants {
     public static final double GEAR_RATIO_LOW = 16.364;
     public static final double GEAR_RATIO_HIGH = 5.601;
       //gear ratio: 16.364, 5.601
-    public static final double TARGET_DISTANCE = 2;
-
 
     public static final double TRACK_WIDTH = 0.655; //The distance between left wheels and right wheels
     
@@ -38,15 +34,31 @@ public final class Constants {
 
     public static final double kP_AUTO = 5.7673;
 
-    public static final double STARTING_ANGLE = 0;
-
-
-    public static final double STARTING_X =0;
-    public static final double STARTING_Y = 0;
-
     public static final double FIELD_CENTER_X = 19.16;
     public static final double FIELD_CENTER_Y = 0;
 
     public static final String PATH_FOLDER = "paths/output";
     
+    public final class CAN{
+      public static final int DRIVE_LEFT_FRONT = 1;
+      public static final int DRIVE_LEFT_BACK = 2;
+      public static final int DRIVE_RIGHT_FRONT = 4;
+      public static final int DRIVE_RIGHT_BACK = 3;
+      public static final int SHOOTER_LEFT_PRIMARY = 0;
+      public static final int SHOOTER_RIGHT_PRIMARY = 0;
+    }
+
+    public final class PWM{
+      public static final int SHOOTER_TOP = 0;
+      public static final int SHOOTER_BOTTOM = 1;
+      public static final int SHOOTER_CONVEYOR = 0;
+      public static final int INTAKE_ROLLER = 0;
+    }
+
+    public final class PCM{
+      public static final int DRIVE_GEAR_SHIFT_FORWARD = 6;
+      public static final int DRIVE_GEAR_SHIFT_REVERSE = 1;
+      public static final int INTAKE_FORWARD = 0;
+      public static final int INTAKE_REVERSE = 0;
+    }
 }

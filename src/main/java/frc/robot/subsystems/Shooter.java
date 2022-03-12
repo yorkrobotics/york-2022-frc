@@ -6,35 +6,40 @@ package frc.robot.subsystems;
 
 import edu.wpi.first.wpilibj.motorcontrol.PWMVictorSPX;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
+import frc.robot.Constants;
 
 public class Shooter extends SubsystemBase {
-  private PWMVictorSPX top, bottom;
+  private static final Shooter mShooter = new Shooter();
+  public static Shooter getInstance(){
+    return mShooter;
+  }
+
+  private PWMVictorSPX mTop, mBottom, mConveyor;
   double speed;
   double default_speed = 20;
 
   /** Creates a new Shooter. */
   public Shooter() {
-    top = new PWMVictorSPX(0);
-    bottom = new PWMVictorSPX(1);
+    mTop = new PWMVictorSPX(Constants.PWM.SHOOTER_TOP);
+    mBottom = new PWMVictorSPX(Constants.PWM.SHOOTER_BOTTOM);
+    mConveyor = new PWMVictorSPX(Constants.PWM.SHOOTER_CONVEYOR);
 
-    top.setInverted(false);
-    bottom.setInverted(false);
+    mTop.setInverted(false);
+    mBottom.setInverted(false);
   }
 
-  public void setSpeed(double spd) {
-    speed = spd;
-    top.set(spd);
-    bottom.set(spd);
+  public void runShooter(double speed) {
+    mTop.set(speed);
+    mBottom.set(speed);
   }
 
-  public double getSpeed() {
-    return default_speed;
+  public void runConveyor(double speed){
+    mConveyor.set(speed);
   }
 
-  
-  public void stopMotor() {
-    top.set(0);
-    bottom.set(0);
+  public void stopShooter() {
+    mTop.set(0);
+    mBottom.set(0);
   }
   
   public double calculate_trajectory_pos(double z, double y, double v) {
