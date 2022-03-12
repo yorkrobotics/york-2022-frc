@@ -256,6 +256,7 @@ def setupCameras():
 #     fps = 1 / processing_time
 #     return fps
 
+# return a list of all the vertices from the binary image
 def verticesFromBin(binary_img, output_img):
     _, contour_list, _ = cv2.findContours(binary_img, mode=cv2.RETR_EXTERNAL, method=cv2.CHAIN_APPROX_TC89_L1)
 
@@ -278,15 +279,17 @@ def verticesFromBin(binary_img, output_img):
             cv2.circle(output_img, center=tuple(point[0]), radius = 1, color = (0,0,255), thickness = 1)
     return vertice_list
 
+# shows the HSV value at the center pixel of the camera frame
 def getCenterHSV(output_img):
     # for tuning only
     pixel_center = hsv_img[int(height/2), int(width/2)]
     cv2.circle(output_img, center = (int(width/2), int(height/2)), radius = 1, color = (0, 0, 255), thickness = 1)
     cv2.putText(output_img, "HSV: " + str(pixel_center), (0, 40), cv2.FONT_HERSHEY_SIMPLEX, 0.5, (255, 255, 255))
 
+# sort the list of quadrilaterals by sorting x first (left to right), and sort y (up then down). The order looks like letter "N"
 def sortQuadList(quad_list):
-    # sort according to x
     if len(quad_list) == 8:
+        # sort according to x
         points = list(zip(quad_list[::2], quad_list[1::2]))
         points.sort(key=lambda t: t[0])
         # sort according to y
@@ -295,6 +298,7 @@ def sortQuadList(quad_list):
         for pair in zip(points[::2], points[1::2]):
             quad_list.extend([val for point in sorted(pair, key=y) for val in point])
 
+# calculate the translation vector from the shoooter to the center
 def calcShooterToCenter(rvec, tvec):
     bottom_list = [[0.0, 0.0, 0.0, 1.0]]
 
@@ -322,6 +326,7 @@ def calcShooterToCenter(rvec, tvec):
 #     center = center.tolist()
 #     return center
 
+# group points from the approxpolydp 
 def makeImagePoints(vertice_list):
     image_points = []
     # sort image points
@@ -338,6 +343,7 @@ def makeImagePoints(vertice_list):
             idx+=1
     return image_points
 
+# returns a list of hoop centers by using groups of quadrilaterals as image points
 def getHoopCenter(output_img, vertice_list):
     # focal lengths
     image_points = makeImagePoints(vertice_list)
@@ -362,6 +368,7 @@ def getHoopCenter(output_img, vertice_list):
     
     return hoop_coords
 
+# rejects outliers in an array judging from each point's difference to the median
 def rejectOutliers(data, m = 2):
     d = np.abs(data - np.median(data))
     mdev = np.median(d)
