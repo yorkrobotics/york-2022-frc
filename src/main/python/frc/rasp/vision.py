@@ -15,7 +15,54 @@ configFile = "/boot/frc.json"
 
 class CameraConfig: pass
 
-DEBUG = False
+# DEBUG = False
+
+# inRange HSV ranges for thresholding the input image for binary image
+BIN_LOW_H = 60
+BIN_LOW_S = 100
+BIN_LOW_V = 120
+
+BIN_HIGH_H = 90
+BIN_HIGH_S = 255
+BIN_HIGH_V = 255
+
+EPSILON_FACTOR = 0.09 # directly influences the number of vertices for approxPolyDP
+
+fx = 625.16 # 1875.49844 / 1920 * 640
+fy = 833.57 # 1875.52991 / 1080 * 480
+cam_center_x = 317.81 # 953.441373 / 1920 * 640
+cam_center_y = 251.49 # 565.857930 / 1080 * 480
+CAMERA_MATRIX = [[fx, 0, cam_center_x], [0, fy, cam_center_y], [0, 0, 1]]
+
+distortion = None
+
+# 2D projection onto the camera
+OBJECT_POINTS = [
+        # imperial(inches)
+        [-2.5, 1.0, .0],
+        [-2.5, -1.0, .0],
+        [2.5, 1.0, .0],
+        [2.5, -1.0, .0],
+
+        ]
+
+# convert to numpy array
+CAMERA_MATRIX, OBJECT_POINTS = [np.array(x) for x in [CAMERA_MATRIX, OBJECT_POINTS ]]
+
+rMatShooter = [
+        [1.0, 0.0, 0.0],
+        [0.0, 1.0, 0.0],
+        [0.0, 0.0, 1.0],
+        ]
+
+tMatShooter = [
+        [0.0],
+        [-50.0],
+        [0.0]
+        ]
+
+
+
 
 team = None
 server = False
@@ -32,36 +79,6 @@ height = config2['cameras'][0]['height']
 ntinst = NetworkTablesInstance.getDefault()
 vision_nt = ntinst.getTable('Vision')
 
-fx = 1875.49844 / 1920 * 640
-fy = 1875.52991 / 1080 * 480
-cam_center_x = 953.441373 /1920 * 640
-cam_center_y = 565.857930 / 1080 * 480
-camera_matrix = [[fx, 0, cam_center_x], [0, fy, cam_center_y], [0, 0, 1]]
-distortion = None
-# 2D projection onto the camera
-object_points = [
-        # imperial(inches)
-        [-2.5, 1.0, .0],
-        [-2.5, -1.0, .0],
-        [2.5, 1.0, .0],
-        [2.5, -1.0, .0],
-
-        ]
-
-# convert to numpy array
-camera_matrix, object_points = [np.array(x) for x in [camera_matrix, object_points ]]
-
-rMatShooter = [
-        [1.0, 0.0, 0.0],
-        [0.0, 1.0, 0.0],
-        [0.0, 0.0, 1.0],
-        ]
-
-tMatShooter = [
-        [0.0],
-        [-50.0],
-        [0.0]
-        ]
 
 def parseError(str):
     """Report parse error."""
@@ -234,10 +251,10 @@ def setupCameras():
     os.system("v4l2-ctl -c auto_exposure=1")
     os.system("v4l2-ctl -c exposure_time_absolute=15")
 
-def framePerSecond(start_time):
-    processing_time = time.time() - start_time
-    fps = 1 / processing_time
-    return fps
+# def framePerSecond(start_time):
+#     processing_time = time.time() - start_time
+#     fps = 1 / processing_time
+#     return fps
 
 def verticesFromBin(binary_img, output_img):
     _, contour_list, _ = cv2.findContours(binary_img, mode=cv2.RETR_EXTERNAL, method=cv2.CHAIN_APPROX_TC89_L1)
@@ -248,7 +265,7 @@ def verticesFromBin(binary_img, output_img):
         if cv2.contourArea(contour) < 25:
             continue
 
-        epsilon = 0.09 * cv2.arcLength(contour, True)
+        epsilon = EPSILON_FACTOR * cv2.arcLength(contour, True)
         quadrilateral = cv2.approxPolyDP(contour, epsilon, True)
         vertices = quadrilateral.ravel().tolist() # 4 corners of the quadrilateral
         vertice_list.append(vertices)
@@ -280,24 +297,30 @@ def sortQuadList(quad_list):
 
 def calcShooterToCenter(rvec, tvec):
     bottom_list = [[0.0, 0.0, 0.0, 1.0]]
+
+    # cosntructing a transformation matrix from camera to hoop center
     trans_matrix = np.hstack((rvec, tvec))
     trans_matrix = np.vstack((trans_matrix, bottom_list))
+
+    # cosntructing a transformation matrix from shooter to camera
     shooter_to_cam_matrix = np.hstack((rMatShooter, tMatShooter))
     shooter_to_cam_matrix = np.vstack((shooter_to_cam_matrix, bottom_list))
+
     center_to_tape = [[.0],[.0],[-27.0], [1.0]]
     center = trans_matrix.dot(center_to_tape)
     center = shooter_to_cam_matrix.dot(center)
     center = center.tolist()
+
     return center
 
-def calcHoopCenter(rvec, tvec):
-    bottom_list = [[0.0, 0.0, 0.0, 1.0]]
-    trans_matrix = np.hstack((rvec, tvec))
-    trans_matrix = np.vstack((trans_matrix, bottom_list))
-    center_to_tape = [[.0],[.0],[-27.0], [1.0]]
-    center = trans_matrix.dot(center_to_tape)
-    center = center.tolist()
-    return center
+# def calcHoopCenter(rvec, tvec):
+#     bottom_list = [[0.0, 0.0, 0.0, 1.0]]
+#     trans_matrix = np.hstack((rvec, tvec))
+#     trans_matrix = np.vstack((trans_matrix, bottom_list))
+#     center_to_tape = [[.0],[.0],[-27.0], [1.0]]
+#     center = trans_matrix.dot(center_to_tape)
+#     center = center.tolist()
+#     return center
 
 def makeImagePoints(vertice_list):
     image_points = []
@@ -321,11 +344,11 @@ def getHoopCenter(output_img, vertice_list):
     hoop_coords = []
     idx = 0
     for quad_points in image_points:
-    # if len(image_points) == len(object_points):
+    # if len(image_points) == len(OBJECT_POINTS):
         quad_points = [np.array(x) for x in [quad_points ]] # convert to numpy array
-        _, rvec, tvec = cv2.solvePnP(object_points, quad_points[0], camera_matrix, distortion)#, flags=cv2.SOLVEPNP_EPNP)
+        _, rvec, tvec = cv2.solvePnP(OBJECT_POINTS, quad_points[0], CAMERA_MATRIX, distortion)#, flags=cv2.SOLVEPNP_EPNP)
         rvec, _ = cv2.Rodrigues(rvec)
-        center = calcHoopCenter(rvec, tvec)
+        center = calcShooterToCenter(rvec, tvec)
         hoop_coords.append([])
         for i in range(3):
             hoop_coords[idx].append(int(center[i][0]))
@@ -339,26 +362,34 @@ def getHoopCenter(output_img, vertice_list):
     
     return hoop_coords
 
-def reduceSigma(coords):
-    sigma = np.std(coords)
-    mean = np.mean(coords)
-    median = np.median(coords)
-    # if (sigma < 15):
-    #     return int(mean)
-    # else:
-        # return "NaN"
-    return median
+def rejectOutliers(data, m = 2):
+    d = np.abs(data - np.median(data))
+    mdev = np.median(d)
+    s = d/mdev if mdev else 0.
+    return data[s<m]
 
+def reduceStdDev(coords):
+    coords = rejectOutliers(coords)
+    sigma = np.std(coords)
+    # mean = np.mean(coords)
+    median = np.median(coords)
+    if (sigma < 15):
+        return median
+    else:
+        return "NaN"
+
+# Chooses the best center point out of all generated from each set of image points
+# returns NaN if value too off or none detected
 def getBestCenter(hoop_centers):
     coords = [np.array(x) for x in [hoop_centers]]
     coords = coords[0]
     if len(hoop_centers) > 0:
-        return [reduceSigma(coords[:,0]), reduceSigma(coords[:,1]), reduceSigma(coords[:,2])]
+        return [reduceStdDev(coords[:,0]), reduceStdDev(coords[:,1]), reduceStdDev(coords[:,2])]
     return ["NaN", "NaN", "NaN"]
 
 if __name__ == "__main__":
     setupCameras()
-    img = np.zeros(shape=(240, 320, 3), dtype=np.uint8)
+    img = np.zeros(shape=(480, 640, 3), dtype=np.uint8)
     inst = CameraServer.getInstance()
     input_stream = inst.getVideo()
     output_stream = inst.putVideo('Processed', width, height)
@@ -377,22 +408,19 @@ if __name__ == "__main__":
         # Convert to HSV and threshold image
         # input_img = cv2.GaussianBlur(input_img, (3,3), cv2.BORDER_CONSTANT)
         hsv_img = cv2.cvtColor(input_img, cv2.COLOR_BGR2HSV)
-        binary_img = cv2.inRange(hsv_img, (60, 100, 120), (90, 255, 255))
+        binary_img = cv2.inRange(hsv_img, (BIN_LOW_H, BIN_LOW_S, BIN_LOW_V), (BIN_HIGH_H, BIN_HIGH_S, BIN_HIGH_V))
         output_img = np.copy(input_img)
 
-        # getCenterHSV(output_img) # for tuning binary image range
+        # getCenterHSV(output_img) # for tuning binary image HSV range
 
         # get the center of the hoop and upload it to the network table
         vertice_list = verticesFromBin(binary_img, output_img)
         hoop_centers = getHoopCenter(output_img, vertice_list)
         center = getBestCenter(hoop_centers)
 
-        cv2.putText(output_img, str(center), (int(200 * width / 1920), int(120 * width / 1920)), 0, (3 * width / 1920), (128, 255, 0), int(3 * width / 1920))
+        cv2.putText(output_img, str(center), (167, 40), 0, (1), (128, 255, 0), 1)
         vision_nt.putNumberArray('translation_vector', center)
 
         binary_output_stream.putFrame(binary_img)
         output_stream.putFrame(output_img)
-
-        if DEBUG:
-            time.sleep(1)
 
