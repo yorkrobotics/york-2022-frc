@@ -43,7 +43,6 @@ OBJECT_POINTS = [
         [-2.5, -1.0, .0],
         [2.5, 1.0, .0],
         [2.5, -1.0, .0],
-
         ]
 
 # convert to numpy array
@@ -395,6 +394,7 @@ def getBestCenter(hoop_centers):
     return ["NaN", "NaN", "NaN"]
 
 if __name__ == "__main__":
+    # set up cameras according to the config
     setupCameras()
     img = np.zeros(shape=(480, 640, 3), dtype=np.uint8)
     inst = CameraServer.getInstance()
@@ -428,6 +428,7 @@ if __name__ == "__main__":
         cv2.putText(output_img, str(center), (167, 40), 0, (1), (128, 255, 0), 1)
         vision_nt.putNumberArray('translation_vector', center)
 
-        binary_output_stream.putFrame(binary_img)
-        output_stream.putFrame(output_img)
+        # display the frames 
+        output_stream.putFrame(output_img) # on port 1182
+        binary_output_stream.putFrame(binary_img) # port 1183
 
