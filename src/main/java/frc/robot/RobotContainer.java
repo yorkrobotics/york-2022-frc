@@ -16,13 +16,13 @@ import frc.robot.autonomous.TrajectoryBuilder;
 import frc.robot.commands.CorrectOdometry;
 import frc.robot.commands.DriveTeleop;
 import frc.robot.commands.RotateToTarget;
-import frc.robot.commands.RunLifter;
 import frc.robot.subsystems.DriveTrain;
-import frc.robot.subsystems.Lifter;
+import frc.robot.subsystems.Climb;
 import frc.robot.subsystems.Intake;
 import frc.robot.subsystems.PyCamera;
 import frc.robot.subsystems.Shooter;
 import edu.wpi.first.wpilibj2.command.Command;
+import edu.wpi.first.wpilibj2.command.InstantCommand;
 import edu.wpi.first.wpilibj2.command.button.JoystickButton;
 
 /**
@@ -34,13 +34,12 @@ import edu.wpi.first.wpilibj2.command.button.JoystickButton;
 public class RobotContainer {
   // Subsystems
   private DriveTrain mDrive;
-  private Lifter mLifter;
-  private Shooter m_shooter;
+  private Climb mLifter;
+  private Shooter mShooter;
   private Intake mIntake;
 
   // Commands
   private DriveTeleop driveTeleop;
-  private RunLifter runLifter;
 
   // XboxController
   public static XboxController mController;
@@ -64,16 +63,15 @@ public class RobotContainer {
     driveTeleop = new DriveTeleop(mDrive);
     mDrive.setDefaultCommand(driveTeleop);
 
-    //Lifter subsystem
+    // Lifter subsystem
     // mLifter = Lifter.getInstance();
-    // runLifter = new RunLifter(mLifter);
-    // mLifter.setDefaultCommand(runLifter);
+    // mLifter.setDefaultCommand(new InstantCommand(()-> mLifter.runLiftWithJoystick(mController)));
     
     //feed
     // mIntake = Intake.getInstance();
 
     //Shooter stuff
-    // m_shooter = Shooter.getInstance();
+    // mShooter = Shooter.getInstance();
 
     //pycam
     pycam = new PyCamera();
@@ -116,12 +114,12 @@ public class RobotContainer {
     });
     
     // B TBD
-    // new JoystickButton(mController, Button.kB.value).whenReleased(new ShootTarget(pycam, m_shooter));
+    // new JoystickButton(mController, Button.kB.value).whenReleased(new ShootTarget(pycam, mShooter));
     new JoystickButton(mController, Button.kB.value).whileHeld(new RotateToTarget(mDrive, pycam));
 
     // X to feed
     new JoystickButton(mController, Button.kX.value).whileHeld(()->{
-      m_shooter.runShooter(0.5);
+      mShooter.runShooter(0.5);
     });
     
     // Y to shoot

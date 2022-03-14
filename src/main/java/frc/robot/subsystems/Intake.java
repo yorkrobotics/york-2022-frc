@@ -8,6 +8,7 @@ import edu.wpi.first.wpilibj2.command.SubsystemBase;
 import frc.robot.Constants;
 import edu.wpi.first.wpilibj.DoubleSolenoid;
 import edu.wpi.first.wpilibj.PneumaticsModuleType;
+import edu.wpi.first.wpilibj.DoubleSolenoid.Value;
 import edu.wpi.first.wpilibj.motorcontrol.PWMMotorController;
 import edu.wpi.first.wpilibj.motorcontrol.PWMVictorSPX;
 
@@ -18,13 +19,13 @@ public class Intake extends SubsystemBase {
   }
 
   private PWMMotorController mRoller;
-  private DoubleSolenoid mSolenoid;
+  private DoubleSolenoid mLifter;
 
   public Intake() {
     mRoller = new PWMVictorSPX(Constants.PWM.INTAKE_ROLLER); //channel number 2
     mRoller.setInverted(false);
 
-    mSolenoid = new DoubleSolenoid(PneumaticsModuleType.CTREPCM, Constants.PCM.INTAKE_FORWARD, Constants.PCM.INTAKE_REVERSE);
+    mLifter = new DoubleSolenoid(PneumaticsModuleType.CTREPCM, Constants.PCM.INTAKE_FORWARD, Constants.PCM.INTAKE_REVERSE);
   }
 
   @Override
@@ -36,10 +37,25 @@ public class Intake extends SubsystemBase {
     mRoller.set(speed);
   }
 
-
   public void stopRoller() {
     mRoller.stopMotor();
   }
 
+  public void deploy(){
+    mLifter.set(Value.kForward);
+  }
 
+  public void retract(){
+    stopRoller();
+    mLifter.set(Value.kReverse);
+  }
+
+  public void release(){
+    stopRoller();
+    mLifter.set(Value.kOff);
+  }
+
+  public enum IntakeLifterMode{
+    RETRACTED, DEPLOYED, UNKNOWN
+  }
 }

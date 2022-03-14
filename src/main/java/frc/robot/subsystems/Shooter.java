@@ -41,6 +41,10 @@ public class Shooter extends SubsystemBase {
     mTop.set(0);
     mBottom.set(0);
   }
+
+  public double getSpeed(){
+    return 0;
+  }
   
   public double calculate_trajectory_pos(double z, double y, double v) {
     double v_squared = Math.pow(v, 2);

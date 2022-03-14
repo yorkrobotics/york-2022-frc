@@ -66,7 +66,7 @@ public class DriveTrain extends SubsystemBase {
   private SimpleMotorFeedforward mFeedforward;
 
   private ShuffleboardTab driveTab;
-  private final Field2d mField = new Field2d();
+  private final Field2d mField;
 
 
   public DriveTrain() {
@@ -107,10 +107,11 @@ public class DriveTrain extends SubsystemBase {
     kV = 4.5288;
     kA = 0.4136;
 
-    SmartDashboard.putData("Field", mField);
-
     mGyro = new ADXRS450_Gyro();
     mGyro.calibrate();
+
+    mField = new Field2d();
+    Shuffleboard.getTab("Autonomous").add(mField);
 
     mKinematics = new DifferentialDriveKinematics(Constants.TRACK_WIDTH);
     mOdometry = new DifferentialDriveOdometry(Rotation2d.fromDegrees(this.getGyroAngle()));

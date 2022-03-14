@@ -40,12 +40,15 @@ public final class Constants {
     public static final String PATH_FOLDER = "paths/output";
     
     public final class CAN{
-      public static final int DRIVE_LEFT_FRONT = 1;
-      public static final int DRIVE_LEFT_BACK = 2;
-      public static final int DRIVE_RIGHT_FRONT = 4;
-      public static final int DRIVE_RIGHT_BACK = 3;
-      public static final int SHOOTER_LEFT_PRIMARY = 0;
-      public static final int SHOOTER_RIGHT_PRIMARY = 0;
+      public static final int DRIVE_LEFT_FRONT = 3;
+      public static final int DRIVE_LEFT_BACK = 4;
+      public static final int DRIVE_RIGHT_FRONT = 2;
+      public static final int DRIVE_RIGHT_BACK = 1;
+      public static final int CLIMB_LEFT_PRIMARY = 8;
+      public static final int CLIMB_RIGHT_PRIMARY = 7;
+      public static final int TOWER_ACTUATOR_LEFT = 6;
+      public static final int TOWER_ACTUATOR_RIGHT = 5;
+
     }
 
     public final class PWM{

@@ -31,9 +31,6 @@ public class DriveTeleop extends CommandBase {
   public void execute() {
     mWheelSpeeds = mDrive.mArcadeDrive(RobotContainer.mController);
 
-
-
-
     if (mDrive.getDriveControlMode() == DriveControlMode.OPEN_LOOP){
       mDrive.setOpenLoop(mWheelSpeeds.left, mWheelSpeeds.right);
       }
