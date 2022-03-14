@@ -46,7 +46,7 @@ OBJECT_POINTS = [
         ]
 
 # convert to numpy array
-CAMERA_MATRIX, OBJECT_POINTS = [np.array(x) for x in [CAMERA_MATRIX, OBJECT_POINTS ]]
+CAMERA_MATRIX, OBJECT_POINTS = [np.array(x) for x in [CAMERA_MATRIX, OBJECT_POINTS]]
 
 rMatShooter = [
         [1.0, 0.0, 0.0],
