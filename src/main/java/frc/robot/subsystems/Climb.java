@@ -66,9 +66,9 @@ public class Climb extends SubsystemBase {
     mRightPrimaryMotor.enableSoftLimit(CANSparkMax.SoftLimitDirection.kForward, true);
     mRightPrimaryMotor.enableSoftLimit(CANSparkMax.SoftLimitDirection.kReverse, true);
 
-    mLeftPrimaryMotor.setSoftLimit(SoftLimitDirection.kForward, 255); //The lifter maxes at 255 rotations
-    mLeftPrimaryMotor.setSoftLimit(SoftLimitDirection.kReverse, 0);
-    mRightPrimaryMotor.setSoftLimit(SoftLimitDirection.kForward, 255);
+    mLeftPrimaryMotor.setSoftLimit(SoftLimitDirection.kForward, 0); //The lifter maxes at 255 rotations
+    mLeftPrimaryMotor.setSoftLimit(SoftLimitDirection.kReverse, -255);
+    mRightPrimaryMotor.setSoftLimit(SoftLimitDirection.kForward, -255);
     mRightPrimaryMotor.setSoftLimit(SoftLimitDirection.kReverse, 0);
 
     mClimbMode = ClimbMode.OPEN_LOOP;
@@ -118,7 +118,7 @@ public class Climb extends SubsystemBase {
     }
     if (mClimbMode == ClimbMode.OPEN_LOOP){
       mLeftPrimaryMotor.set(controller.getRightY() * 0.2);
-      mRightPrimaryMotor.set(controller.getRightY() * 0.2);
+      // mRightPrimaryMotor.set(controller.getRightY() * 0.2);
     }
   }
 
