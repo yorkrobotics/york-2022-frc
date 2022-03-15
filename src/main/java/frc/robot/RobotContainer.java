@@ -23,6 +23,7 @@ import frc.robot.subsystems.PyCamera;
 import frc.robot.subsystems.Shooter;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.InstantCommand;
+import edu.wpi.first.wpilibj2.command.RunCommand;
 import edu.wpi.first.wpilibj2.command.button.JoystickButton;
 
 /**
@@ -34,7 +35,7 @@ import edu.wpi.first.wpilibj2.command.button.JoystickButton;
 public class RobotContainer {
   // Subsystems
   private DriveTrain mDrive;
-  private Climb mLifter;
+  private Climb mClimb;
   private Shooter mShooter;
   private Intake mIntake;
 
@@ -64,14 +65,14 @@ public class RobotContainer {
     mDrive.setDefaultCommand(driveTeleop);
 
     // Lifter subsystem
-    // mLifter = Lifter.getInstance();
-    // mLifter.setDefaultCommand(new InstantCommand(()-> mLifter.runLiftWithJoystick(mController)));
+    mClimb = Climb.getInstance();
+    mClimb.setDefaultCommand(new RunCommand(()-> mClimb.runClimbWithJoystick(mController), mClimb));
     
-    //feed
-    // mIntake = Intake.getInstance();
+    // feed
+    mIntake = Intake.getInstance();
 
     //Shooter stuff
-    // mShooter = Shooter.getInstance();
+    mShooter = Shooter.getInstance();
 
     //pycam
     pycam = new PyCamera();
@@ -109,10 +110,6 @@ public class RobotContainer {
 
     // new JoystickButton(mController, Button.kRightStick.value).whenPressed(mLifter::switchLifterMode, mLifter);
 
-    new JoystickButton(mController, Button.kA.value).whenPressed(()->{
-      mDrive.setRotation(30);
-    });
-    
     // B TBD
     // new JoystickButton(mController, Button.kB.value).whenReleased(new ShootTarget(pycam, mShooter));
     new JoystickButton(mController, Button.kB.value).whileHeld(new RotateToTarget(mDrive, pycam));

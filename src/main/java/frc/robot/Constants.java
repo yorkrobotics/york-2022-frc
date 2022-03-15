@@ -51,17 +51,17 @@ public final class Constants {
 
     }
 
-    public final class PWM{
-      public static final int SHOOTER_TOP = 0;
-      public static final int SHOOTER_BOTTOM = 1;
-      public static final int SHOOTER_CONVEYOR = 0;
-      public static final int INTAKE_ROLLER = 0;
+    public final class VictorSPX{
+      public static final int SHOOTER_TOP = 11;
+      public static final int SHOOTER_BOTTOM = 9;
+      public static final int SHOOTER_CONVEYOR = 10;
+      public static final int INTAKE_ROLLER = 12;
     }
 
     public final class PCM{
-      public static final int DRIVE_GEAR_SHIFT_FORWARD = 6;
-      public static final int DRIVE_GEAR_SHIFT_REVERSE = 1;
-      public static final int INTAKE_FORWARD = 0;
-      public static final int INTAKE_REVERSE = 0;
+      public static final int DRIVE_GEAR_SHIFT_FORWARD = 4;
+      public static final int DRIVE_GEAR_SHIFT_REVERSE = 3;
+      public static final int INTAKE_FORWARD = 5;
+      public static final int INTAKE_REVERSE = 2;
     }
 }

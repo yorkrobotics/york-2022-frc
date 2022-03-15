@@ -4,6 +4,9 @@
 
 package frc.robot.subsystems;
 
+import com.ctre.phoenix.motorcontrol.VictorSPXControlMode;
+import com.ctre.phoenix.motorcontrol.can.VictorSPX;
+
 import edu.wpi.first.wpilibj.motorcontrol.PWMVictorSPX;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
 import frc.robot.Constants;
@@ -14,32 +17,32 @@ public class Shooter extends SubsystemBase {
     return mShooter;
   }
 
-  private PWMVictorSPX mTop, mBottom, mConveyor;
+  private VictorSPX mTop, mBottom, mConveyor;
   double speed;
   double default_speed = 20;
 
   /** Creates a new Shooter. */
   public Shooter() {
-    mTop = new PWMVictorSPX(Constants.PWM.SHOOTER_TOP);
-    mBottom = new PWMVictorSPX(Constants.PWM.SHOOTER_BOTTOM);
-    mConveyor = new PWMVictorSPX(Constants.PWM.SHOOTER_CONVEYOR);
+    mTop = new VictorSPX(Constants.VictorSPX.SHOOTER_TOP);
+    mBottom = new VictorSPX(Constants.VictorSPX.SHOOTER_BOTTOM);
+    mConveyor = new VictorSPX(Constants.VictorSPX.SHOOTER_CONVEYOR);
 
     mTop.setInverted(false);
     mBottom.setInverted(false);
   }
 
   public void runShooter(double speed) {
-    mTop.set(speed);
-    mBottom.set(speed);
+    mTop.set(VictorSPXControlMode.PercentOutput, speed);
+    mBottom.set(VictorSPXControlMode.PercentOutput, speed);
   }
 
   public void runConveyor(double speed){
-    mConveyor.set(speed);
+    mConveyor.set(VictorSPXControlMode.PercentOutput, speed);
   }
 
   public void stopShooter() {
-    mTop.set(0);
-    mBottom.set(0);
+    mTop.set(VictorSPXControlMode.PercentOutput, 0);
+    mBottom.set(VictorSPXControlMode.PercentOutput, 0);
   }
 
   public double getSpeed(){

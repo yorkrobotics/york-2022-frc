@@ -22,7 +22,7 @@ public class Climb extends SubsystemBase {
     return mClimb;
   }
 
-  private CANSparkMax mLeftPrimaryMotor, mRightPrimaryMotor, mLeftSecondaryMotor, mRightSecondaryMotor;
+  private CANSparkMax mLeftPrimaryMotor, mRightPrimaryMotor;
   private SparkMaxPIDController mLeftPrimaryController, mRightPrimaryController;
   private RelativeEncoder mLeftEncoder, mRightEncoder;
   // private SparkMaxLimitSwitch mLimitSwitch;
@@ -48,7 +48,7 @@ public class Climb extends SubsystemBase {
     mRightPrimaryMotor.setIdleMode(IdleMode.kBrake);
 
     mLeftPrimaryMotor.setInverted(true);
-    mRightPrimaryMotor.setInverted(true);
+    mRightPrimaryMotor.setInverted(false);
   
     mLeftEncoder = mLeftPrimaryMotor.getEncoder();
     mRightEncoder = mRightPrimaryMotor.getEncoder();
@@ -88,6 +88,8 @@ public class Climb extends SubsystemBase {
     SmartDashboard.putNumber("Climb reverse limit", mLeftPrimaryMotor.getSoftLimit(SoftLimitDirection.kReverse));
 
     // goHome();
+
+
   }
 
   @Override
@@ -97,11 +99,15 @@ public class Climb extends SubsystemBase {
     // SmartDashboard.putBoolean("Limit Switch isPressed", mLimitSwitch.get());
 
     // stopAtHome();
+
+    SmartDashboard.putNumber("Climb left position", mLeftEncoder.getPosition());
+    SmartDashboard.putNumber("Climb right position", mRightEncoder.getPosition());
     
   }
 
   public void runClimbPositionControl(double setPoint){
     mLeftPrimaryController.setReference(setPoint, ControlType.kPosition);
+    mRightPrimaryController.setReference(setPoint, ControlType.kPosition);
   }
 
   public void runClimbWithJoystick(XboxController controller){

@@ -6,6 +6,10 @@ package frc.robot.subsystems;
 
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
 import frc.robot.Constants;
+
+import com.ctre.phoenix.motorcontrol.VictorSPXControlMode;
+import com.ctre.phoenix.motorcontrol.can.VictorSPX;
+
 import edu.wpi.first.wpilibj.DoubleSolenoid;
 import edu.wpi.first.wpilibj.PneumaticsModuleType;
 import edu.wpi.first.wpilibj.DoubleSolenoid.Value;
@@ -18,14 +22,17 @@ public class Intake extends SubsystemBase {
     return mIntake;
   }
 
-  private PWMMotorController mRoller;
+  private VictorSPX mRoller;
   private DoubleSolenoid mLifter;
 
+  private IntakeLifterMode mLifterMode;
+
   public Intake() {
-    mRoller = new PWMVictorSPX(Constants.PWM.INTAKE_ROLLER); //channel number 2
+    mRoller = new VictorSPX(Constants.VictorSPX.INTAKE_ROLLER); //channel number 2
     mRoller.setInverted(false);
 
     mLifter = new DoubleSolenoid(PneumaticsModuleType.CTREPCM, Constants.PCM.INTAKE_FORWARD, Constants.PCM.INTAKE_REVERSE);
+    mLifterMode = IntakeLifterMode.UNKNOWN;
   }
 
   @Override
@@ -34,20 +41,22 @@ public class Intake extends SubsystemBase {
   }
 
   public void runRoller(double speed) {
-    mRoller.set(speed);
+    mRoller.set(VictorSPXControlMode.PercentOutput, speed);
   }
 
   public void stopRoller() {
-    mRoller.stopMotor();
+    mRoller.set(VictorSPXControlMode.Disabled, 0);
   }
 
   public void deploy(){
     mLifter.set(Value.kForward);
+    mLifterMode = IntakeLifterMode.DEPLOYED;
   }
 
   public void retract(){
     stopRoller();
     mLifter.set(Value.kReverse);
+    mLifterMode = IntakeLifterMode.RETRACTED;
   }
 
   public void release(){
