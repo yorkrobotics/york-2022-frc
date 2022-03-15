@@ -49,15 +49,24 @@ public class PyCamera extends SubsystemBase {
     return hoop_coord;
   }
 
+  // returns the needed angle of the shooter when given a particular initial velocity
   public double getAngle(double v) {
+    double h_h = 5.0;// hoop height (feet)
+    double h_r2g = 0.5; // circle center point to ground
+    double camera_angle = 30.0 / 180 * Math.PI; // TODO: get angle from shooter encoder 
+    double shooter_radius = 1.5;
+
+    double x_field = Math.sin(camera_angle) * Math.tan(camera_angle) * z + Math.cos(camera_angle) * z;
+    double y_field = h_h - shooter_radius * Math.sin(camera_angle) - h_r2g;
     
     double v_squared = Math.pow(v, 2);
     double v_fourth = Math.pow(v, 4);
-    double z_squared = Math.pow(z, 2);
+    double x_field_squared = Math.pow(x_field, 2);
     double g = 9.8;
-    double var_square_root = v_fourth - g * (g * z_squared + 2 * y * v_squared);
-    double equation = (v_squared + Math.sqrt(var_square_root)) / (g * z);
+    double var = v_fourth - g * (g * x_field_squared + 2 * y_field * v_squared); // can be used as determinant to get the minimum velocity required
+    double equation = (v_squared + Math.sqrt(var)) / (g * x_field);
     double angle = Math.atan(equation);
+
     return angle;
   }
 
