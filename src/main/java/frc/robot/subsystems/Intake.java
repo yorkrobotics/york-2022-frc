@@ -13,8 +13,6 @@ import com.ctre.phoenix.motorcontrol.can.VictorSPX;
 import edu.wpi.first.wpilibj.DoubleSolenoid;
 import edu.wpi.first.wpilibj.PneumaticsModuleType;
 import edu.wpi.first.wpilibj.DoubleSolenoid.Value;
-import edu.wpi.first.wpilibj.motorcontrol.PWMMotorController;
-import edu.wpi.first.wpilibj.motorcontrol.PWMVictorSPX;
 
 public class Intake extends SubsystemBase {
   private static final Intake mIntake = new Intake();
@@ -28,7 +26,7 @@ public class Intake extends SubsystemBase {
   private IntakeLifterMode mLifterMode;
 
   public Intake() {
-    mRoller = new VictorSPX(Constants.VictorSPX.INTAKE_ROLLER); //channel number 2
+    mRoller = new VictorSPX(Constants.VictorSPX.INTAKE_ROLLER);
     mRoller.setInverted(false);
 
     mLifter = new DoubleSolenoid(PneumaticsModuleType.CTREPCM, Constants.PCM.INTAKE_FORWARD, Constants.PCM.INTAKE_REVERSE);
@@ -40,28 +38,53 @@ public class Intake extends SubsystemBase {
     // This method will be called once per scheduler run
   }
 
+  /**
+   * Run the roller
+   * @param speed speed between (-1, 1)
+   */
   public void runRoller(double speed) {
     mRoller.set(VictorSPXControlMode.PercentOutput, speed);
   }
 
+  /**
+   * Stop the motor of roller
+   */
   public void stopRoller() {
-    mRoller.set(VictorSPXControlMode.Disabled, 0);
+    mRoller.set(VictorSPXControlMode.PercentOutput, 0);
   }
 
+  /**
+   * Deploy intake and set mode to deployed
+   */
   public void deploy(){
     mLifter.set(Value.kForward);
     mLifterMode = IntakeLifterMode.DEPLOYED;
   }
 
+  /**
+   * Retract intake and set mode to retracted
+   */
   public void retract(){
     stopRoller();
     mLifter.set(Value.kReverse);
     mLifterMode = IntakeLifterMode.RETRACTED;
   }
 
+  /**
+   * Release intake (set solenoid to off) and set mode to unknown
+   */
   public void release(){
     stopRoller();
     mLifter.set(Value.kOff);
+    mLifterMode = IntakeLifterMode.UNKNOWN;
+  }
+
+  /**
+   * Get intake lifter mode
+   * @return intake lifter mode
+   */
+  public IntakeLifterMode getIntakeLifterMode(){
+    return mLifterMode;
   }
 
   public enum IntakeLifterMode{

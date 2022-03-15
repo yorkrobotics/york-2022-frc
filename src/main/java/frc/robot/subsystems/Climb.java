@@ -36,13 +36,10 @@ public class Climb extends SubsystemBase {
   public Climb() {
     mLeftPrimaryMotor = new CANSparkMax(Constants.CAN.CLIMB_LEFT_PRIMARY, MotorType.kBrushless);
     mRightPrimaryMotor = new CANSparkMax(Constants.CAN.CLIMB_RIGHT_PRIMARY, MotorType.kBrushless);
-    // mLeftSecondaryMotor = new CANSparkMax(1, MotorType.kBrushless);
-    // mRightSecondaryMotor = new CANSparkMax(1, MotorType.kBrushless);
+
 
     mLeftPrimaryMotor.restoreFactoryDefaults();
-    mRightPrimaryMotor.restoreFactoryDefaults();
-    // mLeftSecondaryMotor.restoreFactoryDefaults();
-    // mRightSecondaryMotor.restoreFactoryDefaults();  
+    mRightPrimaryMotor.restoreFactoryDefaults(); 
 
     mLeftPrimaryMotor.setIdleMode(IdleMode.kBrake);
     mRightPrimaryMotor.setIdleMode(IdleMode.kBrake);
@@ -66,10 +63,10 @@ public class Climb extends SubsystemBase {
     mRightPrimaryMotor.enableSoftLimit(CANSparkMax.SoftLimitDirection.kForward, true);
     mRightPrimaryMotor.enableSoftLimit(CANSparkMax.SoftLimitDirection.kReverse, true);
 
-    mLeftPrimaryMotor.setSoftLimit(SoftLimitDirection.kForward, 0); //The lifter maxes at 255 rotations
+    mLeftPrimaryMotor.setSoftLimit(SoftLimitDirection.kForward, 0);
     mLeftPrimaryMotor.setSoftLimit(SoftLimitDirection.kReverse, -255);
-    mRightPrimaryMotor.setSoftLimit(SoftLimitDirection.kForward, -255);
-    mRightPrimaryMotor.setSoftLimit(SoftLimitDirection.kReverse, 0);
+    mRightPrimaryMotor.setSoftLimit(SoftLimitDirection.kForward, 0);
+    mRightPrimaryMotor.setSoftLimit(SoftLimitDirection.kReverse, -255);
 
     mClimbMode = ClimbMode.OPEN_LOOP;
 
@@ -105,11 +102,19 @@ public class Climb extends SubsystemBase {
     
   }
 
+  /**
+   * Run motors according to position setpoint
+   * @param setPoint setpoint in rotations
+   */
   public void runClimbPositionControl(double setPoint){
     mLeftPrimaryController.setReference(setPoint, ControlType.kPosition);
     mRightPrimaryController.setReference(setPoint, ControlType.kPosition);
   }
 
+  /**
+   * Run climb motors according to climb mode
+   * @param controller Xbox controller
+   */
   public void runClimbWithJoystick(XboxController controller){
     updateFromSmartDashboard();
     
@@ -122,15 +127,17 @@ public class Climb extends SubsystemBase {
     }
   }
 
+  /**
+   * Reset left and right encoders
+   */
   public void resetEncoders(){
     mLeftEncoder.setPosition(0);
     mRightEncoder.setPosition(0);
   }
 
-  public double rotationsToMeters(double rotations){
-    return 0;
-  }
-
+  /**
+   * Switch climb mode between open loop and position control
+   */
   public void switchClimbMode(){
     if (mClimbMode == ClimbMode.OPEN_LOOP){
       setControlMode(ClimbMode.POSITION_CONTROL);
@@ -142,6 +149,9 @@ public class Climb extends SubsystemBase {
     }
   }
 
+  /**
+   * Get and update values from SmartDashboard
+   */
   public void updateFromSmartDashboard(){
     double p = SmartDashboard.getNumber("Climb_P", 0);
     double i = SmartDashboard.getNumber("Climb_I", 0);
@@ -155,6 +165,9 @@ public class Climb extends SubsystemBase {
     mLeftPrimaryMotor.setSoftLimit(SoftLimitDirection.kReverse, (float)SmartDashboard.getNumber("Climb reverse limit", 0));
   }
 
+  /**
+   * Set PID gains and min, max output of motors
+   */
   public void configurePIDController(){
     mLeftPrimaryController.setP(kP);
     mLeftPrimaryController.setI(kI);
@@ -167,10 +180,18 @@ public class Climb extends SubsystemBase {
     mRightPrimaryController.setOutputRange(kMinOutput, kMaxOutput);
   }
 
+  /**
+   * Get climb control mode
+   * @return climb control mode
+   */
   public ClimbMode getControlMode(){
     return mClimbMode;
   }
 
+  /**
+   * Set climb control mode
+   * @param mode climb control mode to set
+   */
   public void setControlMode(ClimbMode mode){
     mClimbMode = mode;
   }

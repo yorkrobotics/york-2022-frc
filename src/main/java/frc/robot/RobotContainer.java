@@ -100,9 +100,18 @@ public class RobotContainer {
    * edu.wpi.first.wpilibj2.command.button.JoystickButton}.
    */
   private void configureButtonBindings() {  
-    // new JoystickButton(mController, Button.kA.value).whenPressed(driveWithPositionControl);
+    /**
+     * Buttons mapping
+     * A:
+     * B:
+     * X:
+     * Y:
+     * LeftBumper:
+     * RightBumper:
+     * LeftStick:
+     * RightStick:
+     */
 
-    //right bumper to shift up and left bumper to shift down
     new JoystickButton(mController, Button.kRightBumper.value).whenPressed(mDrive::shiftToHighGear, mDrive);
     new JoystickButton(mController, Button.kLeftBumper.value).whenPressed(mDrive::shiftToLowGear, mDrive);
 
@@ -110,8 +119,6 @@ public class RobotContainer {
 
     // new JoystickButton(mController, Button.kRightStick.value).whenPressed(mLifter::switchLifterMode, mLifter);
 
-    // B TBD
-    // new JoystickButton(mController, Button.kB.value).whenReleased(new ShootTarget(pycam, mShooter));
     new JoystickButton(mController, Button.kB.value).whileHeld(new RotateToTarget(mDrive, pycam));
 
     // X to feed

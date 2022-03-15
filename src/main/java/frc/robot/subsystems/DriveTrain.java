@@ -156,7 +156,7 @@ public class DriveTrain extends SubsystemBase {
    * @param left_velocity left velocity between -1 to 1
    * @param right_velocity right velocity between -1 to 1
    */
-  public void setOpenLoop(double left_velocity, double right_velocity){
+  public void driveOpenloop(double left_velocity, double right_velocity){
     if (mDriveControlMode == DriveControlMode.OPEN_LOOP){
       mLeftFront.set(left_velocity * Constants.MAX_OPENLOOP_SPEED);
       mRightFront.set(right_velocity * Constants.MAX_OPENLOOP_SPEED);
@@ -171,7 +171,7 @@ public class DriveTrain extends SubsystemBase {
    * @param left_velocity left velocity 
    * @param right_velocity right velocity
    */
-  public void setVelocity(double left_velocity, double right_velocity){
+  public void driveVelocitySetpoint(double left_velocity, double right_velocity){
     if (mDriveControlMode == DriveControlMode.VELOCITY_CONTROL){
       mleftPIDController.setReference(left_velocity * Constants.DRIVE_MAX_RPM, CANSparkMax.ControlType.kVelocity);
       mrightPIDController.setReference(right_velocity * Constants.DRIVE_MAX_RPM, CANSparkMax.ControlType.kVelocity);
@@ -185,7 +185,7 @@ public class DriveTrain extends SubsystemBase {
    * Run the motors to a position setpoint
    * @param setMeters setpoint in meters
    */
-  public void setPosition(double setMeters){
+  public void drivePositionSetpoint(double setMeters){
     double setRotations = metersToRotations(setMeters);
     mleftPIDController.setReference(setRotations, CANSparkMax.ControlType.kPosition);
     mrightPIDController.setReference(setRotations, CANSparkMax.ControlType.kPosition);
@@ -195,7 +195,7 @@ public class DriveTrain extends SubsystemBase {
    * Run the motors to an angle setpoint
    * @param setAngle setpoint in degrees
    */
-  public void setRotation(double setAngle){
+  public void driveRotationSetpoint(double setAngle){
     mleftPIDController.setOutputRange(-0.5, 0.5);
     mleftPIDController.setP(.3);
     mrightPIDController.setOutputRange(-0.5, 0.5);
@@ -438,7 +438,7 @@ public class DriveTrain extends SubsystemBase {
     if (turnAngle > 180.0) {
       turnAngle = - 360.0 + turnAngle;
     }
-    setRotation(turnAngle);
+    driveRotationSetpoint(turnAngle);
   }
 
   /**
@@ -459,7 +459,7 @@ public class DriveTrain extends SubsystemBase {
       turnAngle = - 360.0 + turnAngle;
     }
 
-    setRotation(turnAngle);
+    driveRotationSetpoint(turnAngle);
     setToOpenLoopMode();
   }
 

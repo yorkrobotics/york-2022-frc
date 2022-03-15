@@ -32,11 +32,11 @@ public class DriveTeleop extends CommandBase {
     mWheelSpeeds = mDrive.mArcadeDrive(RobotContainer.mController);
 
     if (mDrive.getDriveControlMode() == DriveControlMode.OPEN_LOOP){
-      mDrive.setOpenLoop(mWheelSpeeds.left, mWheelSpeeds.right);
+      mDrive.driveOpenloop(mWheelSpeeds.left, mWheelSpeeds.right);
       }
       
     if (mDrive.getDriveControlMode() == DriveControlMode.VELOCITY_CONTROL){
-      mDrive.setVelocity(mWheelSpeeds.left, mWheelSpeeds.right);
+      mDrive.driveVelocitySetpoint(mWheelSpeeds.left, mWheelSpeeds.right);
     }
   }
 

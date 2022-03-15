@@ -66,7 +66,7 @@ public class RotateToTarget extends PIDCommand {
         output *= 0.1;
 
         // Apply the output to the drivetrain
-        drive.setOpenLoop(output, -output);
+        drive.driveOpenloop(output, -output);
     }
     
 }
