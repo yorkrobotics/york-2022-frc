@@ -16,6 +16,8 @@ import frc.robot.autonomous.TrajectoryBuilder;
 import frc.robot.commands.CorrectOdometry;
 import frc.robot.commands.DriveTeleop;
 import frc.robot.commands.RotateToTarget;
+import frc.robot.commands.RunIntakeAndConveyor;
+import frc.robot.commands.RunShooter;
 import frc.robot.subsystems.DriveTrain;
 import frc.robot.subsystems.Climb;
 import frc.robot.subsystems.Intake;
@@ -45,10 +47,10 @@ public class RobotContainer {
   // XboxController
   public static XboxController mController;
 
-  //camera
+  // Camera
   private PyCamera pycam;
 
-  //Test AutoRoutine
+  // AutoRoutine
   private TrajectoryBuilder mTrajectoryBuilder;
   private CommandBuilder mCommandBuilder;
   private SendableChooser<AutoRoutine> mAutoChooser;
@@ -68,10 +70,10 @@ public class RobotContainer {
     mClimb = Climb.getInstance();
     mClimb.setDefaultCommand(new RunCommand(()-> mClimb.runClimbWithJoystick(mController), mClimb));
     
-    // feed
+    // Intake
     mIntake = Intake.getInstance();
 
-    //Shooter stuff
+    // Shooter
     mShooter = Shooter.getInstance();
 
     //pycam
@@ -103,13 +105,13 @@ public class RobotContainer {
     /**
      * Buttons mapping
      * A:
-     * B:
+     * B: Rotate to target
      * X:
      * Y:
-     * LeftBumper:
-     * RightBumper:
-     * LeftStick:
-     * RightStick:
+     * LeftBumper: Shift up
+     * RightBumper: Shift down
+     * LeftStick: Switch drive mode
+     * RightStick: 
      */
 
     new JoystickButton(mController, Button.kRightBumper.value).whenPressed(mDrive::shiftToHighGear, mDrive);
@@ -119,19 +121,20 @@ public class RobotContainer {
 
     // new JoystickButton(mController, Button.kRightStick.value).whenPressed(mLifter::switchLifterMode, mLifter);
 
-    new JoystickButton(mController, Button.kB.value).whileHeld(new RotateToTarget(mDrive, pycam));
+    // new JoystickButton(mController, Button.kB.value).whileHeld(new RotateToTarget(mDrive, pycam));
 
-    // X to feed
-    new JoystickButton(mController, Button.kX.value).whileHeld(()->{
-      mShooter.runShooter(0.5);
-    });
+    new JoystickButton(mController, Button.kX.value).whileHeld(new RunShooter(mShooter, 0.5));
     
-    // Y to shoot
-    new JoystickButton(mController, Button.kY.value).whenPressed(mDrive::turnToTarget, mDrive);
+    new JoystickButton(mController, Button.kY.value).whileHeld(new RunIntakeAndConveyor(mIntake, mShooter));
+
+    new JoystickButton(mController, Button.kA.value).whenPressed(mIntake::deploy, mIntake);
+    new JoystickButton(mController, Button.kB.value).whenPressed(mIntake::retract, mIntake);
+
+
+    // new JoystickButton(mController, Button.kY.value).whenPressed(mDrive::turnToTarget, mDrive);
+
     // new JoystickButton(mController, Button.kY.value).whenPressed(new CorrectOdometry(pycam, mDrive));
-    // new JoystickButton(mController, Button.kY.value).whileHeld(()->{
-    //   m_feed.setSpeed(0.5);
-    // });
+
     }
   
   /**

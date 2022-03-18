@@ -27,8 +27,8 @@ public class Tower extends SubsystemBase {
 
   /** Creates a new Tower. */
   public Tower() {
-    mLeftMotor = new CANSparkMax(Constants.CAN.TOWER_ACTUATOR_LEFT, MotorType.kBrushless);
-    mRightMotor = new CANSparkMax(Constants.CAN.TOWER_ACTUATOR_RIGHT, MotorType.kBrushless);
+    mLeftMotor = new CANSparkMax(Constants.SparkMax.TOWER_ACTUATOR_LEFT, MotorType.kBrushless);
+    mRightMotor = new CANSparkMax(Constants.SparkMax.TOWER_ACTUATOR_RIGHT, MotorType.kBrushless);
 
     mLeftController = mLeftMotor.getPIDController();
     mRightController = mRightMotor.getPIDController();

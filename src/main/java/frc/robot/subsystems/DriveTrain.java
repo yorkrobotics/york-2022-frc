@@ -71,10 +71,10 @@ public class DriveTrain extends SubsystemBase {
 
   public DriveTrain() {
     //Hardware
-    mLeftFront = new CANSparkMax(Constants.CAN.DRIVE_LEFT_FRONT, MotorType.kBrushless);
-    mLeftBack = new CANSparkMax(Constants.CAN.DRIVE_LEFT_BACK, MotorType.kBrushless);
-    mRightFront = new CANSparkMax(Constants.CAN.DRIVE_RIGHT_FRONT, MotorType.kBrushless);
-    mRightBack = new CANSparkMax(Constants.CAN.DRIVE_RIGHT_BACK, MotorType.kBrushless);
+    mLeftFront = new CANSparkMax(Constants.SparkMax.DRIVE_LEFT_FRONT, MotorType.kBrushless);
+    mLeftBack = new CANSparkMax(Constants.SparkMax.DRIVE_LEFT_BACK, MotorType.kBrushless);
+    mRightFront = new CANSparkMax(Constants.SparkMax.DRIVE_RIGHT_FRONT, MotorType.kBrushless);
+    mRightBack = new CANSparkMax(Constants.SparkMax.DRIVE_RIGHT_BACK, MotorType.kBrushless);
     mShifter = new DoubleSolenoid(PneumaticsModuleType.CTREPCM, Constants.PCM.DRIVE_GEAR_SHIFT_FORWARD, Constants.PCM.DRIVE_GEAR_SHIFT_REVERSE);
 
     mLeftFront.restoreFactoryDefaults();

@@ -38,8 +38,12 @@ public final class Constants {
     public static final double FIELD_CENTER_Y = 0;
 
     public static final String PATH_FOLDER = "paths/output";
+
+
+    public static final double INTAKE_ROLLER_SPEED = 0.5;
+    public static final double CONVEYOR_SPEED = 0.5;
     
-    public final class CAN{
+    public final class SparkMax{
       public static final int DRIVE_LEFT_FRONT = 3;
       public static final int DRIVE_LEFT_BACK = 4;
       public static final int DRIVE_RIGHT_FRONT = 2;
@@ -48,7 +52,6 @@ public final class Constants {
       public static final int CLIMB_RIGHT_PRIMARY = 7;
       public static final int TOWER_ACTUATOR_LEFT = 6;
       public static final int TOWER_ACTUATOR_RIGHT = 5;
-
     }
 
     public final class VictorSPX{

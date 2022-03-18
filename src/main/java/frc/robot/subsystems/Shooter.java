@@ -53,11 +53,18 @@ public class Shooter extends SubsystemBase {
   }
 
   /**
-   * Stop the shooter motors
+   * Stop shooter motors
    */
   public void stopShooter() {
     mTop.set(VictorSPXControlMode.PercentOutput, 0);
     mBottom.set(VictorSPXControlMode.PercentOutput, 0);
+  }
+
+  /**
+   * Stop conveyor
+   */
+  public void stopConveyor(){
+    mConveyor.set(VictorSPXControlMode.PercentOutput, 0);
   }
   
   /**

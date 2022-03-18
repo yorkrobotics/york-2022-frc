@@ -34,8 +34,8 @@ public class Climb extends SubsystemBase {
   private double kP, kI, kD, kMinOutput, kMaxOutput;
 
   public Climb() {
-    mLeftPrimaryMotor = new CANSparkMax(Constants.CAN.CLIMB_LEFT_PRIMARY, MotorType.kBrushless);
-    mRightPrimaryMotor = new CANSparkMax(Constants.CAN.CLIMB_RIGHT_PRIMARY, MotorType.kBrushless);
+    mLeftPrimaryMotor = new CANSparkMax(Constants.SparkMax.CLIMB_LEFT_PRIMARY, MotorType.kBrushless);
+    mRightPrimaryMotor = new CANSparkMax(Constants.SparkMax.CLIMB_RIGHT_PRIMARY, MotorType.kBrushless);
 
 
     mLeftPrimaryMotor.restoreFactoryDefaults();
