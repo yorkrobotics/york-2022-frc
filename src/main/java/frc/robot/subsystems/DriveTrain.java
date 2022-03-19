@@ -230,17 +230,27 @@ public class DriveTrain extends SubsystemBase {
   }
 
   /**
+   * Stop the motors 
+   */
+  public void stopDriveMotors(){
+    mLeftFront.stopMotor();
+    mLeftBack.stopMotor();
+    mRightFront.stopMotor();
+    mRightBack.stopMotor();
+  }
+
+  /**
    * Switches drive mode between open loop and velocity control
    */
   public void switchDriveMode(){
     if (mDriveControlMode == DriveControlMode.POSITION_CONTROL || mDriveControlMode == DriveControlMode.VELOCITY_CONTROL){
       setToOpenLoopMode();;
-      System.out.println("[Drive] Set to Open Loop");
+      System.out.println("[Drive] Open Loop");
     }
     else if (mDriveControlMode == DriveControlMode.OPEN_LOOP){
       setToVelocityMode();
       configureVelocityControl();
-      System.out.println("[Drive] Set to Velocity Control");
+      System.out.println("[Drive] Velocity Control");
     }
   }
 
@@ -263,6 +273,7 @@ public class DriveTrain extends SubsystemBase {
     mShifter.set(Value.kReverse);
     gearRatio = Constants.GEAR_RATIO_HIGH;
     mGearMode = GearMode.HIGH_GEAR;
+    System.out.println("[Drive] High Gear");
   }
 
   /**
@@ -272,6 +283,7 @@ public class DriveTrain extends SubsystemBase {
     mShifter.set(Value.kForward);
     gearRatio = Constants.GEAR_RATIO_LOW;
     mGearMode = GearMode.LOW_GEAR;
+    System.out.println("[Drive] Low Gear");
   }
 
   /**
@@ -332,7 +344,7 @@ public class DriveTrain extends SubsystemBase {
    * @param minOutput minimum output
    * @param maxOutput maximum output
    */
-  public void setPIDController(SparkMaxPIDController pidController, double p, double i, double d, double minOutput, double maxOutput){
+  public void configurePIDController(SparkMaxPIDController pidController, double p, double i, double d, double minOutput, double maxOutput){
     pidController.setP(p);
     pidController.setI(i);
     pidController.setD(d);
@@ -531,8 +543,8 @@ public class DriveTrain extends SubsystemBase {
     // if(kMaxOutputEntry.getDouble(0) != kMaxOutput) kMaxOutput = kMaxOutputEntry.getDouble(0);
     // if(kMinOutputEntry.getDouble(0) != kMinOutput) kMinOutput = kMinOutputEntry.getDouble(0);
 
-    setPIDController(mleftPIDController, kP, kI, kD, kMinOutput, kMaxOutput);
-    setPIDController(mrightPIDController, kP, kI, kD, kMinOutput, kMaxOutput);
+    configurePIDController(mleftPIDController, kP, kI, kD, kMinOutput, kMaxOutput);
+    configurePIDController(mrightPIDController, kP, kI, kD, kMinOutput, kMaxOutput);
   }
 
   /**
@@ -559,8 +571,8 @@ public class DriveTrain extends SubsystemBase {
     // if(kMaxOutputEntry.getDouble(0) != kMaxOutput) kMaxOutput = kMaxOutputEntry.getDouble(0);
     // if(kMinOutputEntry.getDouble(0) != kMinOutput) kMinOutput = kMinOutputEntry.getDouble(0);
 
-    setPIDController(mleftPIDController, kP, kI, kD, kMinOutput, kMaxOutput);
-    setPIDController(mrightPIDController, kP, kI, kD, kMinOutput, kMaxOutput);
+    configurePIDController(mleftPIDController, kP, kI, kD, kMinOutput, kMaxOutput);
+    configurePIDController(mrightPIDController, kP, kI, kD, kMinOutput, kMaxOutput);
   }
 
   public enum DriveControlMode{

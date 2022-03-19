@@ -7,7 +7,6 @@ package frc.robot.subsystems;
 import com.revrobotics.CANSparkMax;
 import com.revrobotics.RelativeEncoder;
 import com.revrobotics.SparkMaxPIDController;
-import com.revrobotics.CANSparkMax.ControlType;
 import com.revrobotics.CANSparkMax.IdleMode;
 import com.revrobotics.CANSparkMax.SoftLimitDirection;
 import com.revrobotics.CANSparkMaxLowLevel.MotorType;
@@ -63,29 +62,30 @@ public class Climb extends SubsystemBase {
     mRightPrimaryMotor.enableSoftLimit(CANSparkMax.SoftLimitDirection.kForward, true);
     mRightPrimaryMotor.enableSoftLimit(CANSparkMax.SoftLimitDirection.kReverse, true);
 
+    //the lifters extends in kReverse direction
     mLeftPrimaryMotor.setSoftLimit(SoftLimitDirection.kForward, 0);
-    mLeftPrimaryMotor.setSoftLimit(SoftLimitDirection.kReverse, -255);
+    mLeftPrimaryMotor.setSoftLimit(SoftLimitDirection.kReverse, -215);
     mRightPrimaryMotor.setSoftLimit(SoftLimitDirection.kForward, 0);
-    mRightPrimaryMotor.setSoftLimit(SoftLimitDirection.kReverse, -255);
+    mRightPrimaryMotor.setSoftLimit(SoftLimitDirection.kReverse, -215);
 
     mClimbMode = ClimbMode.OPEN_LOOP;
 
-    kP = 0;
+    kP = 0.1;
     kI = 0;
     kD = 0;
     kMinOutput = -0.5;
-    kMaxOutput = -0.5;
+    kMaxOutput = 0.5;
 
     configurePIDController();
 
-    SmartDashboard.putNumber("Climb_P", mLeftPrimaryController.getP());
-    SmartDashboard.putNumber("Climb_I", mLeftPrimaryController.getI());
-    SmartDashboard.putNumber("Climb_D", mLeftPrimaryController.getD());
+    SmartDashboard.putNumber("Climb_P", kP);
+    SmartDashboard.putNumber("Climb_I", kI);
+    SmartDashboard.putNumber("Climb_D", kD);
     SmartDashboard.putNumber("Climb forward limit", mLeftPrimaryMotor.getSoftLimit(SoftLimitDirection.kForward));
     SmartDashboard.putNumber("Climb reverse limit", mLeftPrimaryMotor.getSoftLimit(SoftLimitDirection.kReverse));
+    SmartDashboard.putNumber("Climb setpoint", 0);
 
     // goHome();
-
 
   }
 
@@ -107,8 +107,19 @@ public class Climb extends SubsystemBase {
    * @param setPoint setpoint in rotations
    */
   public void runClimbPositionControl(double setPoint){
-    mLeftPrimaryController.setReference(setPoint, ControlType.kPosition);
-    mRightPrimaryController.setReference(setPoint, ControlType.kPosition);
+    setPoint = Double.min(setPoint, 0);
+    setPoint = Double.max(setPoint, -215);
+    mLeftPrimaryController.setReference(setPoint, CANSparkMax.ControlType.kPosition);
+    mRightPrimaryController.setReference(setPoint, CANSparkMax.ControlType.kPosition);
+  }
+
+  /**
+   * Run motors in open loop
+   * @param speed speed between (-1, 1)
+   */
+  public void runClimbOpenLoop(double speed){
+    mLeftPrimaryMotor.set(speed);
+    mRightPrimaryMotor.set(speed);
   }
 
   /**
@@ -119,11 +130,11 @@ public class Climb extends SubsystemBase {
     updateFromSmartDashboard();
     
     if (mClimbMode == ClimbMode.POSITION_CONTROL){
-      runClimbPositionControl(controller.getRightY() * 50);
+      double setpoint = SmartDashboard.getNumber("Climb setpoint", 0);
+      runClimbPositionControl(setpoint);
     }
     if (mClimbMode == ClimbMode.OPEN_LOOP){
-      mLeftPrimaryMotor.set(controller.getRightY() * 0.2);
-      // mRightPrimaryMotor.set(controller.getRightY() * 0.2);
+      runClimbOpenLoop(controller.getRightY() * 0.6);
     }
   }
 
@@ -141,11 +152,11 @@ public class Climb extends SubsystemBase {
   public void switchClimbMode(){
     if (mClimbMode == ClimbMode.OPEN_LOOP){
       setControlMode(ClimbMode.POSITION_CONTROL);
-      System.out.println("Climb: switched to Position Control");
+      System.out.println("[Climb] Position Control");
     }
     else if(mClimbMode == ClimbMode.POSITION_CONTROL){
       setControlMode(ClimbMode.OPEN_LOOP);
-      System.out.println("Climb: switched to Open Loop");
+      System.out.println("[Climb] Open Loop");
     }
   }
 
@@ -157,9 +168,9 @@ public class Climb extends SubsystemBase {
     double i = SmartDashboard.getNumber("Climb_I", 0);
     double d = SmartDashboard.getNumber("Climb_D", 0);
 
-    if(p != mLeftPrimaryController.getP()) {mLeftPrimaryController.setP(p);}
-    if(i != mLeftPrimaryController.getI()) {mLeftPrimaryController.setI(i);}
-    if(d != mLeftPrimaryController.getD()) {mLeftPrimaryController.setD(d);}
+    if(p != kP) {mLeftPrimaryController.setP(p); mRightPrimaryController.setP(p); kP = p;}
+    if(i != kI) {mLeftPrimaryController.setI(i); mRightPrimaryController.setI(i); kI = i;}
+    if(d != kD) {mLeftPrimaryController.setD(d); mRightPrimaryController.setD(d); kD = d;}
 
     mLeftPrimaryMotor.setSoftLimit(SoftLimitDirection.kForward, (float)SmartDashboard.getNumber("Climb forward limit", 255));
     mLeftPrimaryMotor.setSoftLimit(SoftLimitDirection.kReverse, (float)SmartDashboard.getNumber("Climb reverse limit", 0));

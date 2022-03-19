@@ -27,7 +27,7 @@ public class Intake extends SubsystemBase {
 
   public Intake() {
     mRoller = new VictorSPX(Constants.VictorSPX.INTAKE_ROLLER);
-    mRoller.setInverted(false);
+    mRoller.setInverted(true);
 
     mLifter = new DoubleSolenoid(PneumaticsModuleType.CTREPCM, Constants.PCM.INTAKE_FORWARD, Constants.PCM.INTAKE_REVERSE);
     mLifterMode = IntakeLifterMode.UNKNOWN;

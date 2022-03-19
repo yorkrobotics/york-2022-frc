@@ -20,13 +20,16 @@ import frc.robot.commands.RunIntakeAndConveyor;
 import frc.robot.commands.RunShooter;
 import frc.robot.subsystems.DriveTrain;
 import frc.robot.subsystems.Climb;
+import frc.robot.subsystems.ColorSensor;
 import frc.robot.subsystems.Intake;
 import frc.robot.subsystems.PyCamera;
 import frc.robot.subsystems.Shooter;
+import frc.robot.subsystems.Tower;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.InstantCommand;
 import edu.wpi.first.wpilibj2.command.RunCommand;
 import edu.wpi.first.wpilibj2.command.button.JoystickButton;
+import edu.wpi.first.wpilibj2.command.button.POVButton;
 
 /**
  * This class is where the bulk of the robot should be declared. Since Command-based is a
@@ -40,6 +43,8 @@ public class RobotContainer {
   private Climb mClimb;
   private Shooter mShooter;
   private Intake mIntake;
+  private Tower mTower;
+  private ColorSensor mColorSensor;
 
   // Commands
   private DriveTeleop driveTeleop;
@@ -76,8 +81,15 @@ public class RobotContainer {
     // Shooter
     mShooter = Shooter.getInstance();
 
+    // Tower
+    mTower = Tower.getInstance();
+    mTower.setDefaultCommand(new RunCommand(()-> mTower.runTowerWithController(mController), mTower));
+
     //pycam
     pycam = new PyCamera();
+
+    // Color sensor
+    mColorSensor = ColorSensor.getInstance();
 
     // Autonomous
     mTrajectoryBuilder = new TrajectoryBuilder(Constants.PATH_FOLDER);
@@ -105,7 +117,7 @@ public class RobotContainer {
     /**
      * Buttons mapping
      * A:
-     * B: Rotate to target
+     * B: 
      * X:
      * Y:
      * LeftBumper: Shift up
@@ -119,17 +131,17 @@ public class RobotContainer {
 
     new JoystickButton(mController, Button.kLeftStick.value).whenPressed(mDrive::switchDriveMode, mDrive);
 
-    // new JoystickButton(mController, Button.kRightStick.value).whenPressed(mLifter::switchLifterMode, mLifter);
+    new JoystickButton(mController, Button.kRightStick.value).whenPressed(mClimb::switchClimbMode, mClimb);
 
     // new JoystickButton(mController, Button.kB.value).whileHeld(new RotateToTarget(mDrive, pycam));
 
-    new JoystickButton(mController, Button.kX.value).whileHeld(new RunShooter(mShooter, 0.5));
-    
+    new JoystickButton(mController, Button.kX.value).whileHeld(new RunShooter(mShooter, 0.72));
     new JoystickButton(mController, Button.kY.value).whileHeld(new RunIntakeAndConveyor(mIntake, mShooter));
 
-    new JoystickButton(mController, Button.kA.value).whenPressed(mIntake::deploy, mIntake);
-    new JoystickButton(mController, Button.kB.value).whenPressed(mIntake::retract, mIntake);
+    new POVButton(mController, 90).whenPressed(mIntake::deploy, mIntake);
+    new POVButton(mController, 270).whenPressed(mIntake::retract, mIntake);
 
+    new POVButton(mController, 0).whenPressed(mTower::switchActuatorMode, mTower);
 
     // new JoystickButton(mController, Button.kY.value).whenPressed(mDrive::turnToTarget, mDrive);
 

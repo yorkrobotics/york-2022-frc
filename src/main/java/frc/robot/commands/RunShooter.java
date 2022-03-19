@@ -22,14 +22,19 @@ public class RunShooter extends CommandBase {
 
   // Called when the command is initially scheduled.
   @Override
-  public void initialize() {}
+  public void initialize() {
+    mShooter.runConveyor(-0.3);
+    Timer.delay(0.5);
+    mShooter.stopConveyor();
+    mShooter.runShooter(mSpeed);
+    Timer.delay(2);
+    mShooter.runConveyor(Constants.CONVEYOR_SPEED);
+  }
 
   // Called every time the scheduler runs while the command is scheduled.
   @Override
   public void execute() {
-    mShooter.runShooter(mSpeed);
-    Timer.delay(2);
-    mShooter.runConveyor(Constants.CONVEYOR_SPEED);
+
   }
 
   // Called once the command ends or is interrupted.

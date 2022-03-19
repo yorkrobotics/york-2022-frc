@@ -17,8 +17,6 @@ public class Shooter extends SubsystemBase {
   }
 
   private VictorSPX mTop, mBottom, mConveyor;
-  double speed;
-  double default_speed = 20;
 
   /** Creates a new Shooter. */
   public Shooter() {
