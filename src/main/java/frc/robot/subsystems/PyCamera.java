@@ -70,6 +70,15 @@ public class PyCamera extends SubsystemBase {
     return angle;
   }
 
+  // returns the needed velocity to shoot the target at the current angle
+  public double calcVelocity(double theta) {
+    double g = 9.8;
+    theta = theta / 180 * Math.PI;
+    double v_0 = Math.sqrt(Math.pow(x, 2) * g/(x*Math.sin(2*theta) - 2*y*Math.pow(Math.cos(theta), 2)));
+
+    return v_0;
+  }
+
   public double getHorizontalAngle() {
 
     return filteredAngle;
