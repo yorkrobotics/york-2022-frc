@@ -88,6 +88,8 @@ public class Tower extends SubsystemBase {
 
     SmartDashboard.putBoolean("Tower Left isPressed", mLeftLimitSwitch.isPressed());
     SmartDashboard.putBoolean("Tower Right isPressed", mRightLimitSwitch.isPressed());
+    SmartDashboard.putNumber("Tower angle", this.getTowerAngle());
+    SmartDashboard.putNumber("Actuator length", this.rotationToLength());
   }
 
   /**
@@ -180,6 +182,24 @@ public class Tower extends SubsystemBase {
     if(p != mLeftController.getP()) {mLeftController.setP(p); mRightController.setP(p); kP = p;}
     if(i != mLeftController.getI()) {mLeftController.setI(i); mRightController.setI(i); kI = i;}
     if(d != mLeftController.getD()) {mLeftController.setD(d); mRightController.setD(d); kD = d;}
+  }
+
+  // returns the length of the actuator using the encoder position
+  public double rotationToLength() {
+    double ratio = 1.7 / 100; // ratio of inch to every rotation (100 rotations per 1.75 inc)
+    double base = 8.8; // the extra part that doesn't extend
+    double actuatorLength = mRightEncoder.getPosition() * ratio + base;
+    return actuatorLength;
+  }
+
+  // returns the current angle of the tower in degrees
+  public double getTowerAngle() {
+    double radius = 12;
+    double baseLength = 9.5;
+    double actuatorLength = this.rotationToLength();
+    double vOffset = 0 / 180 * Math.PI; // vertical offset from the ground in radian
+    double towerAngle = Math.acos((Math.pow(radius, 2) + Math.pow(baseLength, 2) - Math.pow(actuatorLength, 2))/(2 * baseLength *  radius)) - vOffset;
+    return towerAngle / Math.PI * 180;
   }
 
 

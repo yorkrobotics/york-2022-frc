@@ -16,6 +16,7 @@ public class RotateToTarget extends PIDCommand {
     private final PyCamera pycam;
 
     private double targetAngle = 0;
+    private boolean isDone = false;
 
     public RotateToTarget(DriveTrain drive, PyCamera pycam) {
         super(
@@ -36,7 +37,7 @@ public class RotateToTarget extends PIDCommand {
         Shuffleboard.getTab("Vision Turning").add(m_controller);
 
         // Install a listener for the translation_vector entry in the Vision subtable
-        NetworkTable visionTable = NetworkTableInstance.getDefault().getTable("Vision");
+        // NetworkTable visionTable = NetworkTableInstance.getDefault().getTable("Vision");
         // NetworkTableEntry translationVectorEntry = visionTable.getEntry("translation_vector");
         // translationVectorEntry.addListener((ev) -> {
         //     targetAngle = getNewAngle();
@@ -54,9 +55,12 @@ public class RotateToTarget extends PIDCommand {
 
     @Override
     public void execute() {
-        targetAngle = getNewAngle();
-        super.execute();
+        if (pycam.getHorizontalAngle() < 3 ) {
+            isDone = true;
+        }
+        // super.execute();
     }
+
     private void useOutput(double output) {
         // Saturate the output between -1 and 1
         if (output > 1) output = 1;
@@ -67,6 +71,11 @@ public class RotateToTarget extends PIDCommand {
 
         // Apply the output to the drivetrain
         drive.driveOpenloop(output, -output);
+    }
+
+    @Override
+    public boolean isFinished() {
+        return isDone;
     }
     
 }

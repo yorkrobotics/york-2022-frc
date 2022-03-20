@@ -7,16 +7,19 @@ package frc.robot.commands;
 import edu.wpi.first.wpilibj2.command.CommandBase;
 import frc.robot.subsystems.PyCamera;
 import frc.robot.subsystems.Shooter;
+import frc.robot.subsystems.Tower;
 
 public class ShootTarget extends CommandBase {
   private final PyCamera pycam;
   private final Shooter shooter;
+  private final Tower tower;
   private boolean isDone;
   /** Creates a new getHoopCenter. */
-  public ShootTarget(PyCamera pc, Shooter st) {
+  public ShootTarget(PyCamera pc, Shooter st, Tower tr) {
     pycam = pc;
     shooter = st;
-    addRequirements(pycam, shooter);
+    tower = tr;
+    addRequirements(pycam, shooter, tower);
     isDone = false;
     // Use addRequirements() here to declare subsystem dependencies.
   }
@@ -31,7 +34,7 @@ public class ShootTarget extends CommandBase {
     System.out.println(pycam.getHoopCenter()[0]);
     System.out.println(pycam.getHoopCenter()[1]);
     System.out.println(pycam.getHoopCenter()[2]);
-    double angle = pycam.getAngle(shooter.getSpeed());
+    double angle = pycam.getAngle(shooter.getSpeed(), tower.getTowerAngle());
     System.out.println(angle);
     shooter.setAngle(angle);
     shooter.runShooter(0.5);
