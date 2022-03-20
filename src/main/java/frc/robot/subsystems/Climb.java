@@ -6,6 +6,7 @@ package frc.robot.subsystems;
 
 import com.revrobotics.CANSparkMax;
 import com.revrobotics.RelativeEncoder;
+import com.revrobotics.SparkMaxLimitSwitch;
 import com.revrobotics.SparkMaxPIDController;
 import com.revrobotics.CANSparkMax.IdleMode;
 import com.revrobotics.CANSparkMax.SoftLimitDirection;
@@ -24,8 +25,7 @@ public class Climb extends SubsystemBase {
   private CANSparkMax mLeftPrimaryMotor, mRightPrimaryMotor;
   private SparkMaxPIDController mLeftPrimaryController, mRightPrimaryController;
   private RelativeEncoder mLeftEncoder, mRightEncoder;
-  // private SparkMaxLimitSwitch mLimitSwitch;
-  // private DigitalInput mLimitSwitch;
+  private SparkMaxLimitSwitch mLeftLimitSwitch, mRightLimitSwitch;
 
   
   private ClimbMode mClimbMode;
@@ -52,14 +52,15 @@ public class Climb extends SubsystemBase {
     mLeftPrimaryController = mLeftPrimaryMotor.getPIDController();
     mRightPrimaryController = mRightPrimaryMotor.getPIDController();
 
-    // mLimitSwitch = mLiftMotor.getForwardLimitSwitch(Type.kNormallyOpen);
-    // mLimitSwitch.enableLimitSwitch(true);
+    mLeftLimitSwitch = mLeftPrimaryMotor.getForwardLimitSwitch(SparkMaxLimitSwitch.Type.kNormallyOpen);
+    mRightLimitSwitch = mRightPrimaryMotor.getForwardLimitSwitch(SparkMaxLimitSwitch.Type.kNormallyOpen);
+    mLeftLimitSwitch.enableLimitSwitch(true);
+    mRightLimitSwitch.enableLimitSwitch(true);
 
-    // mLimitSwitch = new DigitalInput(0);
 
-    mLeftPrimaryMotor.enableSoftLimit(CANSparkMax.SoftLimitDirection.kForward, true);
+    mLeftPrimaryMotor.enableSoftLimit(CANSparkMax.SoftLimitDirection.kForward, false);
     mLeftPrimaryMotor.enableSoftLimit(CANSparkMax.SoftLimitDirection.kReverse, true);
-    mRightPrimaryMotor.enableSoftLimit(CANSparkMax.SoftLimitDirection.kForward, true);
+    mRightPrimaryMotor.enableSoftLimit(CANSparkMax.SoftLimitDirection.kForward, false);
     mRightPrimaryMotor.enableSoftLimit(CANSparkMax.SoftLimitDirection.kReverse, true);
 
     //the lifters extends in kReverse direction
@@ -100,6 +101,8 @@ public class Climb extends SubsystemBase {
     SmartDashboard.putNumber("Climb left position", mLeftEncoder.getPosition());
     SmartDashboard.putNumber("Climb right position", mRightEncoder.getPosition());
     
+    SmartDashboard.putBoolean("Lift Left isPressed", mLeftLimitSwitch.isPressed());
+    SmartDashboard.putBoolean("Lift Right isPressed", mRightLimitSwitch.isPressed());
   }
 
   /**
@@ -207,22 +210,17 @@ public class Climb extends SubsystemBase {
     mClimbMode = mode;
   }
 
-  // public boolean isPressed(){
-  //   return !mLimitSwitch.get();
-  // }
 
-  // public void goHome(){
-  //   if (!isAtHome()){
-  //     mLiftMotor.set(-0.2);
-  //   }
-  //   resetEncoder();
-  // }
+  public void goHome(){
+    if (!mLeftLimitSwitch.isPressed()){
+      mLeftPrimaryMotor.set(0.2);
+    }
+    if (!mRightLimitSwitch.isPressed()){
+      mRightPrimaryMotor.set(0.2);
+    }
+    resetEncoders();
+  }
 
-  // public void stopAtHome(){
-  //   if (isPressed()){
-  //     mLiftMotor.stopMotor();
-  //   }
-  // }
 
   public enum ClimbMode{
     OPEN_LOOP, POSITION_CONTROL

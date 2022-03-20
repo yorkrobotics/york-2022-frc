@@ -26,7 +26,7 @@ public final class Constants {
     public static final double GEAR_RATIO_HIGH = 5.601;
       //gear ratio: 16.364, 5.601
 
-    public static final double TRACK_WIDTH = 0.655; //The distance between left wheels and right wheels
+    public static final double TRACK_WIDTH = 0.617; //The distance between left wheels and right wheels
     
     public static final double kMaxVoltage = 12;
     public static final double kMaxVelocity = 1; // m/s
@@ -40,8 +40,8 @@ public final class Constants {
     public static final String PATH_FOLDER = "paths/output";
 
 
-    public static final double INTAKE_ROLLER_SPEED = 0.5;
-    public static final double CONVEYOR_SPEED = 0.5;
+    public static final double INTAKE_ROLLER_SPEED = 0.3;
+    public static final double CONVEYOR_SPEED = 0.6;
     
     public final class SparkMax{
       public static final int DRIVE_LEFT_FRONT = 3;

@@ -6,6 +6,7 @@ package frc.robot.subsystems;
 
 import com.revrobotics.CANSparkMax;
 import com.revrobotics.RelativeEncoder;
+import com.revrobotics.SparkMaxLimitSwitch;
 import com.revrobotics.SparkMaxPIDController;
 import com.revrobotics.CANSparkMax.SoftLimitDirection;
 import com.revrobotics.CANSparkMaxLowLevel.MotorType;
@@ -27,6 +28,8 @@ public class Tower extends SubsystemBase {
   private RelativeEncoder mLeftEncoder, mRightEncoder;
   private TowerActuatorMode mActuatorMode;
 
+  private SparkMaxLimitSwitch mRightLimitSwitch, mLeftLimitSwitch;
+
   private double kP, kI, kD, kMinOutput, kMaxOutput;
 
   /** Creates a new Tower. */
@@ -47,14 +50,19 @@ public class Tower extends SubsystemBase {
     mRightEncoder = mRightMotor.getEncoder();
 
     mLeftMotor.enableSoftLimit(SoftLimitDirection.kForward, true);
-    mLeftMotor.enableSoftLimit(SoftLimitDirection.kReverse, true);
+    mLeftMotor.enableSoftLimit(SoftLimitDirection.kReverse, false);
     mRightMotor.enableSoftLimit(SoftLimitDirection.kForward, true);
-    mRightMotor.enableSoftLimit(SoftLimitDirection.kReverse, true);
+    mRightMotor.enableSoftLimit(SoftLimitDirection.kReverse, false);
 
     mLeftMotor.setSoftLimit(SoftLimitDirection.kForward, 280);
     mLeftMotor.setSoftLimit(SoftLimitDirection.kReverse, 0);
     mRightMotor.setSoftLimit(SoftLimitDirection.kForward, 280);
     mRightMotor.setSoftLimit(SoftLimitDirection.kReverse, 0);
+
+    mLeftLimitSwitch = mLeftMotor.getReverseLimitSwitch(SparkMaxLimitSwitch.Type.kNormallyOpen);
+    mRightLimitSwitch = mRightMotor.getReverseLimitSwitch(SparkMaxLimitSwitch.Type.kNormallyOpen);
+    mLeftLimitSwitch.enableLimitSwitch(true);
+    mRightLimitSwitch.enableLimitSwitch(true);
 
     mActuatorMode = TowerActuatorMode.OPEN_LOOP;
 
@@ -77,6 +85,9 @@ public class Tower extends SubsystemBase {
     // This method will be called once per scheduler run
     SmartDashboard.putNumber("Tower left position", mLeftEncoder.getPosition());
     SmartDashboard.putNumber("Tower right position", mRightEncoder.getPosition());
+
+    SmartDashboard.putBoolean("Tower Left isPressed", mLeftLimitSwitch.isPressed());
+    SmartDashboard.putBoolean("Tower Right isPressed", mRightLimitSwitch.isPressed());
   }
 
   /**
@@ -110,8 +121,23 @@ public class Tower extends SubsystemBase {
       runActuatorsPositionControl(setpoint);
     }
     if (mActuatorMode == TowerActuatorMode.OPEN_LOOP){
-      runActuatorsOpenLoop(controller.getRightX() * 0.2);
+      runActuatorsOpenLoop(controller.getRightX() * 0.1);
     }
+  }
+
+  public void goHome(){
+    if(!mLeftLimitSwitch.isPressed()){
+      mLeftMotor.set(-0.1);
+    }
+    if (!mRightLimitSwitch.isPressed()){
+      mRightMotor.set(-0.1);
+    }
+    resetEncoders();
+  }
+
+  public void resetEncoders(){
+    mLeftEncoder.setPosition(0);
+    mRightEncoder.setPosition(0);
   }
 
   /**
