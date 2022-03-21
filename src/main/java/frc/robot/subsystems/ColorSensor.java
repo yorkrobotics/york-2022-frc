@@ -23,8 +23,8 @@ public class ColorSensor extends SubsystemBase {
 
   private final ColorMatch mColorMatcher = new ColorMatch();
 
-  private final Color kRedTarget = new Color(0.561, 0.232, 0.114);
-  private final Color kBlueTarget = new Color(0.143, 0.427, 0.429);
+  private final Color kRedTarget = new Color(0.445, 0.393, 0.161);
+  private final Color kBlueTarget = new Color(0.192, 0.438, 0.370);
 
   /** Creates a new ColorSensor. */
   public ColorSensor() {
@@ -43,7 +43,7 @@ public class ColorSensor extends SubsystemBase {
     if (match.color == kBlueTarget){
       colorString = "blue";
     }
-    if (match.color == kRedTarget){
+    else if (match.color == kRedTarget){
       colorString = "red";
     }
     else {
@@ -51,6 +51,7 @@ public class ColorSensor extends SubsystemBase {
     }
 
     SmartDashboard.putNumber("red", detectedColor.red);
+    SmartDashboard.putNumber("green", detectedColor.green);
     SmartDashboard.putNumber("blue", detectedColor.blue);
     SmartDashboard.putNumber("Confidence", match.confidence);
     SmartDashboard.putString("Detected Color", colorString);

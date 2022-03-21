@@ -43,6 +43,9 @@ public class Tower extends SubsystemBase {
     mLeftMotor.setInverted(true);
     mRightMotor.setInverted(true);
 
+    mLeftMotor.setIdleMode(Constants.TOWER_IDLE_MODE);
+    mRightMotor.setIdleMode(Constants.TOWER_IDLE_MODE);
+
     mLeftController = mLeftMotor.getPIDController();
     mRightController = mRightMotor.getPIDController();
 
@@ -123,16 +126,18 @@ public class Tower extends SubsystemBase {
       runActuatorsPositionControl(setpoint);
     }
     if (mActuatorMode == TowerActuatorMode.OPEN_LOOP){
-      runActuatorsOpenLoop(controller.getRightX() * 0.1);
+      runActuatorsOpenLoop(controller.getRightX() * 0.2);
     }
   }
 
   public void goHome(){
-    if(!mLeftLimitSwitch.isPressed()){
-      mLeftMotor.set(-0.1);
-    }
-    if (!mRightLimitSwitch.isPressed()){
-      mRightMotor.set(-0.1);
+    while (!mLeftLimitSwitch.isPressed() || !mRightLimitSwitch.isPressed()){
+      if(!mLeftLimitSwitch.isPressed()){
+        mLeftMotor.set(-0.2);
+      }
+      if (!mRightLimitSwitch.isPressed()){
+        mRightMotor.set(-0.2);
+      }
     }
     resetEncoders();
   }

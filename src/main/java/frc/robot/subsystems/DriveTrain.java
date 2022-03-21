@@ -82,6 +82,11 @@ public class DriveTrain extends SubsystemBase {
     mRightFront.restoreFactoryDefaults();
     mRightBack.restoreFactoryDefaults();
 
+    mLeftFront.setIdleMode(Constants.DRIVE_IDLE_MODE);
+    mLeftBack.setIdleMode(Constants.DRIVE_IDLE_MODE);
+    mRightFront.setIdleMode(Constants.DRIVE_IDLE_MODE);
+    mRightBack.setIdleMode(Constants.DRIVE_IDLE_MODE);
+
     mLeftBack.follow(mLeftFront);
     mRightBack.follow(mRightFront);
 

@@ -138,9 +138,8 @@ public class RobotContainer {
     new JoystickButton(mController, Button.kX.value).whileHeld(new RunShooter(mShooter, 0.30));
     new JoystickButton(mController, Button.kY.value).whileHeld(new RunIntakeAndConveyor(mIntake, mShooter));
     
-    new JoystickButton(mController, Button.kA.value).whenPressed(new RunCommand(()->mClimb.goHome(), mClimb));
-    new JoystickButton(mController, Button.kB.value).whenPressed(new RunCommand(()->mTower.goHome(), mTower));
-      //TODO: Ending conditions of the command
+    new JoystickButton(mController, Button.kA.value).whenPressed(new InstantCommand(()->mClimb.goHome(), mClimb));
+    new JoystickButton(mController, Button.kB.value).whenPressed(new InstantCommand(()->mTower.goHome(), mTower));
 
     new POVButton(mController, 90).whenPressed(mIntake::deploy, mIntake);
     new POVButton(mController, 270).whenPressed(mIntake::retract, mIntake);

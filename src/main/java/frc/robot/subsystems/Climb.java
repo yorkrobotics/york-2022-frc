@@ -8,7 +8,6 @@ import com.revrobotics.CANSparkMax;
 import com.revrobotics.RelativeEncoder;
 import com.revrobotics.SparkMaxLimitSwitch;
 import com.revrobotics.SparkMaxPIDController;
-import com.revrobotics.CANSparkMax.IdleMode;
 import com.revrobotics.CANSparkMax.SoftLimitDirection;
 import com.revrobotics.CANSparkMaxLowLevel.MotorType;
 import edu.wpi.first.wpilibj.XboxController;
@@ -40,8 +39,8 @@ public class Climb extends SubsystemBase {
     mLeftPrimaryMotor.restoreFactoryDefaults();
     mRightPrimaryMotor.restoreFactoryDefaults(); 
 
-    mLeftPrimaryMotor.setIdleMode(IdleMode.kBrake);
-    mRightPrimaryMotor.setIdleMode(IdleMode.kBrake);
+    mLeftPrimaryMotor.setIdleMode(Constants.CLIMB_IDLE_MODE);
+    mRightPrimaryMotor.setIdleMode(Constants.CLIMB_IDLE_MODE);
 
     mLeftPrimaryMotor.setInverted(true);
     mRightPrimaryMotor.setInverted(false);
@@ -212,11 +211,13 @@ public class Climb extends SubsystemBase {
 
 
   public void goHome(){
-    if (!mLeftLimitSwitch.isPressed()){
-      mLeftPrimaryMotor.set(0.2);
-    }
-    if (!mRightLimitSwitch.isPressed()){
-      mRightPrimaryMotor.set(0.2);
+    while (!mLeftLimitSwitch.isPressed() || !mRightLimitSwitch.isPressed()){
+      if (!mLeftLimitSwitch.isPressed()){
+        mLeftPrimaryMotor.set(0.2);
+      }
+      if (!mRightLimitSwitch.isPressed()){
+        mRightPrimaryMotor.set(0.2);
+      }
     }
     resetEncoders();
   }

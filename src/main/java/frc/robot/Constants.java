@@ -4,6 +4,8 @@
 
 package frc.robot;
 
+import com.revrobotics.CANSparkMax.IdleMode;
+
 /**
  * The Constants class provides a convenient place for teams to hold robot-wide numerical or boolean
  * constants. This class should not be used for any other purpose. All constants should be declared
@@ -40,8 +42,15 @@ public final class Constants {
     public static final String PATH_FOLDER = "paths/output";
 
 
-    public static final double INTAKE_ROLLER_SPEED = 0.3;
+    public static final double INTAKE_ROLLER_SPEED = 0.4;
     public static final double CONVEYOR_SPEED = 0.6;
+
+
+    public static final IdleMode DRIVE_IDLE_MODE = IdleMode.kCoast;
+    public static final IdleMode CLIMB_IDLE_MODE = IdleMode.kBrake;
+    public static final IdleMode TOWER_IDLE_MODE = IdleMode.kBrake;
+
+
     
     public final class SparkMax{
       public static final int DRIVE_LEFT_FRONT = 3;
