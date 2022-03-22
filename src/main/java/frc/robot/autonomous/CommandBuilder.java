@@ -4,10 +4,12 @@ import java.util.HashSet;
 import java.util.Set;
 
 import edu.wpi.first.wpilibj.smartdashboard.SendableChooser;
+import frc.robot.autonomous.routines.BlueOneS1B1;
+import frc.robot.autonomous.routines.BlueOneS2B2;
+import frc.robot.autonomous.routines.BlueOneS3B3;
 import frc.robot.autonomous.routines.DoNothing;
-import frc.robot.autonomous.routines.FiveBalls;
-import frc.robot.autonomous.routines.ThreeBalls231;
-import frc.robot.autonomous.routines.TwoBalls2To3;
+import frc.robot.subsystems.Intake;
+import frc.robot.subsystems.Shooter;
 
 /**
  * Inspired by team 6357
@@ -18,12 +20,17 @@ public class CommandBuilder {
     private Set<AutoRoutine> mAutoRoutines = new HashSet<AutoRoutine>();
     private AutoRoutine doNothing = new DoNothing();
 
+    private Intake mIntake;
+    private Shooter mShooter;
 
-    public CommandBuilder(){
+    public CommandBuilder(Intake intake, Shooter shooter){
 
-        mAutoRoutines.add(new TwoBalls2To3());
-        mAutoRoutines.add(new ThreeBalls231());
-        mAutoRoutines.add(new FiveBalls());
+        mIntake = intake;
+        mShooter = shooter;
+
+        mAutoRoutines.add(new BlueOneS1B1(mIntake, mShooter));
+        mAutoRoutines.add(new BlueOneS2B2());
+        mAutoRoutines.add(new BlueOneS3B3());
 
     }
 

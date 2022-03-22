@@ -58,15 +58,15 @@ public class Climb extends SubsystemBase {
 
 
     mLeftPrimaryMotor.enableSoftLimit(CANSparkMax.SoftLimitDirection.kForward, false);
-    mLeftPrimaryMotor.enableSoftLimit(CANSparkMax.SoftLimitDirection.kReverse, true);
+    mLeftPrimaryMotor.enableSoftLimit(CANSparkMax.SoftLimitDirection.kReverse, false);
     mRightPrimaryMotor.enableSoftLimit(CANSparkMax.SoftLimitDirection.kForward, false);
-    mRightPrimaryMotor.enableSoftLimit(CANSparkMax.SoftLimitDirection.kReverse, true);
+    mRightPrimaryMotor.enableSoftLimit(CANSparkMax.SoftLimitDirection.kReverse, false);
 
     //the lifters extends in kReverse direction
     mLeftPrimaryMotor.setSoftLimit(SoftLimitDirection.kForward, 0);
-    mLeftPrimaryMotor.setSoftLimit(SoftLimitDirection.kReverse, -215);
+    mLeftPrimaryMotor.setSoftLimit(SoftLimitDirection.kReverse, -262);
     mRightPrimaryMotor.setSoftLimit(SoftLimitDirection.kForward, 0);
-    mRightPrimaryMotor.setSoftLimit(SoftLimitDirection.kReverse, -215);
+    mRightPrimaryMotor.setSoftLimit(SoftLimitDirection.kReverse, -262);
 
     mClimbMode = ClimbMode.OPEN_LOOP;
 
@@ -110,7 +110,7 @@ public class Climb extends SubsystemBase {
    */
   public void runClimbPositionControl(double setPoint){
     setPoint = Double.min(setPoint, 0);
-    setPoint = Double.max(setPoint, -215);
+    setPoint = Double.max(setPoint, -270);
     mLeftPrimaryController.setReference(setPoint, CANSparkMax.ControlType.kPosition);
     mRightPrimaryController.setReference(setPoint, CANSparkMax.ControlType.kPosition);
   }

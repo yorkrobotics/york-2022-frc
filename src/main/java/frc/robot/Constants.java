@@ -29,12 +29,20 @@ public final class Constants {
       //gear ratio: 16.364, 5.601
 
     public static final double TRACK_WIDTH = 0.617; //The distance between left wheels and right wheels
+    public static final double WHEEL_DIAMETER = 0.1524;
+    
     
     public static final double kMaxVoltage = 12;
     public static final double kMaxVelocity = 1; // m/s
     public static final double kMaxAcceleration = 1; // m/s^2
 
-    public static final double kP_AUTO = 5.7673;
+    public static final double kP_AUTO_LOW_GEAR = 5.5181;
+
+    public static final double kS_LOW_GEAR = 0.20874;
+    public static final double kV_LOW_GEAR = 4.3531;
+    public static final double kA_LOW_GEAR = 0.53187;
+
+    
 
     public static final double FIELD_CENTER_X = 19.16;
     public static final double FIELD_CENTER_Y = 0;
@@ -49,6 +57,8 @@ public final class Constants {
     public static final IdleMode DRIVE_IDLE_MODE = IdleMode.kCoast;
     public static final IdleMode CLIMB_IDLE_MODE = IdleMode.kBrake;
     public static final IdleMode TOWER_IDLE_MODE = IdleMode.kBrake;
+
+
 
 
     

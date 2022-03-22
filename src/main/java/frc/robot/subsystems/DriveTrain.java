@@ -100,8 +100,8 @@ public class DriveTrain extends SubsystemBase {
     mleftPIDController = mLeftFront.getPIDController();
     mrightPIDController = mRightFront.getPIDController();
 
-    mLeftAutoController = new PIDController(Constants.kP_AUTO, 0, 0);
-    mRightAutoController = new PIDController(Constants.kP_AUTO, 0, 0);
+    mLeftAutoController = new PIDController(Constants.kP_AUTO_LOW_GEAR, 0, 0);
+    mRightAutoController = new PIDController(Constants.kP_AUTO_LOW_GEAR, 0, 0);
     
 
     setToOpenLoopMode(); //Default drive mode set to open loop
@@ -297,7 +297,7 @@ public class DriveTrain extends SubsystemBase {
    * @return meter
    */
   public double rotationsToMeters(double rotations){
-    return rotations / gearRatio * 0.145 * Math.PI;
+    return rotations / gearRatio * Constants.WHEEL_DIAMETER * Math.PI;
   }
 
   /**
@@ -306,7 +306,7 @@ public class DriveTrain extends SubsystemBase {
    * @return rotation
    */
   public double metersToRotations(double meters){
-    return meters * gearRatio / 0.145 / Math.PI;
+    return meters * gearRatio / Constants.WHEEL_DIAMETER / Math.PI;
   }
 
   /**
@@ -529,7 +529,7 @@ public class DriveTrain extends SubsystemBase {
    */
   private void configureVelocityControl(){
     if (mGearMode == GearMode.LOW_GEAR){
-      kP = 0.000097988;
+      kP = 0.020772;
       kI = 0;
       kD = 0;
       kMinOutput = -0.7;
