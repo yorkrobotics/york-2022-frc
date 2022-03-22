@@ -18,6 +18,7 @@ import frc.robot.commands.DriveTeleop;
 import frc.robot.commands.RotateToTarget;
 import frc.robot.commands.RunIntakeAndConveyor;
 import frc.robot.commands.RunShooter;
+import frc.robot.commands.ShootTarget;
 import frc.robot.subsystems.DriveTrain;
 import frc.robot.subsystems.Climb;
 import frc.robot.subsystems.ColorSensor;
@@ -135,7 +136,8 @@ public class RobotContainer {
 
     // new JoystickButton(mController, Button.kB.value).whileHeld(new RotateToTarget(mDrive, pycam));
 
-    new JoystickButton(mController, Button.kX.value).whileHeld(new RunShooter(mShooter, 0.4));
+    // new JoystickButton(mController, Button.kX.value).whileHeld(new RunShooter(mShooter, 0.30));
+    new JoystickButton(mController, Button.kX.value).whileHeld(new ShootTarget(pycam, mShooter, mTower));
     new JoystickButton(mController, Button.kY.value).whileHeld(new RunIntakeAndConveyor(mIntake, mShooter));
     
     new JoystickButton(mController, Button.kA.value).whenPressed(new InstantCommand(()->mClimb.goHome(), mClimb));

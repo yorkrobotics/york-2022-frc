@@ -4,6 +4,7 @@ import json
 import os
 import sys
 import time
+import math
 
 from cscore import CameraServer, MjpegServer, UsbCamera, VideoSource
 import cv2
@@ -26,7 +27,7 @@ BIN_HIGH_H = 90
 BIN_HIGH_S = 255
 BIN_HIGH_V = 255
 
-EPSILON_FACTOR = 0.09 # directly influences the number of vertices for approxPolyDP
+EPSILON_FACTOR = 0.08 # directly influences the number of vertices for approxPolyDP
 
 fx = 625.16 # 1875.49844 / 1920 * 640
 fy = 833.57 # 1875.52991 / 1080 * 480
@@ -48,20 +49,19 @@ OBJECT_POINTS = [
 # convert to numpy array
 CAMERA_MATRIX, OBJECT_POINTS = [np.array(x) for x in [CAMERA_MATRIX, OBJECT_POINTS]]
 
+camAngle2Shooter = 30
+
 rMatShooter = [
         [1.0, 0.0, 0.0],
-        [0.0, 1.0, 0.0],
-        [0.0, 0.0, 1.0],
+        [0.0, math.cos(camAngle2Shooter / 180 * math.pi), -math.sin(camAngle2Shooter / 180 * math.pi)],
+        [0.0, math.sin(camAngle2Shooter / 180 * math.pi), math.cos(camAngle2Shooter / 180 * math.pi)],
         ]
 
 tMatShooter = [
         [0.0],
-        [-50.0],
-        [0.0]
+        [5.25],
+        [7.5]
         ]
-
-
-
 
 team = None
 server = False
@@ -248,7 +248,7 @@ def setupCameras():
         startSwitchedCamera(config)
 
     os.system("v4l2-ctl -c auto_exposure=1")
-    os.system("v4l2-ctl -c exposure_time_absolute=15")
+    os.system("v4l2-ctl -c exposure_time_absolute=20")
 
 # def framePerSecond(start_time):
 #     processing_time = time.time() - start_time
@@ -379,7 +379,7 @@ def reduceStdDev(coords):
     sigma = np.std(coords)
     # mean = np.mean(coords)
     median = np.median(coords)
-    if (sigma < 15):
+    if (sigma < 30):
         return median
     else:
         return "NaN"

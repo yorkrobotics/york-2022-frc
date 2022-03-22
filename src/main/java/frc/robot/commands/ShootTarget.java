@@ -4,7 +4,10 @@
 
 package frc.robot.commands;
 
+import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.CommandBase;
+import edu.wpi.first.wpilibj.Timer;
+import frc.robot.Constants;
 import frc.robot.subsystems.PyCamera;
 import frc.robot.subsystems.Shooter;
 import frc.robot.subsystems.Tower;
@@ -26,28 +29,34 @@ public class ShootTarget extends CommandBase {
 
   // Called when the command is initially scheduled.
   @Override
-  public void initialize() {}
+  public void initialize() {
+    double velocity = pycam.calcVelocity(tower.getTowerAngle());
+    SmartDashboard.putNumber("shoote velocity: ", velocity);
+
+    shooter.runConveyor(-0.3);
+    Timer.delay(0.5);
+    shooter.stopConveyor();
+    shooter.runShooter(velocity);
+    Timer.delay(2);
+    shooter.runConveyor(Constants.CONVEYOR_SPEED);
+  }
 
   // Called every time the scheduler runs while the command is scheduled.
   @Override
   public void execute() {
-    System.out.println(pycam.getHoopCenter()[0]);
-    System.out.println(pycam.getHoopCenter()[1]);
-    System.out.println(pycam.getHoopCenter()[2]);
-    double angle = pycam.getAngle(shooter.getSpeed(), tower.getTowerAngle());
-    System.out.println(angle);
-    shooter.setAngle(angle);
-    shooter.runShooter(0.5);
-    isDone = true;
   }
 
   // Called once the command ends or is interrupted.
   @Override
-  public void end(boolean interrupted) {}
+  public void end(boolean interrupted) {
+    shooter.stopConveyor();
+    shooter.stopShooter();
+
+  }
 
   // Returns true when the command should end.
   @Override
   public boolean isFinished() {
-    return isDone;
+    return false;
  }
 }

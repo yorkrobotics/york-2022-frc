@@ -58,11 +58,11 @@ public class PyCamera extends SubsystemBase {
 
     double x_field = Math.sin(shooter_angle) * Math.tan(shooter_angle) * z + Math.cos(shooter_angle) * z;
     double y_field = h_h - shooter_radius * Math.sin(shooter_angle) - h_r2g;
-    
+
     double v_squared = Math.pow(v, 2);
     double v_fourth = Math.pow(v, 4);
     double x_field_squared = Math.pow(x_field, 2);
-    double g = 9.8;
+    double g = 32.2 * 12;
     double var = v_fourth - g * (g * x_field_squared + 2 * y_field * v_squared); // can be used as determinant to get the minimum velocity required
     double equation = (v_squared + Math.sqrt(var)) / (g * x_field);
     double angle = Math.atan(equation);
@@ -72,11 +72,28 @@ public class PyCamera extends SubsystemBase {
 
   // returns the needed velocity to shoot the target at the current angle
   public double calcVelocity(double theta) {
-    double g = 9.8;
-    theta = theta / 180 * Math.PI;
-    double v_0 = Math.sqrt(Math.pow(x, 2) * g/(x*Math.sin(2*theta) - 2*y*Math.pow(Math.cos(theta), 2)));
+    double h_h = 5.0;// hoop height (feet)
+    double h_r2g = 0.5; // circle center point to ground
+    double shooter_angle = theta / 180 * Math.PI;
+    double shooter_radius = 1.5;
 
-    return v_0;
+    double x_field = Math.sin(shooter_angle) * Math.tan(shooter_angle) * z + Math.cos(shooter_angle) * z;
+    double y_field = h_h - shooter_radius * Math.sin(shooter_angle) - h_r2g;
+
+    SmartDashboard.putNumber("x_field", x_field);
+    SmartDashboard.putNumber("y_field", y_field);
+
+    double g = 32.2 * 12;
+    theta = theta / 180 * Math.PI;
+    double v_0 = Math.sqrt(Math.pow(x_field, 2) * g/(x_field*Math.sin(2*theta) - 2*y_field*Math.pow(Math.cos(theta), 2)));
+    double motor_power = (v_0 - 132.9) / 242.48 ;
+    if (motor_power > 1) {
+      motor_power = 1;
+    } else if (motor_power < 0) {
+      motor_power = 0;
+    }
+
+    return motor_power;
   }
 
   public double getHorizontalAngle() {
