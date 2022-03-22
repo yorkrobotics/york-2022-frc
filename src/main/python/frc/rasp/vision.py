@@ -4,6 +4,7 @@ import json
 import os
 import sys
 import time
+import math
 
 from cscore import CameraServer, MjpegServer, UsbCamera, VideoSource
 import cv2
@@ -50,18 +51,15 @@ CAMERA_MATRIX, OBJECT_POINTS = [np.array(x) for x in [CAMERA_MATRIX, OBJECT_POIN
 
 rMatShooter = [
         [1.0, 0.0, 0.0],
-        [0.0, 1.0, 0.0],
-        [0.0, 0.0, 1.0],
+        [0.0, math.cos(45 / 180 * math.pi), -math.sin(45 / 180 * math.pi)],
+        [0.0, math.sin(45 / 180 * math.pi), math.cos(45 / 180 * math.pi)],
         ]
 
 tMatShooter = [
         [0.0],
-        [-50.0],
-        [0.0]
+        [5.25],
+        [7.5]
         ]
-
-
-
 
 team = None
 server = False
