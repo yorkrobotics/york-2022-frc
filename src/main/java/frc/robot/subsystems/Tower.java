@@ -57,9 +57,9 @@ public class Tower extends SubsystemBase {
     mRightMotor.enableSoftLimit(SoftLimitDirection.kForward, true);
     mRightMotor.enableSoftLimit(SoftLimitDirection.kReverse, false);
 
-    mLeftMotor.setSoftLimit(SoftLimitDirection.kForward, 245);
+    mLeftMotor.setSoftLimit(SoftLimitDirection.kForward, 260);
     mLeftMotor.setSoftLimit(SoftLimitDirection.kReverse, 0);
-    mRightMotor.setSoftLimit(SoftLimitDirection.kForward, 245);
+    mRightMotor.setSoftLimit(SoftLimitDirection.kForward, 260);
     mRightMotor.setSoftLimit(SoftLimitDirection.kReverse, 0);
 
     mLeftLimitSwitch = mLeftMotor.getReverseLimitSwitch(SparkMaxLimitSwitch.Type.kNormallyOpen);
@@ -109,7 +109,7 @@ public class Tower extends SubsystemBase {
    * @param setpoint setpoint in rotations
    */
   public void runActuatorsPositionControl(double setpoint){
-    setpoint = Double.min(setpoint, 245);
+    setpoint = Double.min(setpoint, 260);
     setpoint = Double.max(setpoint, 0);
     mLeftController.setReference(setpoint, CANSparkMax.ControlType.kPosition);
     mRightController.setReference(setpoint, CANSparkMax.ControlType.kPosition);

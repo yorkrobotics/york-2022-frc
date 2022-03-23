@@ -77,10 +77,10 @@ public class DriveTrain extends SubsystemBase {
     mRightBack = new CANSparkMax(Constants.SparkMax.DRIVE_RIGHT_BACK, MotorType.kBrushless);
     mShifter = new DoubleSolenoid(PneumaticsModuleType.CTREPCM, Constants.PCM.DRIVE_GEAR_SHIFT_FORWARD, Constants.PCM.DRIVE_GEAR_SHIFT_REVERSE);
 
-    mLeftFront.restoreFactoryDefaults();
-    mLeftBack.restoreFactoryDefaults();
-    mRightFront.restoreFactoryDefaults();
-    mRightBack.restoreFactoryDefaults();
+    // mLeftFront.restoreFactoryDefaults();
+    // mLeftBack.restoreFactoryDefaults();
+    // mRightFront.restoreFactoryDefaults();
+    // mRightBack.restoreFactoryDefaults();
 
     mLeftFront.setIdleMode(Constants.DRIVE_IDLE_MODE);
     mLeftBack.setIdleMode(Constants.DRIVE_IDLE_MODE);
@@ -529,16 +529,16 @@ public class DriveTrain extends SubsystemBase {
    */
   private void configureVelocityControl(){
     if (mGearMode == GearMode.LOW_GEAR){
-      kP = 0.020772;
-      kI = 0;
-      kD = 0;
+      kP = Constants.kP_VELOCITY_DRIVE_LOW_GEAR;
+      kI = Constants.kI_VELOCITY_DRIVE_LOW_GEAR;
+      kD = Constants.kD_VELOCITY_DRIVE_LOW_GEAR;
       kMinOutput = -0.7;
       kMaxOutput = 0.7;
     }
     if (mGearMode == GearMode.HIGH_GEAR){
-      kP = 0.000097988;
-      kI = 0;
-      kD = 0;
+      kP = Constants.kP_VELOCITY_DRIVE_HIGH_GEAR;
+      kI = Constants.kI_VELOCITY_DRIVE_HIGH_GEAR;
+      kD = Constants.kD_VELOCITY_DRIVE_HIGH_GEAR;
       kMinOutput = -0.7;
       kMaxOutput = 0.7;
     }
