@@ -135,9 +135,11 @@ public class PyCamera extends SubsystemBase {
     y = hoop_coord[1].doubleValue();
     z = hoop_coord[2].doubleValue();
 
-    double shooter_angle = towerAngle / 180 * Math.PI;
-    y_field = h_h - shooter_radius * Math.sin(shooter_angle) - h_r2g;
-    x_field = Math.tan(shooter_angle) * (Math.sin(shooter_angle) *  z - y_field) + Math.cos(shooter_angle) * z;
+    if (towerAngle < 47 && towerAngle > 46) {
+      double shooter_angle = towerAngle / 180 * Math.PI;
+      y_field = h_h - shooter_radius * Math.sin(shooter_angle) - h_r2g;
+      x_field = Math.tan(shooter_angle) * (Math.sin(shooter_angle) *  z - y_field) + Math.cos(shooter_angle) * z;
+    }
 
     // x_field = filter.calculate(x_field); // TODO: to be tested
 
@@ -148,8 +150,8 @@ public class PyCamera extends SubsystemBase {
     SmartDashboard.putNumber("Field y", y_field);
 
 
-    double velocity = this.calcVelocity();
-    SmartDashboard.putNumber("shooter velocity: ", velocity);
+    /* double velocity = this.calcVelocity();
+    SmartDashboard.putNumber("shooter velocity: ", velocity); */
 
     double power = 0.513798 + 0.000825723 * x_field - 0.00000323753 * Math.pow(x_field, 2) + 8.5563 * Math.pow(10, -9) * Math.pow(x_field, 3);
     SmartDashboard.putNumber("Target power", power);
