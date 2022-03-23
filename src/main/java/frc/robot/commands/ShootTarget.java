@@ -35,8 +35,11 @@ public class ShootTarget extends CommandBase {
     x_field = pycam.getFieldX();
     targetAngle = 1 / Math.pow((0.000896333 * x_field + 0.00200909), 1.14638) + 41.2633;
     power = 0.513798 + 0.000825723 * x_field - 0.00000323753 * Math.pow(x_field, 2) + 8.5563 * Math.pow(10, -9) * Math.pow(x_field, 3);
-
+    SmartDashboard.putNumber("target angle", targetAngle);
+    SmartDashboard.putNumber("velocity", power);
     tower.setTowerAngle(targetAngle);
+    shooter.runShooter(power);
+
   }
 
   // Called every time the scheduler runs while the command is scheduled.
@@ -44,7 +47,6 @@ public class ShootTarget extends CommandBase {
   public void execute() {
     // double towerAngle = tower.getTowerAngle();
     // double y_field = pycam.getFieldY();
-    shooter.runShooter(power);
 
     // double minAngle = Math.atan(y_field/x_field);
     // if (towerAngle < minAngle) { // 55 - 10 is the smallest angle

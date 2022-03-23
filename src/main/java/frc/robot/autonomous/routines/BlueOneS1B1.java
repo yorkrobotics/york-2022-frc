@@ -11,6 +11,7 @@ import edu.wpi.first.wpilibj2.command.SequentialCommandGroup;
 import frc.robot.Constants;
 import frc.robot.autonomous.AutoRoutine;
 import frc.robot.autonomous.TrajectoryBuilder;
+import frc.robot.subsystems.Conveyor;
 import frc.robot.subsystems.Intake;
 import frc.robot.subsystems.Shooter;
 
@@ -18,10 +19,12 @@ public class BlueOneS1B1 implements AutoRoutine{
 
     private Intake mIntake;
     private Shooter mShooter;
+    private Conveyor mConveyor;
     
-    public BlueOneS1B1(Intake intake, Shooter shooter){
+    public BlueOneS1B1(Intake intake, Shooter shooter, Conveyor conveyor){
         mIntake = intake;
         mShooter = shooter;
+        mConveyor = conveyor;
     }
     @Override
     public String getName() {
@@ -32,12 +35,13 @@ public class BlueOneS1B1 implements AutoRoutine{
     public Command getCommand(TrajectoryBuilder trajectoryBuilder,
             BiFunction<Trajectory, Boolean, Command> RamseteCommandBuilder) {
         return new SequentialCommandGroup(
-            new ParallelCommandGroup(
-                RamseteCommandBuilder.apply(trajectoryBuilder.getTrajectory("Blue-S1-B1"), true),
-                new InstantCommand(()->mIntake.deploy(), mIntake)
-            ),
-            new RunCommand(()->mIntake.runRoller(Constants.INTAKE_ROLLER_SPEED), mIntake),
-            new RunCommand(()->mShooter.runShooter(0.5), mShooter)
+            // new ParallelCommandGroup(
+                RamseteCommandBuilder.apply(trajectoryBuilder.getTrajectory("Blue-S1-B1"), true)
+                // new InstantCommand(()->mIntake.deploy(), mIntake)
+            // ),
+            // new RunCommand(()->mIntake.runRoller(Constants.INTAKE_ROLLER_SPEED), mIntake),
+            // new RunCommand(()->mConveyor.runConveyor(Constants.CONVEYOR_SPEED), mConveyor),
+            // new RunCommand(()->mShooter.runShooter(0.5), mShooter)
         );
     }
     

@@ -8,6 +8,7 @@ import frc.robot.autonomous.routines.BlueOneS1B1;
 import frc.robot.autonomous.routines.BlueOneS2B2;
 import frc.robot.autonomous.routines.BlueOneS3B3;
 import frc.robot.autonomous.routines.DoNothing;
+import frc.robot.subsystems.Conveyor;
 import frc.robot.subsystems.Intake;
 import frc.robot.subsystems.Shooter;
 
@@ -22,13 +23,15 @@ public class CommandBuilder {
 
     private Intake mIntake;
     private Shooter mShooter;
+    private Conveyor mConveyor;
 
-    public CommandBuilder(Intake intake, Shooter shooter){
+    public CommandBuilder(Intake intake, Shooter shooter, Conveyor conveyor){
 
         mIntake = intake;
         mShooter = shooter;
+        mConveyor = conveyor;
 
-        mAutoRoutines.add(new BlueOneS1B1(mIntake, mShooter));
+        mAutoRoutines.add(new BlueOneS1B1(mIntake, mShooter, mConveyor));
         mAutoRoutines.add(new BlueOneS2B2());
         mAutoRoutines.add(new BlueOneS3B3());
 

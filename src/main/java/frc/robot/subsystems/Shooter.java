@@ -50,12 +50,6 @@ public class Shooter extends SubsystemBase {
     isShooting = speed > 0.0;
   }
 
-  public void testRunShooter(){
-    double tSpeed = SmartDashboard.getNumber("Test speed", 0);
-    if (testSpeed != tSpeed){ testSpeed = tSpeed;}
-    runShooter(testSpeed);
-  }
-
   /**
    * Stop shooter motors
    */
@@ -66,7 +60,6 @@ public class Shooter extends SubsystemBase {
   }
 
 
-  
   /**
    * TODO: Add comments
    * @param z

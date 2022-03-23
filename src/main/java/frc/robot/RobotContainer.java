@@ -98,7 +98,7 @@ public class RobotContainer {
 
     // Autonomous
     mTrajectoryBuilder = new TrajectoryBuilder(Constants.PATH_FOLDER);
-    mCommandBuilder = new CommandBuilder(mIntake, mShooter);
+    mCommandBuilder = new CommandBuilder(mIntake, mShooter, mConveyor);
     mAutoChooser = new SendableChooser<AutoRoutine>();
 
     // Populate shuffleboard
@@ -140,7 +140,6 @@ public class RobotContainer {
 
     // new JoystickButton(mController, Button.kB.value).whileHeld(new RotateToTarget(mDrive, pycam));
 
-    // new JoystickButton(mController, Button.kX.value).whileHeld(new RunShooter(mShooter, 0.30));
     new JoystickButton(mController, Button.kX.value).whenPressed(() -> {
       mIntake.runRoller(Constants.INTAKE_ROLLER_SPEED);
       mConveyor.runConveyor(Constants.CONVEYOR_SPEED);
@@ -167,6 +166,9 @@ public class RobotContainer {
       if (mShooter.isShooting()) mShooter.stopShooter();
       else mShooter.runShooter(SmartDashboard.getNumber("Test speed", 0.0));
     });
+
+    // new POVButton(mController, 180).whenPressed(new ShootTarget(pycam, mShooter, mTower));
+
 
     new POVButton(mController, 0).whenPressed(mTower::switchActuatorMode, mTower);
 
