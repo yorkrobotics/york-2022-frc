@@ -24,7 +24,7 @@ public class PyCamera extends SubsystemBase {
   public double z = 0;
   public double filteredAngle = 0;
 
-  public double h_h = 60.0;// hoop height (inches)
+  public double h_h = 106.0;// hoop height (inches)
   public double h_r2g = 6; // circle center point to ground
   public double shooter_radius = 1.5;
 
@@ -136,8 +136,8 @@ public class PyCamera extends SubsystemBase {
     z = hoop_coord[2].doubleValue();
 
     double shooter_angle = towerAngle / 180 * Math.PI;
-    x_field = Math.sin(shooter_angle) * Math.tan(shooter_angle) * z + Math.cos(shooter_angle) * z;
     y_field = h_h - shooter_radius * Math.sin(shooter_angle) - h_r2g;
+    x_field = Math.tan(shooter_angle) * (Math.sin(shooter_angle) *  z - y_field) + Math.cos(shooter_angle) * z;
 
     SmartDashboard.putNumber("filterdAngle", filteredAngle);
     // filteredAngle = filter.calculate(angle);
