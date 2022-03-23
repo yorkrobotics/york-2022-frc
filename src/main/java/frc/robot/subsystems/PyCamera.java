@@ -30,6 +30,8 @@ public class PyCamera extends SubsystemBase {
 
   public double x_field;
   public double y_field;
+  
+  public double towerAngle;
 
   Number[] default_hoop_center_coord = new Number[] {0,0,0};
   NetworkTable table;
@@ -57,11 +59,11 @@ public class PyCamera extends SubsystemBase {
   }
 
   // returns the needed angle of the shooter when given a particular initial velocity
-  public double getAngle(double v, double shooter_angle) {
-    shooter_angle = shooter_angle / 180 * Math.PI;
+  public double getAngle(double v) {
+    double towerAngleRad = towerAngle / 180 * Math.PI;
 
-    double x_field = Math.sin(shooter_angle) * Math.tan(shooter_angle) * z + Math.cos(shooter_angle) * z;
-    double y_field = h_h - shooter_radius * Math.sin(shooter_angle) - h_r2g;
+    double x_field = Math.sin(towerAngleRad) * Math.tan(towerAngleRad) * z + Math.cos(towerAngleRad) * z;
+    double y_field = h_h - shooter_radius * Math.sin(towerAngleRad) - h_r2g;
 
     double v_squared = Math.pow(v, 2);
     double v_fourth = Math.pow(v, 4);
@@ -75,18 +77,15 @@ public class PyCamera extends SubsystemBase {
   }
 
   // returns the needed velocity to shoot the target at the current angle
-  public double calcVelocity(double theta) {
-    double shooter_angle = theta / 180 * Math.PI;
+  public double calcVelocity() {
+    double shooter_angle = towerAngle / 180 * Math.PI;
 
     double x_field = Math.sin(shooter_angle) * Math.tan(shooter_angle) * z + Math.cos(shooter_angle) * z;
     double y_field = h_h - shooter_radius * Math.sin(shooter_angle) - h_r2g;
 
-    SmartDashboard.putNumber("x_field", x_field);
-    SmartDashboard.putNumber("y_field", y_field);
-
     double g = 32.2 * 12;
-    theta = theta / 180 * Math.PI;
-    double v_0 = Math.sqrt(Math.pow(x_field, 2) * g/(x_field*Math.sin(2*theta) - 2*y_field*Math.pow(Math.cos(theta), 2)));
+    double towerAngleRad = towerAngle / 180 * Math.PI;
+    double v_0 = Math.sqrt(Math.pow(x_field, 2) * g/(x_field*Math.sin(2*towerAngleRad) - 2*y_field*Math.pow(Math.cos(towerAngleRad), 2)));
     double motor_power = (v_0 - 132.9) / 242.48 ;
     if (motor_power > 1) {
       motor_power = 1;
@@ -102,15 +101,11 @@ public class PyCamera extends SubsystemBase {
     return filteredAngle;
   }
 
-  public double getFieldX(double shooterAngle) {
-    double shooter_angle = shooterAngle / 180 * Math.PI;
-    x_field = Math.sin(shooter_angle) * Math.tan(shooter_angle) * z + Math.cos(shooter_angle) * z;
+  public double getFieldX() {
     return x_field;
   }
 
-  public double getFieldY(double shooterAngle) {
-    double shooter_angle = shooterAngle / 180 * Math.PI;
-    y_field = h_h - shooter_radius * Math.sin(shooter_angle) - h_r2g;
+  public double getFieldY() {
     return y_field;
   }
 
@@ -128,6 +123,8 @@ public class PyCamera extends SubsystemBase {
 
   @Override
   public void periodic() {
+    towerAngle = SmartDashboard.getNumber("Tower angle", 0);
+
     if (!(Double.valueOf(x).isNaN() || z == 0)) {
       double angle = Math.atan(x / z) / Math.PI * 180;
       filteredAngle = angle;
@@ -137,12 +134,15 @@ public class PyCamera extends SubsystemBase {
     x = hoop_coord[0].doubleValue();
     y = hoop_coord[1].doubleValue();
     z = hoop_coord[2].doubleValue();
+
+    double shooter_angle = towerAngle / 180 * Math.PI;
+    x_field = Math.sin(shooter_angle) * Math.tan(shooter_angle) * z + Math.cos(shooter_angle) * z;
+    y_field = h_h - shooter_radius * Math.sin(shooter_angle) - h_r2g;
+
     SmartDashboard.putNumber("filterdAngle", filteredAngle);
     // filteredAngle = filter.calculate(angle);
     // This method will be called once per scheduler run
-    SmartDashboard.putNumber("x", x);
-    SmartDashboard.putNumber("y", y);
-    SmartDashboard.putNumber("z", z);
-    SmartDashboard.putNumber("filteredAngle", filteredAngle);
+    SmartDashboard.putNumber("Field X", x_field);
+    SmartDashboard.putNumber("Field y", y_field);
   }
 }

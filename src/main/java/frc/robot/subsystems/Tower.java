@@ -209,7 +209,7 @@ public class Tower extends SubsystemBase {
     double radius = 12;
     double baseLength = 9.5;
     double actuatorLength = this.rotationToLength();
-    double vOffset = 0 / 180 * Math.PI; // vertical offset from the ground in radian
+    double vOffset = 5 / 180 * Math.PI; // vertical offset from the ground in radian
     double towerAngle = Math.acos((Math.pow(radius, 2) + Math.pow(baseLength, 2) - Math.pow(actuatorLength, 2))/(2 * baseLength *  radius)) - vOffset;
     return towerAngle / Math.PI * 180;
   }
@@ -217,7 +217,7 @@ public class Tower extends SubsystemBase {
   public void setTowerAngle(double angle) {
     double radius = 12;
     double baseLength = 9.5;
-    double vOffset = 0 / 180 * Math.PI; // vertical offset from the ground in radian
+    double vOffset = 5 / 180 * Math.PI; // vertical offset from the ground in radian
 
     double acutatorLength =  Math.sqrt(Math.pow(radius, 2)+ Math.pow(baseLength, 2) - 2 * radius * baseLength * Math.cos(angle / 180 * Math.PI + vOffset));
 

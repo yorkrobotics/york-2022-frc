@@ -84,14 +84,6 @@ public class Shooter extends SubsystemBase {
   
   /**
    * TODO: To be implemented
-   * @param angle
-   */
-  public void setAngle(double angle) {
-    // sets the angle of the shooter
-  }
-
-  /**
-   * TODO: To be implemented
    * @return
    */
   public double getSpeed() {
