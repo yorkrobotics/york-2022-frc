@@ -163,12 +163,21 @@ public class RobotContainer {
     new POVButton(mController, 270).whenPressed(mIntake::retract, mIntake);
 
     new POVButton(mController, 180).whenPressed(() -> {
-      if (mShooter.isShooting()) mShooter.stopShooter();
-      else mShooter.runShooter(SmartDashboard.getNumber("Test speed", 0.0));
+      mShooter.shootTarget();
+      mTower.aimTarget();
+    }, mShooter, mTower).whenReleased(() -> {
+      mShooter.stopShooter();
     });
 
     // new POVButton(mController, 180).whenPressed(new ShootTarget(pycam, mShooter, mTower));
 
+    new JoystickButton(mController, Button.kX.value).whenPressed(() -> {
+      mIntake.runRoller(Constants.INTAKE_ROLLER_SPEED);
+      mConveyor.runConveyor(Constants.CONVEYOR_SPEED);
+    }, mIntake, mConveyor).whenReleased(() -> {
+      mIntake.stopRoller();
+      mConveyor.stopConveyor();
+    }, mIntake, mConveyor);
 
     new POVButton(mController, 0).whenPressed(mTower::switchActuatorMode, mTower);
 

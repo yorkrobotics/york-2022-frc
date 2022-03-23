@@ -21,6 +21,7 @@ public class Shooter extends SubsystemBase {
   private double testSpeed;
 
   private boolean isShooting = false;
+  private double x_field;
 
   /** Creates a new Shooter. */
   public Shooter() {
@@ -37,6 +38,7 @@ public class Shooter extends SubsystemBase {
 
   @Override
   public void periodic() {
+    x_field = SmartDashboard.getNumber("Field X", 0);
     // This method will be called once per scheduler run
   }
 
@@ -83,6 +85,12 @@ public class Shooter extends SubsystemBase {
    */
   public double getSpeed() {
     return 0;
+  }
+
+  // shoots target with field x and characterized angle
+  public void shootTarget() {
+    power = 0.513798 + 0.000825723 * x_field - 0.00000323753 * Math.pow(x_field, 2) + 8.5563 * Math.pow(10, -9) * Math.pow(x_field, 3);
+    this.runShooter(power);
   }
 
   public boolean isShooting() {
