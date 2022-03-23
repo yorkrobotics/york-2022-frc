@@ -163,8 +163,8 @@ public class RobotContainer {
     new POVButton(mController, 270).whenPressed(mIntake::retract, mIntake);
 
     new POVButton(mController, 180).whenPressed(() -> {
-      mShooter.shootTarget();
-      mTower.aimTarget();
+      mShooter.shootTarget(pycam.getFieldX());
+      mTower.aimTarget(pycam.getFieldX());
     }, mShooter, mTower).whenReleased(() -> {
       mShooter.stopShooter();
     });

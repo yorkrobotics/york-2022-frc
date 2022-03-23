@@ -139,7 +139,7 @@ public class PyCamera extends SubsystemBase {
     y_field = h_h - shooter_radius * Math.sin(shooter_angle) - h_r2g;
     x_field = Math.tan(shooter_angle) * (Math.sin(shooter_angle) *  z - y_field) + Math.cos(shooter_angle) * z;
 
-    x_field = filter.calculate(x_field); // TODO: to be tested
+    // x_field = filter.calculate(x_field); // TODO: to be tested
 
     SmartDashboard.putNumber("filterdAngle", filteredAngle);
     // filteredAngle = filter.calculate(angle);
@@ -150,5 +150,10 @@ public class PyCamera extends SubsystemBase {
 
     double velocity = this.calcVelocity();
     SmartDashboard.putNumber("shooter velocity: ", velocity);
+
+    double power = 0.513798 + 0.000825723 * x_field - 0.00000323753 * Math.pow(x_field, 2) + 8.5563 * Math.pow(10, -9) * Math.pow(x_field, 3);
+    SmartDashboard.putNumber("Target power", power);
+    double targetAngle = 1 / Math.pow((0.000896333 * x_field + 0.00200909), 1.14638) + 41.2633;
+    SmartDashboard.putNumber("Target Angle", targetAngle);
   }
 }
