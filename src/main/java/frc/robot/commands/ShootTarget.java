@@ -58,7 +58,7 @@ public class ShootTarget extends CommandBase {
 
     double velocity = pycam.calcVelocity();
 
-    shooter.runShooter(velocity);
+    shooter.runShooter(0.6);
   }
 
   // Called once the command ends or is interrupted.

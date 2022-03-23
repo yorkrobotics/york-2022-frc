@@ -10,18 +10,18 @@ import edu.wpi.first.wpilibj.XboxController.Button;
 import edu.wpi.first.wpilibj.shuffleboard.Shuffleboard;
 import edu.wpi.first.wpilibj.shuffleboard.ShuffleboardTab;
 import edu.wpi.first.wpilibj.smartdashboard.SendableChooser;
+import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import frc.robot.autonomous.AutoRoutine;
 import frc.robot.autonomous.CommandBuilder;
 import frc.robot.autonomous.TrajectoryBuilder;
 import frc.robot.commands.CorrectOdometry;
 import frc.robot.commands.DriveTeleop;
 import frc.robot.commands.RotateToTarget;
-import frc.robot.commands.RunIntakeAndConveyor;
-import frc.robot.commands.RunShooter;
 import frc.robot.commands.ShootTarget;
 import frc.robot.subsystems.DriveTrain;
 import frc.robot.subsystems.Climb;
 import frc.robot.subsystems.ColorSensor;
+import frc.robot.subsystems.Conveyor;
 import frc.robot.subsystems.Intake;
 import frc.robot.subsystems.PyCamera;
 import frc.robot.subsystems.Shooter;
@@ -46,6 +46,7 @@ public class RobotContainer {
   private Intake mIntake;
   private Tower mTower;
   private ColorSensor mColorSensor;
+  private Conveyor mConveyor;
 
   // Commands
   private DriveTeleop driveTeleop;
@@ -81,6 +82,9 @@ public class RobotContainer {
 
     // Shooter
     mShooter = Shooter.getInstance();
+
+    // Conveyor
+    mConveyor = Conveyor.getInstance();
 
     // Tower
     mTower = Tower.getInstance();
@@ -139,18 +143,18 @@ public class RobotContainer {
     // new JoystickButton(mController, Button.kX.value).whileHeld(new RunShooter(mShooter, 0.30));
     new JoystickButton(mController, Button.kX.value).whenPressed(() -> {
       mIntake.runRoller(Constants.INTAKE_ROLLER_SPEED);
-      mShooter.runConveyor(Constants.CONVEYOR_SPEED);
-    }, mIntake, mShooter).whenReleased(() -> {
+      mConveyor.runConveyor(Constants.CONVEYOR_SPEED);
+    }, mIntake, mConveyor).whenReleased(() -> {
       mIntake.stopRoller();
-      mShooter.stopConveyor();
-    }, mIntake, mShooter);
+      mConveyor.stopConveyor();
+    }, mIntake, mConveyor);
     new JoystickButton(mController, Button.kY.value).whenPressed(() -> {
       mIntake.runRoller(-Constants.INTAKE_ROLLER_SPEED);
-      mShooter.runConveyor(-Constants.CONVEYOR_SPEED);
-    }, mIntake, mShooter).whenReleased(() -> {
+      mConveyor.runConveyor(-Constants.CONVEYOR_SPEED);
+    }, mIntake, mConveyor).whenReleased(() -> {
       mIntake.stopRoller();
-      mShooter.stopConveyor();
-    }, mIntake, mShooter);
+      mConveyor.stopConveyor();
+    }, mIntake, mConveyor);
 
     
     new JoystickButton(mController, Button.kA.value).whenPressed(new InstantCommand(()->mClimb.goHome(), mClimb));
@@ -158,7 +162,12 @@ public class RobotContainer {
 
     new POVButton(mController, 90).whenPressed(mIntake::deploy, mIntake);
     new POVButton(mController, 270).whenPressed(mIntake::retract, mIntake);
-    new POVButton(mController, 180).toggleWhenPressed(new ShootTarget(pycam, mShooter, mTower));
+
+    new POVButton(mController, 180).whenPressed(() -> {
+      if (mShooter.isShooting()) mShooter.stopShooter();
+      else mShooter.runShooter(SmartDashboard.getNumber("Test speed", 0.0));
+    });
+
     new POVButton(mController, 0).whenPressed(mTower::switchActuatorMode, mTower);
 
     // new JoystickButton(mController, Button.kY.value).whenPressed(mDrive::turnToTarget, mDrive);

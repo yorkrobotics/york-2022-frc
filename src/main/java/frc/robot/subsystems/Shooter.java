@@ -7,6 +7,7 @@ package frc.robot.subsystems;
 import com.ctre.phoenix.motorcontrol.VictorSPXControlMode;
 import com.ctre.phoenix.motorcontrol.can.VictorSPX;
 
+import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
 import frc.robot.Constants;
 
@@ -16,16 +17,22 @@ public class Shooter extends SubsystemBase {
     return mShooter;
   }
 
-  private VictorSPX mTop, mBottom, mConveyor;
+  private VictorSPX mTop, mBottom;
+  private double testSpeed;
+
+  private boolean isShooting = false;
 
   /** Creates a new Shooter. */
   public Shooter() {
     mTop = new VictorSPX(Constants.VictorSPX.SHOOTER_TOP);
     mBottom = new VictorSPX(Constants.VictorSPX.SHOOTER_BOTTOM);
-    mConveyor = new VictorSPX(Constants.VictorSPX.SHOOTER_CONVEYOR);
 
     mTop.setInverted(false);
     mBottom.setInverted(false);
+
+    testSpeed = 0;
+
+    SmartDashboard.putNumber("Test speed", testSpeed);
   }
 
   @Override
@@ -40,14 +47,13 @@ public class Shooter extends SubsystemBase {
   public void runShooter(double speed) {
     mTop.set(VictorSPXControlMode.PercentOutput, speed);
     mBottom.set(VictorSPXControlMode.PercentOutput, speed);
+    isShooting = speed > 0.0;
   }
 
-  /**
-   * Run the conveyor
-   * @param speed speed between (-1, 1)
-   */
-  public void runConveyor(double speed){
-    mConveyor.set(VictorSPXControlMode.PercentOutput, speed);
+  public void testRunShooter(){
+    double tSpeed = SmartDashboard.getNumber("Test speed", 0);
+    if (testSpeed != tSpeed){ testSpeed = tSpeed;}
+    runShooter(testSpeed);
   }
 
   /**
@@ -56,14 +62,10 @@ public class Shooter extends SubsystemBase {
   public void stopShooter() {
     mTop.set(VictorSPXControlMode.PercentOutput, 0);
     mBottom.set(VictorSPXControlMode.PercentOutput, 0);
+    isShooting = false;
   }
 
-  /**
-   * Stop conveyor
-   */
-  public void stopConveyor(){
-    mConveyor.set(VictorSPXControlMode.PercentOutput, 0);
-  }
+
   
   /**
    * TODO: Add comments
@@ -88,5 +90,9 @@ public class Shooter extends SubsystemBase {
    */
   public double getSpeed() {
     return 0;
+  }
+
+  public boolean isShooting() {
+    return isShooting;
   }
 }
