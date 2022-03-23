@@ -17,13 +17,20 @@ import frc.robot.Constants;
 import java.io.File;
 import java.lang.Double;
 
-
 public class PyCamera extends SubsystemBase {
   public Number[] hoop_coord;
   public double x = 0;
   public double y = 0;
   public double z = 0;
   public double filteredAngle = 0;
+
+  public double h_h = 60.0;// hoop height (inches)
+  public double h_r2g = 6; // circle center point to ground
+  public double shooter_radius = 1.5;
+
+  public double x_field;
+  public double y_field;
+
   Number[] default_hoop_center_coord = new Number[] {0,0,0};
   NetworkTable table;
   // public LinearFilter filter = LinearFilter.singlePoleIIR(0, 0.02);
@@ -51,10 +58,7 @@ public class PyCamera extends SubsystemBase {
 
   // returns the needed angle of the shooter when given a particular initial velocity
   public double getAngle(double v, double shooter_angle) {
-    double h_h = 5.0;// hoop height (feet)
-    double h_r2g = 0.5; // circle center point to ground
     shooter_angle = shooter_angle / 180 * Math.PI;
-    double shooter_radius = 1.5;
 
     double x_field = Math.sin(shooter_angle) * Math.tan(shooter_angle) * z + Math.cos(shooter_angle) * z;
     double y_field = h_h - shooter_radius * Math.sin(shooter_angle) - h_r2g;
@@ -72,10 +76,7 @@ public class PyCamera extends SubsystemBase {
 
   // returns the needed velocity to shoot the target at the current angle
   public double calcVelocity(double theta) {
-    double h_h = 5.0;// hoop height (feet)
-    double h_r2g = 0.5; // circle center point to ground
     double shooter_angle = theta / 180 * Math.PI;
-    double shooter_radius = 1.5;
 
     double x_field = Math.sin(shooter_angle) * Math.tan(shooter_angle) * z + Math.cos(shooter_angle) * z;
     double y_field = h_h - shooter_radius * Math.sin(shooter_angle) - h_r2g;
@@ -101,17 +102,29 @@ public class PyCamera extends SubsystemBase {
     return filteredAngle;
   }
 
-  public double getFieldX(Rotation2d currentHeading) {
-    double fieldX = z * Math.sin(currentHeading.getRadians());
-    fieldX = Constants.FIELD_CENTER_X - fieldX;
-    return fieldX;
+  public double getFieldX(double shooterAngle) {
+    double shooter_angle = shooterAngle / 180 * Math.PI;
+    x_field = Math.sin(shooter_angle) * Math.tan(shooter_angle) * z + Math.cos(shooter_angle) * z;
+    return x_field;
   }
 
-  public double getFieldY(Rotation2d currentHeading) {
-    double fieldY = z * Math.cos(currentHeading.getRadians());
-    fieldY = Constants.FIELD_CENTER_Y - fieldY;
-    return fieldY;
+  public double getFieldY(double shooterAngle) {
+    double shooter_angle = shooterAngle / 180 * Math.PI;
+    y_field = h_h - shooter_radius * Math.sin(shooter_angle) - h_r2g;
+    return y_field;
   }
+
+  // public double getFieldX(Rotation2d currentHeading) {
+  //   double fieldX = z * Math.sin(currentHeading.getRadians());
+  //   fieldX = Constants.FIELD_CENTER_X - fieldX;
+  //   return fieldX;
+  // }
+
+  // public double getFieldY(Rotation2d currentHeading) {
+  //   double fieldY = z * Math.cos(currentHeading.getRadians());
+  //   fieldY = Constants.FIELD_CENTER_Y - fieldY;
+  //   return fieldY;
+  // }
 
   @Override
   public void periodic() {
