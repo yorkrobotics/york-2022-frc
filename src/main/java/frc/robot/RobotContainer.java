@@ -137,15 +137,28 @@ public class RobotContainer {
     // new JoystickButton(mController, Button.kB.value).whileHeld(new RotateToTarget(mDrive, pycam));
 
     // new JoystickButton(mController, Button.kX.value).whileHeld(new RunShooter(mShooter, 0.30));
-    new JoystickButton(mController, Button.kX.value).whileHeld(new ShootTarget(pycam, mShooter, mTower));
-    new JoystickButton(mController, Button.kY.value).whileHeld(new RunIntakeAndConveyor(mIntake, mShooter));
+    new JoystickButton(mController, Button.kX.value).whenPressed(() -> {
+      mIntake.runRoller(Constants.INTAKE_ROLLER_SPEED);
+      mShooter.runConveyor(Constants.CONVEYOR_SPEED);
+    }, mIntake, mShooter).whenReleased(() -> {
+      mIntake.stopRoller();
+      mShooter.stopConveyor();
+    }, mIntake, mShooter);
+    new JoystickButton(mController, Button.kY.value).whenPressed(() -> {
+      mIntake.runRoller(-Constants.INTAKE_ROLLER_SPEED);
+      mShooter.runConveyor(-Constants.CONVEYOR_SPEED);
+    }, mIntake, mShooter).whenReleased(() -> {
+      mIntake.stopRoller();
+      mShooter.stopConveyor();
+    }, mIntake, mShooter);
+
     
     new JoystickButton(mController, Button.kA.value).whenPressed(new InstantCommand(()->mClimb.goHome(), mClimb));
     new JoystickButton(mController, Button.kB.value).whenPressed(new InstantCommand(()->mTower.goHome(), mTower));
 
     new POVButton(mController, 90).whenPressed(mIntake::deploy, mIntake);
     new POVButton(mController, 270).whenPressed(mIntake::retract, mIntake);
-
+    new POVButton(mController, 180).toggleWhenPressed(new ShootTarget(pycam, mShooter, mTower));
     new POVButton(mController, 0).whenPressed(mTower::switchActuatorMode, mTower);
 
     // new JoystickButton(mController, Button.kY.value).whenPressed(mDrive::turnToTarget, mDrive);

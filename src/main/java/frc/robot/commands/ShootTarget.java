@@ -28,6 +28,20 @@ public class ShootTarget extends CommandBase {
   // Called when the command is initially scheduled.
   @Override
   public void initialize() {
+    
+
+    // velocity = Double.min(.8, velocity);
+    // shooter.runConveyor(-0.3);
+    // Timer.delay(0.5);
+    // shooter.stopConveyor();
+    // shooter.runShooter(velocity * 0.8);
+    // Timer.delay(2);
+    // shooter.runConveyor(Constants.CONVEYOR_SPEED);
+  }
+
+  // Called every time the scheduler runs while the command is scheduled.
+  @Override
+  public void execute() {
     double towerAngle = tower.getTowerAngle();
     double x_field = pycam.getFieldX();
     double y_field = pycam.getFieldY();
@@ -45,24 +59,13 @@ public class ShootTarget extends CommandBase {
     double velocity = pycam.calcVelocity();
     SmartDashboard.putNumber("shooter velocity: ", velocity);
 
-    velocity = Double.min(.8, velocity);
-    shooter.runConveyor(-0.3);
-    Timer.delay(0.5);
-    shooter.stopConveyor();
-    shooter.runShooter(velocity * 0.8);
-    Timer.delay(2);
-    shooter.runConveyor(Constants.CONVEYOR_SPEED);
-  }
-
-  // Called every time the scheduler runs while the command is scheduled.
-  @Override
-  public void execute() {
+    shooter.runShooter(velocity);
   }
 
   // Called once the command ends or is interrupted.
   @Override
   public void end(boolean interrupted) {
-    shooter.stopConveyor();
+    // shooter.stopConveyor();
     shooter.stopShooter();
 
   }
