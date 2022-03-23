@@ -38,6 +38,22 @@ public final class Constants {
 
     public static final double kP_AUTO_LOW_GEAR = 5.5181;
 
+    public static final double kP_VELOCITY_DRIVE_LOW_GEAR = 0.000097988;
+    public static final double kI_VELOCITY_DRIVE_LOW_GEAR = 0;
+    public static final double kD_VELOCITY_DRIVE_LOW_GEAR = 0;
+
+    public static final double kP_VELOCITY_DRIVE_HIGH_GEAR = 0.000097988;
+    public static final double kI_VELOCITY_DRIVE_HIGH_GEAR = 0;
+    public static final double kD_VELOCITY_DRIVE_HIGH_GEAR = 0;
+
+    public static final double kP_POSITION_DRIVE_LOW_GEAR = 0.3;
+    public static final double kI_POSITION_DRIVE_LOW_GEAR = 0;
+    public static final double kD_POSITION_DRIVE_LOW_GEAR = 0;
+
+    public static final double kP_POSITION_DRIVE_HIGH_GEAR = 0.3;
+    public static final double kI_POSITION_DRIVE_HIGH_GEAR = 0;
+    public static final double kD_POSITION_DRIVE_HIGH_GEAR = 0;
+
     public static final double kS_LOW_GEAR = 0.20874;
     public static final double kV_LOW_GEAR = 4.3531;
     public static final double kA_LOW_GEAR = 0.53187;

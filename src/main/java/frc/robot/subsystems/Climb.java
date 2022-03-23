@@ -133,6 +133,8 @@ public class Climb extends SubsystemBase {
     
     if (mClimbMode == ClimbMode.POSITION_CONTROL){
       double setpoint = SmartDashboard.getNumber("Climb setpoint", 0);
+      // double setpoint = 0;
+      // setpoint += controller.getRightY()*10;
       runClimbPositionControl(setpoint);
     }
     if (mClimbMode == ClimbMode.OPEN_LOOP){
