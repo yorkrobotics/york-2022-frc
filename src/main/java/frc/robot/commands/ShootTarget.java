@@ -43,7 +43,6 @@ public class ShootTarget extends CommandBase {
     }
 
     double velocity = pycam.calcVelocity();
-    SmartDashboard.putNumber("shooter velocity: ", velocity);
 
     velocity = Double.min(.8, velocity);
     shooter.runConveyor(-0.3);

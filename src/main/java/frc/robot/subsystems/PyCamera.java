@@ -144,5 +144,9 @@ public class PyCamera extends SubsystemBase {
     // This method will be called once per scheduler run
     SmartDashboard.putNumber("Field X", x_field);
     SmartDashboard.putNumber("Field y", y_field);
+
+
+    double velocity = this.calcVelocity();
+    SmartDashboard.putNumber("shooter velocity: ", velocity);
   }
 }
