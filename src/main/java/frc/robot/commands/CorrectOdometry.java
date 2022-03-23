@@ -29,15 +29,15 @@ public class CorrectOdometry extends CommandBase {
   // Called every time the scheduler runs while the command is scheduled.
   @Override
   public void execute() {
-    double x, y;
-    Rotation2d currentHeading = new Rotation2d(mDrive.getHeading() / 180 * Math.PI);
-    x = pycam.getFieldX(currentHeading);
-    y = pycam.getFieldY(currentHeading);
+    // double x, y;
+    // Rotation2d currentHeading = new Rotation2d(mDrive.getHeading() / 180 * Math.PI);
+    // x = pycam.getFieldX(currentHeading);
+    // y = pycam.getFieldY(currentHeading);
 
-    Pose2d poseMeters = new Pose2d(x, y, currentHeading);
-    Rotation2d gyroAngle = new Rotation2d(mDrive.getGyroAngle() / 180 * Math.PI);
+    // Pose2d poseMeters = new Pose2d(x, y, currentHeading);
+    // Rotation2d gyroAngle = new Rotation2d(mDrive.getGyroAngle() / 180 * Math.PI);
 
-    mDrive.getOdometry().resetPosition(poseMeters, gyroAngle);
+    // mDrive.getOdometry().resetPosition(poseMeters, gyroAngle);
     isDone = true;
   }
 

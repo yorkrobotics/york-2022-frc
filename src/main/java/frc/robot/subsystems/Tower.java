@@ -197,6 +197,13 @@ public class Tower extends SubsystemBase {
     return actuatorLength;
   }
 
+  public double LengthToRotation(double actuatorLength) {
+    double ratio = 100 /1.7;
+    double base = 8.8;
+    double rotations = (actuatorLength - base) * ratio;
+    return rotations;
+  }
+
   // returns the current angle of the tower in degrees
   public double getTowerAngle() {
     double radius = 12;
@@ -205,6 +212,17 @@ public class Tower extends SubsystemBase {
     double vOffset = 0 / 180 * Math.PI; // vertical offset from the ground in radian
     double towerAngle = Math.acos((Math.pow(radius, 2) + Math.pow(baseLength, 2) - Math.pow(actuatorLength, 2))/(2 * baseLength *  radius)) - vOffset;
     return towerAngle / Math.PI * 180;
+  }
+
+  public void setTowerAngle(double angle) {
+    double radius = 12;
+    double baseLength = 9.5;
+    double vOffset = 0 / 180 * Math.PI; // vertical offset from the ground in radian
+
+    double acutatorLength =  Math.sqrt(Math.pow(radius, 2)+ Math.pow(baseLength, 2) - 2 * radius * baseLength * Math.cos(angle / 180 * Math.PI + vOffset));
+
+    double encoderPos = LengthToRotation(acutatorLength);
+    this.runActuatorsPositionControl(encoderPos);
   }
 
 

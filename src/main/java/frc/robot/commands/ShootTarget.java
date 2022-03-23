@@ -30,15 +30,29 @@ public class ShootTarget extends CommandBase {
   // Called when the command is initially scheduled.
   @Override
   public void initialize() {
-    double velocity = pycam.calcVelocity(tower.getTowerAngle());
-    SmartDashboard.putNumber("shoote velocity: ", velocity);
+    double towerAngle = tower.getTowerAngle();
+    double x_field = pycam.getFieldX(towerAngle);
+    double y_field = pycam.getFieldY(towerAngle);
 
-    shooter.runConveyor(-0.3);
-    Timer.delay(0.5);
-    shooter.stopConveyor();
-    shooter.runShooter(velocity);
-    Timer.delay(2);
-    shooter.runConveyor(Constants.CONVEYOR_SPEED);
+    double minAngle = Math.atan(y_field/x_field);
+    if (towerAngle < minAngle) { // 55 - 10 is the smallest angle
+      if (minAngle > 55) {
+        tower.setTowerAngle(minAngle + 10); // add 10 to create a better projectile
+        towerAngle = minAngle + 10;
+      } else {
+        this.cancel();
+      }
+    }
+
+    double velocity = pycam.calcVelocity(towerAngle);
+    SmartDashboard.putNumber("shooter velocity: ", velocity);
+
+    // shooter.runConveyor(-0.3);
+    // Timer.delay(0.5);
+    // shooter.stopConveyor();
+    // shooter.runShooter(velocity);
+    // Timer.delay(2);
+    // shooter.runConveyor(Constants.CONVEYOR_SPEED);
   }
 
   // Called every time the scheduler runs while the command is scheduled.
