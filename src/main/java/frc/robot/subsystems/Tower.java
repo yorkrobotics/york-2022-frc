@@ -32,6 +32,8 @@ public class Tower extends SubsystemBase {
 
   private double kP, kI, kD, kMinOutput, kMaxOutput;
 
+  private double x_field;
+
   /** Creates a new Tower. */
   public Tower() {
     mLeftMotor = new CANSparkMax(Constants.SparkMax.TOWER_ACTUATOR_LEFT, MotorType.kBrushless);
@@ -93,6 +95,8 @@ public class Tower extends SubsystemBase {
     SmartDashboard.putBoolean("Tower Right isPressed", mRightLimitSwitch.isPressed());
     SmartDashboard.putNumber("Tower angle", this.getTowerAngle());
     SmartDashboard.putNumber("Actuator length", this.rotationToLength());
+
+    x_field = SmartDashboard.setNumber("Field X", 0);
   }
 
   /**
@@ -223,6 +227,11 @@ public class Tower extends SubsystemBase {
 
     double encoderPos = LengthToRotation(acutatorLength);
     this.runActuatorsPositionControl(encoderPos);
+  }
+
+  public void aimTarget()  {
+    targetAngle = 1 / Math.pow((0.000896333 * x_field + 0.00200909), 1.14638) + 41.2633;
+    this.setTowerAngle(targetAngle);
   }
 
 
