@@ -59,7 +59,8 @@ public class RobotContainer {
   private DriveTeleop driveTeleop;
 
   // XboxController
-  public static XboxController mController;
+  public static XboxController mainController;
+  public static XboxController secondaryController;
 
   // Camera
   private PyCamera pycam;
@@ -73,7 +74,7 @@ public class RobotContainer {
   public RobotContainer() {
 
     // Driver's controller
-    mController = new XboxController(Constants.CONTROLLER_PORT);
+    mainController = new XboxController(Constants.CONTROLLER_PORT);
 
     // DriveTrain subsystem
     mDrive = DriveTrain.getInstance();
@@ -82,7 +83,7 @@ public class RobotContainer {
 
     // Lifter subsystem
     mClimb = Climb.getInstance();
-    mClimb.setDefaultCommand(new RunCommand(()-> mClimb.runClimbWithJoystick(mController), mClimb));
+    mClimb.setDefaultCommand(new RunCommand(()-> mClimb.runClimbWithJoystick(mainController), mClimb));
     
     // Intake
     mIntake = Intake.getInstance();
@@ -98,7 +99,7 @@ public class RobotContainer {
     mTower.setDefaultCommand(
       new RunCommand(()-> {
         if (!mTower.isHome()) mIntake.deploy();
-        mTower.runTowerWithController(mController);
+        mTower.runTowerWithController(mainController);
       }, mTower, mIntake)
     );
 
@@ -143,23 +144,23 @@ public class RobotContainer {
      * RightStick: 
      */
 
-    new JoystickButton(mController, Button.kRightBumper.value).whenPressed(mDrive::shiftToHighGear, mDrive);
-    new JoystickButton(mController, Button.kLeftBumper.value).whenPressed(mDrive::shiftToLowGear, mDrive);
+    new JoystickButton(mainController, Button.kRightBumper.value).whenPressed(mDrive::shiftToHighGear, mDrive);
+    new JoystickButton(mainController, Button.kLeftBumper.value).whenPressed(mDrive::shiftToLowGear, mDrive);
 
-    new JoystickButton(mController, Button.kLeftStick.value).whenPressed(mDrive::switchDriveMode, mDrive);
+    new JoystickButton(mainController, Button.kLeftStick.value).whenPressed(mDrive::switchDriveMode, mDrive);
 
-    new JoystickButton(mController, Button.kRightStick.value).whenPressed(mClimb::switchClimbMode, mClimb);
+    new JoystickButton(mainController, Button.kRightStick.value).whenPressed(mClimb::switchClimbMode, mClimb);
 
-    // new JoystickButton(mController, Button.kB.value).whileHeld(new RotateToTarget(mDrive, pycam));
+    // new JoystickButton(mainController, Button.kB.value).whileHeld(new RotateToTarget(mDrive, pycam));
 
-    new JoystickButton(mController, Button.kX.value).whenPressed(() -> {
+    new JoystickButton(mainController, Button.kX.value).whenPressed(() -> {
       if (mIntake.isDeployed()) mIntake.runRoller(Constants.INTAKE_ROLLER_SPEED);
       mConveyor.runConveyor(Constants.CONVEYOR_SPEED);
     }, mIntake, mConveyor).whenReleased(() -> {
       mIntake.stopRoller();
       mConveyor.stopConveyor();
     }, mIntake, mConveyor);
-    new JoystickButton(mController, Button.kY.value).whenPressed(() -> {
+    new JoystickButton(mainController, Button.kY.value).whenPressed(() -> {
       if (mIntake.isDeployed()) mIntake.runRoller(-Constants.INTAKE_ROLLER_SPEED);
       mConveyor.runConveyor(-Constants.CONVEYOR_SPEED);
     }, mIntake, mConveyor).whenReleased(() -> {
@@ -168,15 +169,15 @@ public class RobotContainer {
     }, mIntake, mConveyor);
 
     
-    new JoystickButton(mController, Button.kA.value).whenPressed(new InstantCommand(()->mClimb.goHome(), mClimb));
-    // new JoystickButton(mController, Button.kA.value).whenPressed(new InstantCommand(()->mTower.aimTarget(), mTower));
-    new JoystickButton(mController, Button.kB.value).whenPressed(new InstantCommand(()->mTower.goHome(), mTower));
+    new JoystickButton(mainController, Button.kA.value).whenPressed(new InstantCommand(()->mClimb.goHome(), mClimb));
+    // new JoystickButton(mainController, Button.kA.value).whenPressed(new InstantCommand(()->mTower.aimTarget(), mTower));
+    new JoystickButton(mainController, Button.kB.value).whenPressed(new InstantCommand(()->mTower.goHome(), mTower));
 
-    new POVButton(mController, 90).whenPressed(new DeployIntake(mIntake, mTower));
+    new POVButton(mainController, 90).whenPressed(new DeployIntake(mIntake, mTower));
 
-    new POVButton(mController, 270).whenPressed(new RetractIntake(mIntake, mTower));
+    new POVButton(mainController, 270).whenPressed(new RetractIntake(mIntake, mTower));
  
-    // new POVButton(mController, 180).whenPressed(() -> {
+    // new POVButton(mainController, 180).whenPressed(() -> {
     //   if (mShooter.isShooting()) {mShooter.stopShooter();}
     //   else {
     //     mShooter.shootTarget();
@@ -184,11 +185,11 @@ public class RobotContainer {
     //   }
     // });
 
-    new POVButton(mController, 180).whenPressed(
+    new POVButton(mainController, 180).whenPressed(
       new ConditionalCommand(
         new InstantCommand(mShooter::stopShooter, mShooter), 
         new ParallelCommandGroup(
-          new RotateToTarget(mDrive, pycam)
+          new RotateToTarget(mDrive, pycam),
           new AngleToTarget(mTower),
           new InstantCommand(mShooter::shootTarget, mShooter)
         ), 
@@ -196,10 +197,10 @@ public class RobotContainer {
       )
     );
 
-    new POVButton(mController, 0).whenPressed(mTower::switchActuatorMode, mTower);
+    new POVButton(mainController, 0).whenPressed(mTower::switchActuatorMode, mTower);
 
-    // new JoystickButton(mController, Button.kY.value).whenPressed(mDrive::turnToTarget, mDrive);
-    // new JoystickButton(mController, Button.kY.value).whenPressed(new CorrectOdometry(pycam, mDrive));
+    // new JoystickButton(mainController, Button.kY.value).whenPressed(mDrive::turnToTarget, mDrive);
+    // new JoystickButton(mainController, Button.kY.value).whenPressed(new CorrectOdometry(pycam, mDrive));
 
     }
   
