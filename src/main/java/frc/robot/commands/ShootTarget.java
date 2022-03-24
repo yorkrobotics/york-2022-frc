@@ -16,6 +16,10 @@ public class ShootTarget extends CommandBase {
   private final PyCamera pycam;
   private final Shooter shooter;
   private final Tower tower;
+
+  private double x_field; 
+  private double power;
+  private double targetAngle;
   /** Creates a new getHoopCenter. */
   public ShootTarget(PyCamera pc, Shooter st, Tower tr) {
     pycam = pc;
@@ -28,37 +32,31 @@ public class ShootTarget extends CommandBase {
   // Called when the command is initially scheduled.
   @Override
   public void initialize() {
-    
+    x_field = pycam.getFieldX();
+    targetAngle = 1 / Math.pow((0.000896333 * x_field + 0.00200909), 1.14638) + 41.2633;
+    power = 0.513798 + 0.000825723 * x_field - 0.00000323753 * Math.pow(x_field, 2) + 8.5563 * Math.pow(10, -9) * Math.pow(x_field, 3);
 
-    // velocity = Double.min(.8, velocity);
-    // shooter.runConveyor(-0.3);
-    // Timer.delay(0.5);
-    // shooter.stopConveyor();
-    // shooter.runShooter(velocity * 0.8);
-    // Timer.delay(2);
-    // shooter.runConveyor(Constants.CONVEYOR_SPEED);
+    tower.setTowerAngle(targetAngle);
   }
 
   // Called every time the scheduler runs while the command is scheduled.
   @Override
   public void execute() {
-    double towerAngle = tower.getTowerAngle();
-    double x_field = pycam.getFieldX();
-    double y_field = pycam.getFieldY();
+    // double towerAngle = tower.getTowerAngle();
+    // double y_field = pycam.getFieldY();
+    shooter.runShooter(power);
 
-    double minAngle = Math.atan(y_field/x_field);
-    if (towerAngle < minAngle) { // 55 - 10 is the smallest angle
-      if (minAngle > 55) {
-        tower.setTowerAngle(minAngle + 10); // add 10 to create a better projectile
-        towerAngle = minAngle + 10;
-      } else {
-        this.cancel();
-      }
-    }
+    // double minAngle = Math.atan(y_field/x_field);
+    // if (towerAngle < minAngle) { // 55 - 10 is the smallest angle
+    //   if (minAngle > 55) {
+    //     tower.setTowerAngle(minAngle + 10); // add 10 to create a better projectile
+    //     towerAngle = minAngle + 10;
+    //   } else {
+    //     this.cancel();
+    //   }
+    // }
+    // double velocity = pycam.calcVelocity();
 
-    double velocity = pycam.calcVelocity();
-
-    shooter.runShooter(0.6);
   }
 
   // Called once the command ends or is interrupted.

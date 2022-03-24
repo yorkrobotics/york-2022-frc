@@ -35,7 +35,7 @@ public class PyCamera extends SubsystemBase {
 
   Number[] default_hoop_center_coord = new Number[] {0,0,0};
   NetworkTable table;
-  // public LinearFilter filter = LinearFilter.singlePoleIIR(0, 0.02);
+  public LinearFilter filter = LinearFilter.singlePoleIIR(0, 0.02);
   
   /** Creates a new PyCamera. */
   public PyCamera() {
@@ -138,6 +138,8 @@ public class PyCamera extends SubsystemBase {
     double shooter_angle = towerAngle / 180 * Math.PI;
     y_field = h_h - shooter_radius * Math.sin(shooter_angle) - h_r2g;
     x_field = Math.tan(shooter_angle) * (Math.sin(shooter_angle) *  z - y_field) + Math.cos(shooter_angle) * z;
+
+    x_field = filter.calculate(x_field); // TODO: to be tested
 
     SmartDashboard.putNumber("filterdAngle", filteredAngle);
     // filteredAngle = filter.calculate(angle);
