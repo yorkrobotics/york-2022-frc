@@ -206,7 +206,10 @@ public class RobotContainer {
     new POVButton(secondaryController, 270).whenPressed(new RetractIntake(mIntake, mTower));
     new POVButton(secondaryController, 180).whenPressed(      
       new ConditionalCommand(
-        new InstantCommand(mShooter::stopShooter, mShooter), 
+        new SequentialCommand(
+          new InstantCommand(mShooter::stopShooter, mShooter), 
+          new InstantCommand(mTower::goHome, mTower) 
+        ),
         new ParallelCommandGroup(
           new RotateToTarget(mDrive, pycam),
           new AngleToTarget(mTower),
