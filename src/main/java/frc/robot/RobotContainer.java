@@ -156,7 +156,8 @@ public class RobotContainer {
     }, mIntake, mConveyor);
 
     
-    new JoystickButton(mController, Button.kA.value).whenPressed(new InstantCommand(()->mClimb.goHome(), mClimb));
+    // new JoystickButton(mController, Button.kA.value).whenPressed(new InstantCommand(()->mClimb.goHome(), mClimb));
+    new JoystickButton(mController, Button.kA.value).whenPressed(new InstantCommand(()->mTower.aimTarget(pycam.getFieldX()), mClimb));
     new JoystickButton(mController, Button.kB.value).whenPressed(new InstantCommand(()->mTower.goHome(), mTower));
 
     new POVButton(mController, 90).whenPressed(mIntake::deploy, mIntake);
@@ -164,7 +165,6 @@ public class RobotContainer {
 
     new POVButton(mController, 180).whenPressed(() -> {
       mShooter.shootTarget(pycam.getFieldX());
-      mTower.aimTarget(pycam.getFieldX());
     }, mShooter, mTower).whenReleased(() -> {
       mShooter.stopShooter();
     });
