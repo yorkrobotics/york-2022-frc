@@ -20,6 +20,7 @@ public class Shooter extends SubsystemBase {
   private VictorSPX mTop, mBottom;
   private double testSpeed;
   private double x_field;
+  private double power;
   private boolean isShooting = false;
 
   /** Creates a new Shooter. */
@@ -37,7 +38,7 @@ public class Shooter extends SubsystemBase {
 
   @Override
   public void periodic() {
-    x_field = SmartDashboard.getNumber("Field X", 0);
+    power = SmartDashboard.getNumber("Target Power", 0);
     // This method will be called once per scheduler run
   }
 
@@ -88,8 +89,7 @@ public class Shooter extends SubsystemBase {
 
   // shoots target with field x and characterized angle
   public void shootTarget() { 
-    double power = 0.490304 + 0.000745817 * x_field;
-    this.runShooter(power * 1.02);
+    this.runShooter(power);
   }
 
   public boolean isShooting() {
