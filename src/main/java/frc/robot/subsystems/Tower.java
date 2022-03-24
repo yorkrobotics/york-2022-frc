@@ -148,6 +148,7 @@ public class Tower extends SubsystemBase {
         mRightMotor.set(-0.2);
       }
     }
+    mSetpoint = 0;
     resetEncoders();
   }
 
@@ -232,6 +233,7 @@ public class Tower extends SubsystemBase {
 
     double encoderPos = LengthToRotation(acutatorLength);
     this.runActuatorsPositionControl(encoderPos);
+    mSetpoint = encoderPos;
   }
 
   public double computeTargetAngle() {

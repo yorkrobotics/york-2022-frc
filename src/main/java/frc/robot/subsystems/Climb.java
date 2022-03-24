@@ -34,11 +34,7 @@ public class Climb extends SubsystemBase {
 
   public Climb() {
     mLeftPrimaryMotor = new CANSparkMax(Constants.SparkMax.CLIMB_LEFT_PRIMARY, MotorType.kBrushless);
-    mRightPrimaryMotor = new CANSparkMax(Constants.SparkMax.CLIMB_RIGHT_PRIMARY, MotorType.kBrushless);
-
-
-    mLeftPrimaryMotor.restoreFactoryDefaults();
-    mRightPrimaryMotor.restoreFactoryDefaults(); 
+    mRightPrimaryMotor = new CANSparkMax(Constants.SparkMax.CLIMB_RIGHT_PRIMARY, MotorType.kBrushless); 
 
     mLeftPrimaryMotor.setIdleMode(Constants.CLIMB_IDLE_MODE);
     mRightPrimaryMotor.setIdleMode(Constants.CLIMB_IDLE_MODE);
@@ -174,9 +170,6 @@ public class Climb extends SubsystemBase {
     if(p != kP) {mLeftPrimaryController.setP(p); mRightPrimaryController.setP(p); kP = p;}
     if(i != kI) {mLeftPrimaryController.setI(i); mRightPrimaryController.setI(i); kI = i;}
     if(d != kD) {mLeftPrimaryController.setD(d); mRightPrimaryController.setD(d); kD = d;}
-
-    mLeftPrimaryMotor.setSoftLimit(SoftLimitDirection.kForward, (float)SmartDashboard.getNumber("Climb forward limit", 255));
-    mLeftPrimaryMotor.setSoftLimit(SoftLimitDirection.kReverse, (float)SmartDashboard.getNumber("Climb reverse limit", 0));
   }
 
   /**
@@ -220,6 +213,7 @@ public class Climb extends SubsystemBase {
         mRightPrimaryMotor.set(0.2);
       }
     }
+    mSetpoint = 0;
     resetEncoders();
   }
 

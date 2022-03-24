@@ -176,13 +176,13 @@ public class RobotContainer {
 
     new POVButton(mController, 270).whenPressed(new RetractIntake(mIntake, mTower));
  
-    new POVButton(mController, 180).whenPressed(() -> {
-      if (mShooter.isShooting()) {mShooter.stopShooter();}
-      else {
-        mShooter.shootTarget();
+    // new POVButton(mController, 180).whenPressed(() -> {
+    //   if (mShooter.isShooting()) {mShooter.stopShooter();}
+    //   else {
+    //     mShooter.shootTarget();
 
-      }
-    });
+    //   }
+    // });
 
     new POVButton(mController, 180).whenPressed(
       new ConditionalCommand(
