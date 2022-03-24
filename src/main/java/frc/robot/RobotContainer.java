@@ -156,20 +156,18 @@ public class RobotContainer {
     }, mIntake, mConveyor);
 
     
-    // new JoystickButton(mController, Button.kA.value).whenPressed(new InstantCommand(()->mClimb.goHome(), mClimb));
-    new JoystickButton(mController, Button.kA.value).whenPressed(new InstantCommand(()->mTower.aimTarget(pycam.getFieldX()), mClimb));
+    new JoystickButton(mController, Button.kA.value).whenPressed(new InstantCommand(()->mClimb.goHome(), mClimb));
+    // new JoystickButton(mController, Button.kA.value).whenPressed(new InstantCommand(()->mTower.aimTarget(), mTower));
     new JoystickButton(mController, Button.kB.value).whenPressed(new InstantCommand(()->mTower.goHome(), mTower));
 
     new POVButton(mController, 90).whenPressed(mIntake::deploy, mIntake);
     new POVButton(mController, 270).whenPressed(mIntake::retract, mIntake);
  
     new POVButton(mController, 180).whenPressed(() -> {
-      mShooter.shootTarget(pycam.getFieldX());
-    }, mShooter, mTower).whenReleased(() -> {
-      mShooter.stopShooter();
+      if (mShooter.isShooting()) {mShooter.stopShooter();}
+      else mShooter.shootTarget();;
     });
 
-    // new POVButton(mController, 180).whenPressed(new ShootTarget(pycam, mShooter, mTower));
 
     new JoystickButton(mController, Button.kX.value).whenPressed(() -> {
       mIntake.runRoller(Constants.INTAKE_ROLLER_SPEED);

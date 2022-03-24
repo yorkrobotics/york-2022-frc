@@ -228,7 +228,7 @@ public class Tower extends SubsystemBase {
   }
 
   public void aimTarget()  {
-    double targetAngle = 1 / Math.pow((0.000896333 * x_field + 0.00200909), 1.14638) + 41.2633;
+    double targetAngle = 67.6818 - 0.101674* x_field;
     this.setTowerAngle(targetAngle);
   }
 
