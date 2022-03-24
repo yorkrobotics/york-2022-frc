@@ -26,6 +26,7 @@ public class Climb extends SubsystemBase {
   private RelativeEncoder mLeftEncoder, mRightEncoder;
   private SparkMaxLimitSwitch mLeftLimitSwitch, mRightLimitSwitch;
 
+  private double mSetpoint = 0;
   
   private ClimbMode mClimbMode;
 
@@ -58,15 +59,15 @@ public class Climb extends SubsystemBase {
 
 
     mLeftPrimaryMotor.enableSoftLimit(CANSparkMax.SoftLimitDirection.kForward, false);
-    mLeftPrimaryMotor.enableSoftLimit(CANSparkMax.SoftLimitDirection.kReverse, false);
+    mLeftPrimaryMotor.enableSoftLimit(CANSparkMax.SoftLimitDirection.kReverse, true);
     mRightPrimaryMotor.enableSoftLimit(CANSparkMax.SoftLimitDirection.kForward, false);
-    mRightPrimaryMotor.enableSoftLimit(CANSparkMax.SoftLimitDirection.kReverse, false);
+    mRightPrimaryMotor.enableSoftLimit(CANSparkMax.SoftLimitDirection.kReverse, true);
 
     //the lifters extends in kReverse direction
     mLeftPrimaryMotor.setSoftLimit(SoftLimitDirection.kForward, 0);
-    mLeftPrimaryMotor.setSoftLimit(SoftLimitDirection.kReverse, -262);
+    mLeftPrimaryMotor.setSoftLimit(SoftLimitDirection.kReverse, Constants.CLIMB_REVERSE_LIMIT);
     mRightPrimaryMotor.setSoftLimit(SoftLimitDirection.kForward, 0);
-    mRightPrimaryMotor.setSoftLimit(SoftLimitDirection.kReverse, -262);
+    mRightPrimaryMotor.setSoftLimit(SoftLimitDirection.kReverse, Constants.CLIMB_REVERSE_LIMIT);
 
     mClimbMode = ClimbMode.OPEN_LOOP;
 
@@ -81,9 +82,7 @@ public class Climb extends SubsystemBase {
     SmartDashboard.putNumber("Climb_P", kP);
     SmartDashboard.putNumber("Climb_I", kI);
     SmartDashboard.putNumber("Climb_D", kD);
-    SmartDashboard.putNumber("Climb forward limit", mLeftPrimaryMotor.getSoftLimit(SoftLimitDirection.kForward));
-    SmartDashboard.putNumber("Climb reverse limit", mLeftPrimaryMotor.getSoftLimit(SoftLimitDirection.kReverse));
-    SmartDashboard.putNumber("Climb setpoint", 0);
+    SmartDashboard.putNumber("Climb setpoint", mSetpoint);
 
     // goHome();
 
@@ -110,7 +109,7 @@ public class Climb extends SubsystemBase {
    */
   public void runClimbPositionControl(double setPoint){
     setPoint = Double.min(setPoint, 0);
-    setPoint = Double.max(setPoint, -270);
+    setPoint = Double.max(setPoint, (double) Constants.CLIMB_REVERSE_LIMIT);
     mLeftPrimaryController.setReference(setPoint, CANSparkMax.ControlType.kPosition);
     mRightPrimaryController.setReference(setPoint, CANSparkMax.ControlType.kPosition);
   }
@@ -132,10 +131,10 @@ public class Climb extends SubsystemBase {
     updateFromSmartDashboard();
     
     if (mClimbMode == ClimbMode.POSITION_CONTROL){
-      double setpoint = SmartDashboard.getNumber("Climb setpoint", 0);
-      // double setpoint = 0;
-      // setpoint += controller.getRightY()*10;
-      runClimbPositionControl(setpoint);
+      mSetpoint += controller.getRightY() * 1;
+      mSetpoint = Double.min(mSetpoint, 0);
+      mSetpoint = Double.max(mSetpoint, (double)Constants.CLIMB_REVERSE_LIMIT);
+      runClimbPositionControl(mSetpoint);
     }
     if (mClimbMode == ClimbMode.OPEN_LOOP){
       runClimbOpenLoop(controller.getRightY() * 0.6);

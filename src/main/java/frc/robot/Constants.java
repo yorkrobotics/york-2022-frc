@@ -75,6 +75,10 @@ public final class Constants {
     public static final IdleMode TOWER_IDLE_MODE = IdleMode.kBrake;
 
 
+    public static final float TOWER_FORWARD_LIMIT = 250;
+    public static final float CLIMB_REVERSE_LIMIT = -262;
+
+
 
 
     

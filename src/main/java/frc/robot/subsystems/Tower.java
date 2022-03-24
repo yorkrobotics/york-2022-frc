@@ -33,6 +33,8 @@ public class Tower extends SubsystemBase {
   private double kP, kI, kD, kMinOutput, kMaxOutput;
   private double x_field;
 
+  private double mSetpoint = 0;
+
   /** Creates a new Tower. */
   public Tower() {
     mLeftMotor = new CANSparkMax(Constants.SparkMax.TOWER_ACTUATOR_LEFT, MotorType.kBrushless);
@@ -58,10 +60,10 @@ public class Tower extends SubsystemBase {
     mRightMotor.enableSoftLimit(SoftLimitDirection.kForward, true);
     mRightMotor.enableSoftLimit(SoftLimitDirection.kReverse, false);
 
-    mLeftMotor.setSoftLimit(SoftLimitDirection.kForward, 260);
     mLeftMotor.setSoftLimit(SoftLimitDirection.kReverse, 0);
-    mRightMotor.setSoftLimit(SoftLimitDirection.kForward, 260);
     mRightMotor.setSoftLimit(SoftLimitDirection.kReverse, 0);
+    
+    whenIntakeRetracted();
 
     mLeftLimitSwitch = mLeftMotor.getReverseLimitSwitch(SparkMaxLimitSwitch.Type.kNormallyOpen);
     mRightLimitSwitch = mRightMotor.getReverseLimitSwitch(SparkMaxLimitSwitch.Type.kNormallyOpen);
@@ -111,7 +113,7 @@ public class Tower extends SubsystemBase {
    * @param setpoint setpoint in rotations
    */
   public void runActuatorsPositionControl(double setpoint){
-    setpoint = Double.min(setpoint, 260);
+    setpoint = Double.min(setpoint, (double)Constants.TOWER_FORWARD_LIMIT);
     setpoint = Double.max(setpoint, 0);
     mLeftController.setReference(setpoint, CANSparkMax.ControlType.kPosition);
     mRightController.setReference(setpoint, CANSparkMax.ControlType.kPosition);
@@ -124,8 +126,10 @@ public class Tower extends SubsystemBase {
   public void runTowerWithController(XboxController controller){
     updateFromSmartDashboard();
     if (mActuatorMode == TowerActuatorMode.POSITION_CONTROL){
-      Double setpoint = SmartDashboard.getNumber("Actuator setpoint", 0);
-      runActuatorsPositionControl(setpoint);
+      mSetpoint += controller.getRightX() * 1;
+      mSetpoint = Double.min(mSetpoint, (double)Constants.TOWER_FORWARD_LIMIT);
+      mSetpoint = Double.max(mSetpoint, 0);
+      runActuatorsPositionControl(mSetpoint);
     }
     if (mActuatorMode == TowerActuatorMode.OPEN_LOOP){
       runActuatorsOpenLoop(controller.getRightX() * 0.2);
@@ -227,13 +231,33 @@ public class Tower extends SubsystemBase {
     this.runActuatorsPositionControl(encoderPos);
   }
 
-  public void aimTarget()  {
-    double targetAngle = 67.6818 - 0.101674* x_field;
-    this.setTowerAngle(targetAngle);
+  public double computeTargetAngle() {
+    return 67.6818 - 0.101674 * x_field;
   }
 
+  public void aimTarget()  {
+    this.setTowerAngle(computeTargetAngle());
+  }
+
+  public boolean isHome() {
+    return mLeftLimitSwitch.isPressed() && mRightLimitSwitch.isPressed();
+  }
+
+  public void whenIntakeRetracted(){
+    mLeftMotor.setSoftLimit(SoftLimitDirection.kForward, 0);
+    mRightMotor.setSoftLimit(SoftLimitDirection.kForward, 0);
+  }
+
+  public void whenIntakeDeployed(){
+    mLeftMotor.setSoftLimit(SoftLimitDirection.kForward, Constants.TOWER_FORWARD_LIMIT);
+    mRightMotor.setSoftLimit(SoftLimitDirection.kForward, Constants.TOWER_FORWARD_LIMIT);
+  }
 
   private enum TowerActuatorMode{
     POSITION_CONTROL, OPEN_LOOP, OFF
+  }
+
+  public boolean isAimed() {
+    return Math.abs(getTowerAngle() - computeTargetAngle()) < 1.0;
   }
 }

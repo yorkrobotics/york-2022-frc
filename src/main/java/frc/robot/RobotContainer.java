@@ -14,8 +14,11 @@ import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import frc.robot.autonomous.AutoRoutine;
 import frc.robot.autonomous.CommandBuilder;
 import frc.robot.autonomous.TrajectoryBuilder;
+import frc.robot.commands.AngleToTarget;
 import frc.robot.commands.CorrectOdometry;
+import frc.robot.commands.DeployIntake;
 import frc.robot.commands.DriveTeleop;
+import frc.robot.commands.RetractIntake;
 import frc.robot.commands.RotateToTarget;
 import frc.robot.commands.ShootTarget;
 import frc.robot.subsystems.DriveTrain;
@@ -27,8 +30,12 @@ import frc.robot.subsystems.PyCamera;
 import frc.robot.subsystems.Shooter;
 import frc.robot.subsystems.Tower;
 import edu.wpi.first.wpilibj2.command.Command;
+import edu.wpi.first.wpilibj2.command.CommandScheduler;
+import edu.wpi.first.wpilibj2.command.ConditionalCommand;
 import edu.wpi.first.wpilibj2.command.InstantCommand;
+import edu.wpi.first.wpilibj2.command.ParallelCommandGroup;
 import edu.wpi.first.wpilibj2.command.RunCommand;
+import edu.wpi.first.wpilibj2.command.SequentialCommandGroup;
 import edu.wpi.first.wpilibj2.command.button.JoystickButton;
 import edu.wpi.first.wpilibj2.command.button.POVButton;
 
@@ -88,7 +95,12 @@ public class RobotContainer {
 
     // Tower
     mTower = Tower.getInstance();
-    mTower.setDefaultCommand(new RunCommand(()-> mTower.runTowerWithController(mController), mTower));
+    mTower.setDefaultCommand(
+      new RunCommand(()-> {
+        if (!mTower.isHome()) mIntake.deploy();
+        mTower.runTowerWithController(mController);
+      }, mTower, mIntake)
+    );
 
     //pycam
     pycam = new PyCamera();
@@ -141,14 +153,14 @@ public class RobotContainer {
     // new JoystickButton(mController, Button.kB.value).whileHeld(new RotateToTarget(mDrive, pycam));
 
     new JoystickButton(mController, Button.kX.value).whenPressed(() -> {
-      mIntake.runRoller(Constants.INTAKE_ROLLER_SPEED);
+      if (mIntake.isDeployed()) mIntake.runRoller(Constants.INTAKE_ROLLER_SPEED);
       mConveyor.runConveyor(Constants.CONVEYOR_SPEED);
     }, mIntake, mConveyor).whenReleased(() -> {
       mIntake.stopRoller();
       mConveyor.stopConveyor();
     }, mIntake, mConveyor);
     new JoystickButton(mController, Button.kY.value).whenPressed(() -> {
-      mIntake.runRoller(-Constants.INTAKE_ROLLER_SPEED);
+      if (mIntake.isDeployed()) mIntake.runRoller(-Constants.INTAKE_ROLLER_SPEED);
       mConveyor.runConveyor(-Constants.CONVEYOR_SPEED);
     }, mIntake, mConveyor).whenReleased(() -> {
       mIntake.stopRoller();
@@ -160,22 +172,28 @@ public class RobotContainer {
     // new JoystickButton(mController, Button.kA.value).whenPressed(new InstantCommand(()->mTower.aimTarget(), mTower));
     new JoystickButton(mController, Button.kB.value).whenPressed(new InstantCommand(()->mTower.goHome(), mTower));
 
-    new POVButton(mController, 90).whenPressed(mIntake::deploy, mIntake);
-    new POVButton(mController, 270).whenPressed(mIntake::retract, mIntake);
+    new POVButton(mController, 90).whenPressed(new DeployIntake(mIntake, mTower));
+
+    new POVButton(mController, 270).whenPressed(new RetractIntake(mIntake, mTower));
  
     new POVButton(mController, 180).whenPressed(() -> {
       if (mShooter.isShooting()) {mShooter.stopShooter();}
-      else mShooter.shootTarget();;
+      else {
+        mShooter.shootTarget();
+
+      }
     });
 
-
-    new JoystickButton(mController, Button.kX.value).whenPressed(() -> {
-      mIntake.runRoller(Constants.INTAKE_ROLLER_SPEED);
-      mConveyor.runConveyor(Constants.CONVEYOR_SPEED);
-    }, mIntake, mConveyor).whenReleased(() -> {
-      mIntake.stopRoller();
-      mConveyor.stopConveyor();
-    }, mIntake, mConveyor);
+    new POVButton(mController, 180).whenPressed(
+      new ConditionalCommand(
+        new InstantCommand(mShooter::stopShooter, mShooter), 
+        new ParallelCommandGroup(
+          new AngleToTarget(mTower),
+          new InstantCommand(mShooter::shootTarget, mShooter)
+        ), 
+        mShooter::isShooting
+      )
+    );
 
     new POVButton(mController, 0).whenPressed(mTower::switchActuatorMode, mTower);
 

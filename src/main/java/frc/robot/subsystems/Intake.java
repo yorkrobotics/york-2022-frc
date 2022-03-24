@@ -90,4 +90,8 @@ public class Intake extends SubsystemBase {
   public enum IntakeLifterMode{
     RETRACTED, DEPLOYED, UNKNOWN
   }
+
+  public boolean isDeployed() {
+      return mLifterMode == IntakeLifterMode.DEPLOYED;
+  }
 }
