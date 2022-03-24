@@ -42,6 +42,9 @@ public class PyCamera extends SubsystemBase {
     NetworkTableInstance inst = NetworkTableInstance.getDefault(); 
     table = inst.getTable("Vision");
     inst.startClientTeam(5171);
+
+    SmartDashboard.putNumber("Power Fudge", 1);
+    SmartDashboard.putNumber("Angle Fudge", 1);
     // hoop_coord = table.getEntry("translation_vector").getNumberArray(default_hoop_center_coord);
     // table.addEntryListener("translation_vector", (tbl, key, entry, value, flags) -> {
     //   double[] hoop_coord = value.getDoubleArray();
@@ -154,10 +157,12 @@ public class PyCamera extends SubsystemBase {
 
     /* double velocity = this.calcVelocity();
     SmartDashboard.putNumber("shooter velocity: ", velocity); */
+    double power = 0.490304 + 0.000745817 * x_field;
+    double powerFudge = SmartDashboard.getNumber("Power Fudge", 0);
+    SmartDashboard.putNumber("Target Power", power * powerFudge);
 
-    double power = 0.513798 + 0.000825723 * x_field - 0.00000323753 * Math.pow(x_field, 2) + 8.5563 * Math.pow(10, -9) * Math.pow(x_field, 3);
-    SmartDashboard.putNumber("Target power", power);
-    double targetAngle = 1 / Math.pow((0.000896333 * x_field + 0.00200909), 1.14638) + 41.2633;
-    SmartDashboard.putNumber("Target Angle", targetAngle);
+    double angleFudge = SmartDashboard.getNumber("Angle Fudge", 0);
+    double targetAngle = 67.6818 - 0.101674* x_field;
+    SmartDashboard.putNumber("Target Angle", targetAngle * angleFudge);
   }
 }

@@ -32,6 +32,7 @@ public class Tower extends SubsystemBase {
 
   private double kP, kI, kD, kMinOutput, kMaxOutput;
   private double x_field;
+  private double targetAngle;
 
   /** Creates a new Tower. */
   public Tower() {
@@ -95,6 +96,8 @@ public class Tower extends SubsystemBase {
     SmartDashboard.putNumber("Tower angle", this.getTowerAngle());
     SmartDashboard.putNumber("Actuator length", this.rotationToLength());
     x_field = SmartDashboard.getNumber("Field X", 0);
+
+    targetAngle = SmartDashboard.getNumber("Target Angle", 0); 
   }
 
   /**
@@ -228,7 +231,6 @@ public class Tower extends SubsystemBase {
   }
 
   public void aimTarget()  {
-    double targetAngle = 67.6818 - 0.101674* x_field;
     this.setTowerAngle(targetAngle);
   }
 
