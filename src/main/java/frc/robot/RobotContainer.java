@@ -188,6 +188,7 @@ public class RobotContainer {
       new ConditionalCommand(
         new InstantCommand(mShooter::stopShooter, mShooter), 
         new ParallelCommandGroup(
+          new RotateToTarget(mDrive, pycam)
           new AngleToTarget(mTower),
           new InstantCommand(mShooter::shootTarget, mShooter)
         ), 
