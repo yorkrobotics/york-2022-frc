@@ -79,6 +79,10 @@ public final class Constants {
     public static final float CLIMB_REVERSE_LIMIT = -262;
 
 
+    public static final double CLIMB_UPPER_PRESET = -262;
+    public static final double CLIMB_LOWER_PRESET = 0;
+
+
 
 
     

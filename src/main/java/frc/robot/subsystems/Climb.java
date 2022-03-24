@@ -110,6 +110,15 @@ public class Climb extends SubsystemBase {
     mRightPrimaryController.setReference(setPoint, CANSparkMax.ControlType.kPosition);
   }
 
+  public void runClimbToUpperPreset(){
+    runClimbPositionControl(Constants.CLIMB_UPPER_PRESET);
+    mSetpoint = Constants.CLIMB_UPPER_PRESET;
+  }
+
+  public void runClimbToLowerPreset(){
+    runClimbPositionControl(Constants.CLIMB_LOWER_PRESET);
+    mSetpoint = Constants.CLIMB_LOWER_PRESET;
+  }
   /**
    * Run motors in open loop
    * @param speed speed between (-1, 1)
@@ -119,6 +128,16 @@ public class Climb extends SubsystemBase {
     mRightPrimaryMotor.set(speed);
   }
 
+  //
+  public void ClimbUpWithBumper(){
+    mSetpoint += 2;
+    runClimbPositionControl(mSetpoint);
+  }
+
+  public void ClimbDownWithBumper(){
+    mSetpoint -= 2;
+    runClimbPositionControl(mSetpoint);
+  }
   /**
    * Run climb motors according to climb mode
    * @param controller Xbox controller
@@ -127,7 +146,13 @@ public class Climb extends SubsystemBase {
     updateFromSmartDashboard();
     
     if (mClimbMode == ClimbMode.POSITION_CONTROL){
-      mSetpoint += controller.getRightY() * 1;
+      // mSetpoint += controller.getRightY() * 1;
+      if(controller.getRightBumperPressed()){
+        mSetpoint += 1;
+      }
+      if (controller.getLeftBumperPressed()){
+        mSetpoint -= 1;
+      }
       mSetpoint = Double.min(mSetpoint, 0);
       mSetpoint = Double.max(mSetpoint, (double)Constants.CLIMB_REVERSE_LIMIT);
       runClimbPositionControl(mSetpoint);
