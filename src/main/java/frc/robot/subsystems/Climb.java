@@ -146,13 +146,13 @@ public class Climb extends SubsystemBase {
     updateFromSmartDashboard();
     
     if (mClimbMode == ClimbMode.POSITION_CONTROL){
-      // mSetpoint += controller.getRightY() * 1;
-      if(controller.getRightBumperPressed()){
-        mSetpoint += 1;
-      }
-      if (controller.getLeftBumperPressed()){
-        mSetpoint -= 1;
-      }
+      mSetpoint += controller.getRightY() * 1;
+      // if(controller.getRightBumperPressed()){
+      //   mSetpoint += 1;
+      // }
+      // if (controller.getLeftBumperPressed()){
+      //   mSetpoint -= 1;
+      // }
       mSetpoint = Double.min(mSetpoint, 0);
       mSetpoint = Double.max(mSetpoint, (double)Constants.CLIMB_REVERSE_LIMIT);
       runClimbPositionControl(mSetpoint);

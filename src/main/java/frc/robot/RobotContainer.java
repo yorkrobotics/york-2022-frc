@@ -75,6 +75,7 @@ public class RobotContainer {
 
     // Driver's controller
     mainController = new XboxController(Constants.CONTROLLER_PORT);
+    secondaryController = new XboxController(Constants.CONTROLLER_PORT_SECONDARY);
 
     // DriveTrain subsystem
     mDrive = DriveTrain.getInstance();
@@ -136,8 +137,8 @@ public class RobotContainer {
     /**
      * main controller
      */
-    new JoystickButton(mainController, Button.kRightBumper.value).whileHeld(mClimb::ClimbUpWithBumper, mClimb);
-    new JoystickButton(mainController, Button.kLeftBumper.value).whileHeld(mClimb::ClimbDownWithBumper, mClimb);
+    // new JoystickButton(mainController, Button.kRightBumper.value).whileHeld(mClimb::ClimbUpWithBumper, mClimb);
+    // new JoystickButton(mainController, Button.kLeftBumper.value).whileHeld(mClimb::ClimbDownWithBumper, mClimb);
 
     new JoystickButton(mainController, Button.kLeftStick.value).whenPressed(mDrive::switchDriveMode, mDrive);
 
@@ -206,7 +207,7 @@ public class RobotContainer {
     new POVButton(secondaryController, 270).whenPressed(new RetractIntake(mIntake, mTower));
     new POVButton(secondaryController, 180).whenPressed(      
       new ConditionalCommand(
-        new SequentialCommand(
+        new SequentialCommandGroup(
           new InstantCommand(mShooter::stopShooter, mShooter), 
           new InstantCommand(mTower::goHome, mTower) 
         ),

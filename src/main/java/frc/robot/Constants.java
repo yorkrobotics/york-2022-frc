@@ -17,7 +17,7 @@ import com.revrobotics.CANSparkMax.IdleMode;
 public final class Constants {
 
     public static final int CONTROLLER_PORT = 0;
-
+    public static final int CONTROLLER_PORT_SECONDARY = 1;
 
     public static final double MAX_OPENLOOP_SPEED = 0.5;
 
@@ -81,6 +81,8 @@ public final class Constants {
 
     public static final double CLIMB_UPPER_PRESET = -262;
     public static final double CLIMB_LOWER_PRESET = 0;
+
+
 
 
 
