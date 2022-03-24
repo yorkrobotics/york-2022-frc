@@ -135,12 +135,14 @@ public class PyCamera extends SubsystemBase {
     y = hoop_coord[1].doubleValue();
     z = hoop_coord[2].doubleValue();
 
-    if (towerAngle < 47 && towerAngle > 46) {
+    if (towerAngle < 46.6 && towerAngle > 46.4) {
       double shooter_angle = towerAngle / 180 * Math.PI;
       y_field = h_h - shooter_radius * Math.sin(shooter_angle) - h_r2g;
       x_field = Math.tan(shooter_angle) * (Math.sin(shooter_angle) *  z - y_field) + Math.cos(shooter_angle) * z;
     }
-
+    // double shooter_angle = towerAngle / 180 * Math.PI;
+    // y_field = h_h - shooter_radius * Math.sin(shooter_angle) - h_r2g;
+    // x_field = Math.tan(shooter_angle) * (Math.sin(shooter_angle) *  z - y_field) + Math.cos(shooter_angle) * z;
     // x_field = filter.calculate(x_field); // TODO: to be tested
 
     SmartDashboard.putNumber("filterdAngle", filteredAngle);
