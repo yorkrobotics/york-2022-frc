@@ -110,7 +110,7 @@ public class RobotContainer {
 
     // Autonomous
     mTrajectoryBuilder = new TrajectoryBuilder(Constants.PATH_FOLDER);
-    mCommandBuilder = new CommandBuilder(mIntake, mShooter, mConveyor);
+    mCommandBuilder = new CommandBuilder(mIntake, mShooter, mConveyor, mTower);
     mAutoChooser = new SendableChooser<AutoRoutine>();
 
     // Populate shuffleboard
