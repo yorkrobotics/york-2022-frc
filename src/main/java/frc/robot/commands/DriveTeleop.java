@@ -29,7 +29,7 @@ public class DriveTeleop extends CommandBase {
   // Called every time the scheduler runs while the command is scheduled.
   @Override
   public void execute() {
-    mWheelSpeeds = mDrive.mArcadeDrive(RobotContainer.mController);
+    mWheelSpeeds = mDrive.mArcadeDrive(RobotContainer.mainController);
 
     if (mDrive.getDriveControlMode() == DriveControlMode.OPEN_LOOP){
       mDrive.driveOpenloop(mWheelSpeeds.left, mWheelSpeeds.right);
