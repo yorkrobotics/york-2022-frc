@@ -86,6 +86,23 @@ public class Tower extends SubsystemBase {
     SmartDashboard.putNumber("Actuator D", kD);
     SmartDashboard.putNumber("Actuator setpoint", 0);
   }
+  
+
+  // public limit getLeftLimitSwitch() {
+  //   return mLeftLimitSwitch;
+  // }
+
+  // public limit getrLimitSwitch() {
+
+  // }
+
+  // public CANSparkMax getLeftMotor() {
+  //   return mLeftMotor;
+  // }
+
+  // public CANSparkMax getRightMotor() {
+  //   return mRightMotor;
+  // }
 
   @Override
   public void periodic() {
@@ -239,7 +256,11 @@ public class Tower extends SubsystemBase {
   }
 
   public double computeTargetAngle() {
-    return 67.6818 - 0.101674 * x_field;
+    double targetAngle = 67.6818 - 0.101674 * x_field;
+    if (targetAngle > 79) {
+      return 79;
+    }
+    return targetAngle;
   }
 
   public void aimTarget()  {
