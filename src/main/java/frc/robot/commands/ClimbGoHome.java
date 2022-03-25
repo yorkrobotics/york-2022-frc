@@ -25,7 +25,7 @@ public class ClimbGoHome extends CommandBase {
   @Override
   public void execute() {
     if (!mClimb.isHome()){
-      mClimb.runClimbOpenLoop(0.4);
+      mClimb.runClimbOpenLoop(0.6);
     }
   }
 

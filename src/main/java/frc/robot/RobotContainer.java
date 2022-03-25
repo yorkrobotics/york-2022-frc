@@ -26,6 +26,7 @@ import frc.robot.commands.StopIntakeAndConveyor;
 import frc.robot.commands.TowerGoHome;
 import frc.robot.commands.DeployIntake;
 import frc.robot.commands.DriveTeleop;
+import frc.robot.commands.HomeTowerAndRetractIntake;
 import frc.robot.commands.RetractIntake;
 import frc.robot.commands.ReverseIntakeAndConveyor;
 import frc.robot.commands.RotateToTarget;
@@ -172,7 +173,7 @@ public class RobotContainer {
     // new JoystickButton(mainController, Button.kBack.value).whenPressed(mClimb::goHome, mClimb);
     
     new POVButton(mainController, 90).whenPressed(new DeployIntake(mIntake, mTower));
-    new POVButton(mainController, 270).whenPressed(new RetractIntake(mIntake, mTower));
+    new POVButton(mainController, 270).whenPressed(new HomeTowerAndRetractIntake(mIntake, mTower));
 
     new POVButton(mainController, 180).whenPressed(
       new ConditionalCommand(

@@ -43,6 +43,6 @@ public class AutoRetractConveyor extends CommandBase {
   // Returns true when the command should end.
   @Override
   public boolean isFinished() {
-    return mTimer.hasElapsed(0.2);
+    return mTimer.hasElapsed(0.25);
   }
 }

@@ -24,7 +24,7 @@ public class TowerGoHome extends CommandBase {
   @Override
   public void execute() {
     if (!mTower.isHome()){
-      mTower.runActuatorsOpenLoop(-0.4);
+      mTower.runActuatorsOpenLoop(-0.6);
     }
   }
 

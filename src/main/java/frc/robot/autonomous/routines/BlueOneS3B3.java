@@ -11,6 +11,7 @@ import edu.wpi.first.wpilibj2.command.SequentialCommandGroup;
 import frc.robot.autonomous.AutoRoutine;
 import frc.robot.autonomous.TrajectoryBuilder;
 import frc.robot.commands.RunIntakeAndConveyor;
+import frc.robot.commands.TowerGoHome;
 import frc.robot.commands.AutoDrive;
 import frc.robot.commands.AutoRunShooter;
 import frc.robot.commands.DeployIntake;
@@ -63,7 +64,7 @@ public class BlueOneS3B3 implements AutoRoutine{
                 mConveyor.stopConveyor();
                 mShooter.stopShooter();
             }),
-            new InstantCommand(mTower::goHome, mTower),
+            new TowerGoHome(mTower),
             new RetractIntake(mIntake, mTower)
         );
     }
