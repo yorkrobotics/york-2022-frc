@@ -86,6 +86,23 @@ public class Tower extends SubsystemBase {
     SmartDashboard.putNumber("Actuator D", kD);
     SmartDashboard.putNumber("Actuator setpoint", 0);
   }
+  
+
+  // public limit getLeftLimitSwitch() {
+  //   return mLeftLimitSwitch;
+  // }
+
+  // public limit getrLimitSwitch() {
+
+  // }
+
+  // public CANSparkMax getLeftMotor() {
+  //   return mLeftMotor;
+  // }
+
+  // public CANSparkMax getRightMotor() {
+  //   return mRightMotor;
+  // }
 
   @Override
   public void periodic() {
