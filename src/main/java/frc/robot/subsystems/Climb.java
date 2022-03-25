@@ -215,6 +215,10 @@ public class Climb extends SubsystemBase {
     resetEncoders();
   }
 
+  public boolean isHome(){
+    return mLeftLimitSwitch.isPressed() && mRightLimitSwitch.isPressed();
+  }
+
   public void ClimbUpWithBumper(){
     mSetpoint -= 1.5;
     runClimbPositionControl(mSetpoint);
@@ -223,6 +227,11 @@ public class Climb extends SubsystemBase {
   public void ClimbDownWithBumper(){
     mSetpoint += 1.5;
     runClimbPositionControl(mSetpoint);
+  }
+
+  public void stopMotors(){
+    mLeftPrimaryMotor.stopMotor();
+    mRightPrimaryMotor.stopMotor();
   }
 
   public enum ClimbMode{
