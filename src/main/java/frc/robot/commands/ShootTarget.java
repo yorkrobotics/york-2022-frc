@@ -39,7 +39,6 @@ public class ShootTarget extends CommandBase {
     SmartDashboard.putNumber("velocity", power);
     tower.setTowerAngle(targetAngle);
     shooter.runShooter(power);
-
   }
 
   // Called every time the scheduler runs while the command is scheduled.

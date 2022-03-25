@@ -143,26 +143,28 @@ public class Tower extends SubsystemBase {
    * Run the tower actuators with controller
    * @param controller Xbox controller
    */
-  public void runTowerWithController(XboxController mainController, XboxController secondController){
+  public void runTowerWithController(XboxController mainController){
     updateFromSmartDashboard();
     if (mActuatorMode == TowerActuatorMode.POSITION_CONTROL){
-      mSetpoint += (mainController.getRightY() + secondController.getRightY()) * 1;
+      Double rightY = mainController.getRightY();
+      if (Math.abs(rightY) < 0.1) {rightY = 0.0;}
+      mSetpoint += rightY * - 1.8;
       mSetpoint = Double.min(mSetpoint, (double)Constants.TOWER_FORWARD_LIMIT);
       mSetpoint = Double.max(mSetpoint, 0);
       runActuatorsPositionControl(mSetpoint);
     }
     if (mActuatorMode == TowerActuatorMode.OPEN_LOOP){
-      runActuatorsOpenLoop((mainController.getRightY() + secondController.getRightY()) * 0.2);
+      runActuatorsOpenLoop((mainController.getRightY()) * 0.2);
     }
   }
 
   public void goHome(){
     while (!mLeftLimitSwitch.isPressed() || !mRightLimitSwitch.isPressed()){
       if(!mLeftLimitSwitch.isPressed()){
-        mLeftMotor.set(-0.2);
+        mLeftMotor.set(-0.4);
       }
       if (!mRightLimitSwitch.isPressed()){
-        mRightMotor.set(-0.2);
+        mRightMotor.set(-0.4);
       }
     }
     mSetpoint = 0;
@@ -254,7 +256,11 @@ public class Tower extends SubsystemBase {
   }
 
   public double computeTargetAngle() {
-    return 67.6818 - 0.101674 * x_field;
+    double targetAngle = 67.6818 - 0.101674 * x_field;
+    if (targetAngle > 79) {
+      return 79;
+    }
+    return targetAngle;
   }
 
   public void aimTarget()  {
@@ -281,5 +287,14 @@ public class Tower extends SubsystemBase {
 
   public boolean isAimed() {
     return Math.abs(getTowerAngle() - computeTargetAngle()) < 1.0;
+  }
+
+  public boolean isAtAngle(double angle){
+    return Math.abs(getTowerAngle() - angle) < 1.0;
+  }
+
+  public void stopMotors(){
+    mLeftMotor.stopMotor();
+    mRightMotor.stopMotor();
   }
 }

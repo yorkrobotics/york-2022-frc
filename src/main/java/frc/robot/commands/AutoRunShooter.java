@@ -6,7 +6,6 @@ package frc.robot.commands;
 
 import edu.wpi.first.wpilibj.Timer;
 import edu.wpi.first.wpilibj2.command.InstantCommand;
-import edu.wpi.first.wpilibj2.command.RunCommand;
 import edu.wpi.first.wpilibj2.command.SequentialCommandGroup;
 import frc.robot.Constants;
 import frc.robot.subsystems.Conveyor;
@@ -32,7 +31,6 @@ public class AutoRunShooter extends SequentialCommandGroup {
       new AutoRetractConveyor(mConveyor), 
       new InstantCommand(()->mShooter.runShooter(speed), mShooter), 
       new InstantCommand(()->mTower.setTowerAngle(angle)),
-      // new Wait(2),
       new InstantCommand(() -> Timer.delay(2)),
       new InstantCommand(()->mConveyor.runConveyor(Constants.CONVEYOR_SPEED), mConveyor),
       new InstantCommand(() -> Timer.delay(2))

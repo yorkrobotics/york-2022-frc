@@ -10,9 +10,10 @@ import edu.wpi.first.wpilibj2.command.ParallelCommandGroup;
 import edu.wpi.first.wpilibj2.command.SequentialCommandGroup;
 import frc.robot.autonomous.AutoRoutine;
 import frc.robot.autonomous.TrajectoryBuilder;
-import frc.robot.commands.AutoRunIntakeAndConveyor;
+import frc.robot.commands.RunIntakeAndConveyor;
 import frc.robot.commands.AutoRunShooter;
 import frc.robot.commands.DeployIntake;
+import frc.robot.commands.RetractIntake;
 import frc.robot.subsystems.Conveyor;
 import frc.robot.subsystems.Intake;
 import frc.robot.subsystems.Shooter;
@@ -44,7 +45,7 @@ public class BlueOneS3B3 implements AutoRoutine{
                 RamseteCommandBuilder.apply(trajectoryBuilder.getTrajectory("Blue-S3-B3"), true),
                 new SequentialCommandGroup(
                     new DeployIntake(mIntake, mTower),
-                    new AutoRunIntakeAndConveyor(mIntake, mConveyor)
+                    new RunIntakeAndConveyor(mIntake, mConveyor)
                 )
             ),
             new InstantCommand(() -> Timer.delay(2)),
@@ -56,7 +57,9 @@ public class BlueOneS3B3 implements AutoRoutine{
             new InstantCommand(() -> {
                 mConveyor.stopConveyor();
                 mShooter.stopShooter();
-            })
+            }),
+            new InstantCommand(mTower::goHome, mTower),
+            new RetractIntake(mIntake, mTower)
         );
     }
     

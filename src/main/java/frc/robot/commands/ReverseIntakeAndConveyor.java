@@ -12,11 +12,10 @@ import frc.robot.subsystems.Intake;
 // NOTE:  Consider using this command inline, rather than writing a subclass.  For more
 // information, see:
 // https://docs.wpilib.org/en/stable/docs/software/commandbased/convenience-features.html
-public class AutoRunIntakeAndConveyor extends InstantCommand {
+public class ReverseIntakeAndConveyor extends InstantCommand {
   private Intake mIntake;
   private Conveyor mConveyor;
-  
-  public AutoRunIntakeAndConveyor(Intake intake, Conveyor conveyor) {
+  public ReverseIntakeAndConveyor(Intake intake, Conveyor conveyor) {
     // Use addRequirements() here to declare subsystem dependencies.
     mIntake = intake;
     mConveyor = conveyor;
@@ -27,8 +26,8 @@ public class AutoRunIntakeAndConveyor extends InstantCommand {
   @Override
   public void initialize() {
     if (mIntake.isDeployed()){
-      mIntake.runRoller(Constants.INTAKE_ROLLER_SPEED);
+      mIntake.runRoller(-Constants.INTAKE_ROLLER_SPEED);
     }
-    mConveyor.runConveyor(Constants.CONVEYOR_SPEED);
+    mConveyor.runConveyor(-Constants.CONVEYOR_SPEED);
   }
 }
