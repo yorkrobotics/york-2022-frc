@@ -8,6 +8,7 @@ import com.revrobotics.CANSparkMax;
 import com.revrobotics.RelativeEncoder;
 import com.revrobotics.SparkMaxPIDController;
 import com.revrobotics.CANSparkMaxLowLevel.MotorType;
+import com.revrobotics.SparkMaxLimitSwitch.Type;
 
 import edu.wpi.first.math.controller.PIDController;
 import edu.wpi.first.math.controller.RamseteController;
@@ -105,6 +106,8 @@ public class DriveTrain extends SubsystemBase {
     mLeftAutoController = new PIDController(Constants.kP_AUTO_LOW_GEAR, 0, 0);
     mRightAutoController = new PIDController(Constants.kP_AUTO_LOW_GEAR, 0, 0);
     
+    mLeftFront.getReverseLimitSwitch(Type.kNormallyOpen).enableLimitSwitch(false);
+    mRightFront.getReverseLimitSwitch(Type.kNormallyOpen).enableLimitSwitch(false);
 
     setToOpenLoopMode(); //Default drive mode set to open loop
     mGearMode = GearMode.UNKNOWN;

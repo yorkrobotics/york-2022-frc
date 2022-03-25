@@ -11,10 +11,13 @@ import edu.wpi.first.wpilibj2.command.SequentialCommandGroup;
 import frc.robot.autonomous.AutoRoutine;
 import frc.robot.autonomous.TrajectoryBuilder;
 import frc.robot.commands.RunIntakeAndConveyor;
+import frc.robot.commands.AutoDrive;
 import frc.robot.commands.AutoRunShooter;
 import frc.robot.commands.DeployIntake;
+import frc.robot.commands.DriveTeleop;
 import frc.robot.commands.RetractIntake;
 import frc.robot.subsystems.Conveyor;
+import frc.robot.subsystems.DriveTrain;
 import frc.robot.subsystems.Intake;
 import frc.robot.subsystems.Shooter;
 import frc.robot.subsystems.Tower;
@@ -25,12 +28,14 @@ public class BlueOneS3B3 implements AutoRoutine{
     private Shooter mShooter;
     private Conveyor mConveyor;
     private Tower mTower;
+    private DriveTrain mDrive;
     
-    public BlueOneS3B3(Intake intake, Shooter shooter, Conveyor conveyor, Tower tower){
+    public BlueOneS3B3(Intake intake, Shooter shooter, Conveyor conveyor, Tower tower, DriveTrain drive){
         mIntake = intake;
         mShooter = shooter;
         mConveyor = conveyor;
         mTower = tower;
+        mDrive = drive;
     }
     @Override
     public String getName() {
@@ -42,7 +47,7 @@ public class BlueOneS3B3 implements AutoRoutine{
             BiFunction<Trajectory, Boolean, Command> RamseteCommandBuilder) {
         return new SequentialCommandGroup(
             new ParallelCommandGroup(
-                RamseteCommandBuilder.apply(trajectoryBuilder.getTrajectory("Blue-S3-B3"), true),
+                new AutoDrive(mDrive),
                 new SequentialCommandGroup(
                     new DeployIntake(mIntake, mTower),
                     new RunIntakeAndConveyor(mIntake, mConveyor)

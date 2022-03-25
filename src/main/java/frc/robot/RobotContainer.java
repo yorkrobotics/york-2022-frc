@@ -15,10 +15,15 @@ import edu.wpi.first.wpilibj.smartdashboard.SendableChooser;
 import frc.robot.autonomous.AutoRoutine;
 import frc.robot.autonomous.CommandBuilder;
 import frc.robot.autonomous.TrajectoryBuilder;
+import frc.robot.autonomous.routines.BlueOneS1B1;
+import frc.robot.autonomous.routines.BlueOneS2B2;
+import frc.robot.autonomous.routines.BlueOneS3B3;
 import frc.robot.commands.AngleTowerSetpoint;
 import frc.robot.commands.AngleTowerVision;
+import frc.robot.commands.ClimbGoHome;
 import frc.robot.commands.RunIntakeAndConveyor;
 import frc.robot.commands.StopIntakeAndConveyor;
+import frc.robot.commands.TowerGoHome;
 import frc.robot.commands.DeployIntake;
 import frc.robot.commands.DriveTeleop;
 import frc.robot.commands.RetractIntake;
@@ -72,6 +77,10 @@ public class RobotContainer {
   private CommandBuilder mCommandBuilder;
   private SendableChooser<AutoRoutine> mAutoChooser;
 
+  private BlueOneS1B1 blueOneS1B1;
+  private BlueOneS2B2 blueOneS2B2;
+  private BlueOneS3B3 blueOneS3B3;
+
   /** The container for the robot. Contains subsystems, OI devices, and commands. */
   public RobotContainer() {
 
@@ -114,15 +123,19 @@ public class RobotContainer {
 
     // Autonomous
     mTrajectoryBuilder = new TrajectoryBuilder(Constants.PATH_FOLDER);
-    mCommandBuilder = new CommandBuilder(mIntake, mShooter, mConveyor, mTower);
+    mCommandBuilder = new CommandBuilder(mIntake, mShooter, mConveyor, mTower, mDrive);
     mAutoChooser = new SendableChooser<AutoRoutine>();
+
+    blueOneS1B1 = new BlueOneS1B1(mIntake, mShooter, mConveyor, mTower);
+    blueOneS2B2 = new BlueOneS2B2(mIntake, mShooter, mConveyor, mTower);
+    blueOneS3B3 = new BlueOneS3B3(mIntake, mShooter, mConveyor, mTower, mDrive);
+
 
     // Populate shuffleboard
     ShuffleboardTab autoTab = Shuffleboard.getTab("Autonomous");
     autoTab.add(mAutoChooser);
 
     mCommandBuilder.displayRoutines(mAutoChooser);
-
 
     // Configure the button bindings
     configureButtonBindings();
@@ -152,15 +165,20 @@ public class RobotContainer {
     new JoystickButton(mainController, Button.kX.value).whenPressed(mDrive::shiftToLowGear, mDrive);
     new JoystickButton(mainController, Button.kB.value).whenPressed(mDrive::shiftToHighGear, mDrive);
 
-    new JoystickButton(mainController, Button.kStart.value).whenPressed(mTower::goHome, mTower);
-    new JoystickButton(mainController, Button.kBack.value).whenPressed(mClimb::goHome, mClimb);
+    new JoystickButton(mainController, Button.kStart.value).whenPressed(new TowerGoHome(mTower));
+    new JoystickButton(mainController, Button.kBack.value).whenPressed(new ClimbGoHome(mClimb));
 
+    // new JoystickButton(mainController, Button.kStart.value).whenPressed(mTower::goHome, mTower);
+    // new JoystickButton(mainController, Button.kBack.value).whenPressed(mClimb::goHome, mClimb);
+    
     new POVButton(mainController, 90).whenPressed(new DeployIntake(mIntake, mTower));
     new POVButton(mainController, 270).whenPressed(new RetractIntake(mIntake, mTower));
 
     new POVButton(mainController, 180).whenPressed(
       new ConditionalCommand(
-        new InstantCommand(mShooter::stopShooter, mShooter), 
+        new ParallelCommandGroup(
+          new InstantCommand(mShooter::stopShooter, mShooter)
+        ),
         new ParallelCommandGroup(
           // new RotateToTarget(mDrive, pycam),
           new AngleTowerVision(mTower),
@@ -172,7 +190,10 @@ public class RobotContainer {
     
     new POVButton(mainController, 0).whenPressed(
       new ConditionalCommand(
-        new InstantCommand(mShooter::stopShooter, mShooter),
+        new SequentialCommandGroup(        
+          new InstantCommand(mShooter::stopShooter, mShooter),
+          new TowerGoHome(mTower)
+        ),
         new ParallelCommandGroup(
           new AngleTowerSetpoint(mTower, 60),
           new InstantCommand(()->mShooter.runShooter(0.6), mShooter)
@@ -189,6 +210,6 @@ public class RobotContainer {
    */
   public Command getAutonomousCommand() {
     // A command to run in autonomous
-    return mAutoChooser.getSelected().getCommand(mTrajectoryBuilder, mDrive::makeTrajectoryToCommand);
+    return blueOneS3B3.getCommand(mTrajectoryBuilder, mDrive::makeTrajectoryToCommand);
   }
 }

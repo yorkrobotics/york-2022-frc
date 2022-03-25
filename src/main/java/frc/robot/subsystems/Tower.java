@@ -148,7 +148,7 @@ public class Tower extends SubsystemBase {
     if (mActuatorMode == TowerActuatorMode.POSITION_CONTROL){
       Double rightY = mainController.getRightY();
       if (Math.abs(rightY) < 0.1) {rightY = 0.0;}
-      mSetpoint += rightY * - 1.8;
+      mSetpoint += rightY * 1.8;
       mSetpoint = Double.min(mSetpoint, (double)Constants.TOWER_FORWARD_LIMIT);
       mSetpoint = Double.max(mSetpoint, 0);
       runActuatorsPositionControl(mSetpoint);
@@ -159,16 +159,15 @@ public class Tower extends SubsystemBase {
   }
 
   public void goHome(){
-    while (!mLeftLimitSwitch.isPressed() || !mRightLimitSwitch.isPressed()){
       if(!mLeftLimitSwitch.isPressed()){
         mLeftMotor.set(-0.4);
       }
       if (!mRightLimitSwitch.isPressed()){
         mRightMotor.set(-0.4);
       }
-    }
-    mSetpoint = 0;
-    resetEncoders();
+      mSetpoint = 0;
+      resetEncoders();
+    
   }
 
   public void resetEncoders(){
@@ -279,6 +278,10 @@ public class Tower extends SubsystemBase {
   public void whenIntakeDeployed(){
     mLeftMotor.setSoftLimit(SoftLimitDirection.kForward, Constants.TOWER_FORWARD_LIMIT);
     mRightMotor.setSoftLimit(SoftLimitDirection.kForward, Constants.TOWER_FORWARD_LIMIT);
+  }
+
+  public void zeroSetpoint(){
+    mSetpoint = 0;
   }
 
   private enum TowerActuatorMode{
