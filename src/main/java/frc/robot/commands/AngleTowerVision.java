@@ -4,12 +4,12 @@ import edu.wpi.first.wpilibj.Timer;
 import edu.wpi.first.wpilibj2.command.CommandBase;
 import frc.robot.subsystems.Tower;
 
-public class AngleToTarget extends CommandBase {
+public class AngleTowerVision extends CommandBase {
 
     private Tower mTower;
     private Timer mCutoff = new Timer();
 
-    public AngleToTarget(Tower tower) {
+    public AngleTowerVision(Tower tower) {
         mTower = tower;
         addRequirements(tower);
     }

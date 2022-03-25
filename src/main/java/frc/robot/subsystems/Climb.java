@@ -65,7 +65,7 @@ public class Climb extends SubsystemBase {
     mRightPrimaryMotor.setSoftLimit(SoftLimitDirection.kForward, 0);
     mRightPrimaryMotor.setSoftLimit(SoftLimitDirection.kReverse, Constants.CLIMB_REVERSE_LIMIT);
 
-    mClimbMode = ClimbMode.OPEN_LOOP;
+    mClimbMode = ClimbMode.POSITION_CONTROL;
 
     kP = 0.1;
     kI = 0;
@@ -80,9 +80,7 @@ public class Climb extends SubsystemBase {
     SmartDashboard.putNumber("Climb_D", kD);
     SmartDashboard.putNumber("Climb setpoint", mSetpoint);
 
-    // goHome();
-
-  }
+}
 
   @Override
   public void periodic() {
@@ -110,15 +108,6 @@ public class Climb extends SubsystemBase {
     mRightPrimaryController.setReference(setPoint, CANSparkMax.ControlType.kPosition);
   }
 
-  public void runClimbToUpperPreset(){
-    runClimbPositionControl(Constants.CLIMB_UPPER_PRESET);
-    mSetpoint = Constants.CLIMB_UPPER_PRESET;
-  }
-
-  public void runClimbToLowerPreset(){
-    runClimbPositionControl(Constants.CLIMB_LOWER_PRESET);
-    mSetpoint = Constants.CLIMB_LOWER_PRESET;
-  }
   /**
    * Run motors in open loop
    * @param speed speed between (-1, 1)
@@ -128,16 +117,6 @@ public class Climb extends SubsystemBase {
     mRightPrimaryMotor.set(speed);
   }
 
-  //
-  public void ClimbUpWithBumper(){
-    mSetpoint += 2;
-    runClimbPositionControl(mSetpoint);
-  }
-
-  public void ClimbDownWithBumper(){
-    mSetpoint -= 2;
-    runClimbPositionControl(mSetpoint);
-  }
   /**
    * Run climb motors according to climb mode
    * @param controller Xbox controller
@@ -146,13 +125,7 @@ public class Climb extends SubsystemBase {
     updateFromSmartDashboard();
     
     if (mClimbMode == ClimbMode.POSITION_CONTROL){
-      mSetpoint += controller.getRightY() * 1;
-      // if(controller.getRightBumperPressed()){
-      //   mSetpoint += 1;
-      // }
-      // if (controller.getLeftBumperPressed()){
-      //   mSetpoint -= 1;
-      // }
+      mSetpoint += controller.getRightY() * 1.5;
       mSetpoint = Double.min(mSetpoint, 0);
       mSetpoint = Double.max(mSetpoint, (double)Constants.CLIMB_REVERSE_LIMIT);
       runClimbPositionControl(mSetpoint);
@@ -232,16 +205,25 @@ public class Climb extends SubsystemBase {
   public void goHome(){
     while (!mLeftLimitSwitch.isPressed() || !mRightLimitSwitch.isPressed()){
       if (!mLeftLimitSwitch.isPressed()){
-        mLeftPrimaryMotor.set(0.2);
+        mLeftPrimaryMotor.set(0.4);
       }
       if (!mRightLimitSwitch.isPressed()){
-        mRightPrimaryMotor.set(0.2);
+        mRightPrimaryMotor.set(0.4);
       }
     }
     mSetpoint = 0;
     resetEncoders();
   }
 
+  public void ClimbUpWithBumper(){
+    mSetpoint -= 1.5;
+    runClimbPositionControl(mSetpoint);
+  }
+
+  public void ClimbDownWithBumper(){
+    mSetpoint += 1.5;
+    runClimbPositionControl(mSetpoint);
+  }
 
   public enum ClimbMode{
     OPEN_LOOP, POSITION_CONTROL
