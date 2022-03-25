@@ -54,7 +54,11 @@ public class BlueOneS1B1 implements AutoRoutine{
                 mIntake.stopRoller();
                 mConveyor.stopConveyor();
             }, mIntake, mConveyor),
-            new AutoRunShooter(mConveyor, mShooter, mTower, 0.62, 60)
+            new AutoRunShooter(mConveyor, mShooter, mTower, 0.62, 60),
+            new InstantCommand(() -> {
+                mConveyor.stopConveyor();
+                mShooter.stopShooter();
+            })
         );
     }
     

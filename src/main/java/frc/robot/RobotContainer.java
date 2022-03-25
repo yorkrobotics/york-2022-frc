@@ -75,6 +75,7 @@ public class RobotContainer {
 
     // Driver's controller
     mainController = new XboxController(Constants.CONTROLLER_PORT);
+    secondaryController = new XboxController(Constants.CONTROLLER_PORT_SECONDARY);
 
     // DriveTrain subsystem
     mDrive = DriveTrain.getInstance();
@@ -99,7 +100,7 @@ public class RobotContainer {
     mTower.setDefaultCommand(
       new RunCommand(()-> {
         if (!mTower.isHome()) mIntake.deploy();
-        mTower.runTowerWithController(mainController);
+        mTower.runTowerWithController(mainController, secondaryController);
       }, mTower, mIntake)
     );
 
@@ -132,34 +133,25 @@ public class RobotContainer {
    * edu.wpi.first.wpilibj2.command.button.JoystickButton}.
    */
   private void configureButtonBindings() {  
-    /**
-     * Buttons mapping
-     * A:
-     * B: 
-     * X:
-     * Y:
-     * LeftBumper: Shift up
-     * RightBumper: Shift down
-     * LeftStick: Switch drive mode
-     * RightStick: 
-     */
 
-    new JoystickButton(mainController, Button.kRightBumper.value).whenPressed(mDrive::shiftToHighGear, mDrive);
-    new JoystickButton(mainController, Button.kLeftBumper.value).whenPressed(mDrive::shiftToLowGear, mDrive);
+    /**
+     * main controller
+     */
+    // new JoystickButton(mainController, Button.kRightBumper.value).whileHeld(mClimb::ClimbUpWithBumper, mClimb);
+    // new JoystickButton(mainController, Button.kLeftBumper.value).whileHeld(mClimb::ClimbDownWithBumper, mClimb);
 
     new JoystickButton(mainController, Button.kLeftStick.value).whenPressed(mDrive::switchDriveMode, mDrive);
 
     new JoystickButton(mainController, Button.kRightStick.value).whenPressed(mClimb::switchClimbMode, mClimb);
 
-    // new JoystickButton(mainController, Button.kB.value).whileHeld(new RotateToTarget(mDrive, pycam));
-
-    new JoystickButton(mainController, Button.kX.value).whenPressed(() -> {
+    new JoystickButton(mainController, Button.kA.value).whenPressed(() -> {
       if (mIntake.isDeployed()) mIntake.runRoller(Constants.INTAKE_ROLLER_SPEED);
       mConveyor.runConveyor(Constants.CONVEYOR_SPEED);
     }, mIntake, mConveyor).whenReleased(() -> {
       mIntake.stopRoller();
       mConveyor.stopConveyor();
     }, mIntake, mConveyor);
+
     new JoystickButton(mainController, Button.kY.value).whenPressed(() -> {
       if (mIntake.isDeployed()) mIntake.runRoller(-Constants.INTAKE_ROLLER_SPEED);
       mConveyor.runConveyor(-Constants.CONVEYOR_SPEED);
@@ -167,25 +159,53 @@ public class RobotContainer {
       mIntake.stopRoller();
       mConveyor.stopConveyor();
     }, mIntake, mConveyor);
+    new JoystickButton(mainController, Button.kX.value).whenPressed(mDrive::shiftToLowGear, mDrive);
+    new JoystickButton(mainController, Button.kB.value).whenPressed(mDrive::shiftToHighGear, mDrive);
 
-    
-    new JoystickButton(mainController, Button.kA.value).whenPressed(new InstantCommand(()->mClimb.goHome(), mClimb));
-    // new JoystickButton(mainController, Button.kA.value).whenPressed(new InstantCommand(()->mTower.aimTarget(), mTower));
-    new JoystickButton(mainController, Button.kB.value).whenPressed(new InstantCommand(()->mTower.goHome(), mTower));
+    new JoystickButton(mainController, Button.kStart.value).whenPressed(mClimb::goHome, mClimb);
 
     new POVButton(mainController, 90).whenPressed(new DeployIntake(mIntake, mTower));
-
     new POVButton(mainController, 270).whenPressed(new RetractIntake(mIntake, mTower));
  
-    // new POVButton(mainController, 180).whenPressed(() -> {
-    //   if (mShooter.isShooting()) {mShooter.stopShooter();}
-    //   else {
-    //     mShooter.shootTarget();
+    new POVButton(mainController, 0).whenPressed(mClimb::runClimbToUpperPreset, mClimb);
+    new POVButton(mainController, 180).whenPressed(mClimb::runClimbToLowerPreset, mClimb);
 
-    //   }
-    // });
+    // new POVButton(mainController, 180).whenPressed(
+    //   new ConditionalCommand(
+    //     new InstantCommand(mShooter::stopShooter, mShooter), 
+    //     new ParallelCommandGroup(
+    //       new RotateToTarget(mDrive, pycam),
+    //       new AngleToTarget(mTower),
+    //       new InstantCommand(mShooter::shootTarget, mShooter)
+    //     ), 
+    //     mShooter::isShooting
+    //   )
+    // );
 
-    new POVButton(mainController, 180).whenPressed(
+    /**
+     * secondary controller
+     */
+
+    new JoystickButton(secondaryController, Button.kA.value).whenPressed(mTower::goHome, mTower);
+    new JoystickButton(secondaryController, Button.kX.value).whenPressed(() -> {
+      if (mIntake.isDeployed()) mIntake.runRoller(Constants.INTAKE_ROLLER_SPEED);
+      mConveyor.runConveyor(Constants.CONVEYOR_SPEED);
+    }, mIntake, mConveyor).whenReleased(() -> {
+      mIntake.stopRoller();
+      mConveyor.stopConveyor();
+    }, mIntake, mConveyor);
+
+    new JoystickButton(secondaryController, Button.kB.value).whenPressed(() -> {
+      if (mIntake.isDeployed()) mIntake.runRoller(-Constants.INTAKE_ROLLER_SPEED);
+      mConveyor.runConveyor(-Constants.CONVEYOR_SPEED);
+    }, mIntake, mConveyor).whenReleased(() -> {
+      mIntake.stopRoller();
+      mConveyor.stopConveyor();
+    }, mIntake, mConveyor);
+
+    new POVButton(secondaryController, 90).whenPressed(new DeployIntake(mIntake, mTower));
+    new POVButton(secondaryController, 270).whenPressed(new RetractIntake(mIntake, mTower));
+    new POVButton(secondaryController, 180).whenPressed(      
       new ConditionalCommand(
         new SequentialCommandGroup(
           new InstantCommand(mShooter::stopShooter, mShooter), 
@@ -195,16 +215,20 @@ public class RobotContainer {
           new RotateToTarget(mDrive, pycam),
           new AngleToTarget(mTower),
           new InstantCommand(mShooter::shootTarget, mShooter)
+      ), 
+      mShooter::isShooting
+    ));
+
+    new JoystickButton(mainController, Button.kLeftBumper.value).whenPressed(
+      new ConditionalCommand(
+        new InstantCommand(mShooter::stopShooter, mShooter), 
+        new ParallelCommandGroup(
+          new InstantCommand(()->mTower.setTowerAngle(60), mTower),
+          new InstantCommand(()->mShooter.runShooter(0.59), mShooter)
         ), 
         mShooter::isShooting
       )
     );
-
-    new POVButton(mainController, 0).whenPressed(mTower::switchActuatorMode, mTower);
-
-    // new JoystickButton(mainController, Button.kY.value).whenPressed(mDrive::turnToTarget, mDrive);
-    // new JoystickButton(mainController, Button.kY.value).whenPressed(new CorrectOdometry(pycam, mDrive));
-
     }
   
   /**

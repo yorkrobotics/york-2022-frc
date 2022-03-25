@@ -71,7 +71,7 @@ public class Tower extends SubsystemBase {
     mLeftLimitSwitch.enableLimitSwitch(true);
     mRightLimitSwitch.enableLimitSwitch(true);
 
-    mActuatorMode = TowerActuatorMode.OPEN_LOOP;
+    mActuatorMode = TowerActuatorMode.POSITION_CONTROL;
 
     kP = 0.1;
     kI = 0;
@@ -126,16 +126,16 @@ public class Tower extends SubsystemBase {
    * Run the tower actuators with controller
    * @param controller Xbox controller
    */
-  public void runTowerWithController(XboxController controller){
+  public void runTowerWithController(XboxController mainController, XboxController secondController){
     updateFromSmartDashboard();
     if (mActuatorMode == TowerActuatorMode.POSITION_CONTROL){
-      mSetpoint += controller.getRightX() * 1;
+      mSetpoint += (mainController.getRightY() + secondController.getRightY()) * 1;
       mSetpoint = Double.min(mSetpoint, (double)Constants.TOWER_FORWARD_LIMIT);
       mSetpoint = Double.max(mSetpoint, 0);
       runActuatorsPositionControl(mSetpoint);
     }
     if (mActuatorMode == TowerActuatorMode.OPEN_LOOP){
-      runActuatorsOpenLoop(controller.getRightX() * 0.2);
+      runActuatorsOpenLoop((mainController.getRightY() + secondController.getRightY()) * 0.2);
     }
   }
 
