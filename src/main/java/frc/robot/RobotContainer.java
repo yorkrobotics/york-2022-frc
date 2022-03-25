@@ -17,7 +17,6 @@ import frc.robot.autonomous.CommandBuilder;
 import frc.robot.autonomous.TrajectoryBuilder;
 import frc.robot.commands.AngleTowerSetpoint;
 import frc.robot.commands.AngleTowerVision;
-import frc.robot.commands.AutoRetractConveyor;
 import frc.robot.commands.RunIntakeAndConveyor;
 import frc.robot.commands.StopIntakeAndConveyor;
 import frc.robot.commands.DeployIntake;
@@ -163,7 +162,7 @@ public class RobotContainer {
       new ConditionalCommand(
         new InstantCommand(mShooter::stopShooter, mShooter), 
         new ParallelCommandGroup(
-          new RotateToTarget(mDrive, pycam),
+          // new RotateToTarget(mDrive, pycam),
           new AngleTowerVision(mTower),
           new InstantCommand(mShooter::shootTarget, mShooter)
         ), 

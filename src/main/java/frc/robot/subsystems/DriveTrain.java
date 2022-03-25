@@ -51,8 +51,10 @@ public class DriveTrain extends SubsystemBase {
   //Controller setup
   private PIDController mLeftAutoController, mRightAutoController;
   private SparkMaxPIDController mleftPIDController, mrightPIDController;
+
   private DriveControlMode mDriveControlMode;
   private GearMode mGearMode;
+  private boolean isInvertedDriving;
 
   private double gearRatio, kS, kV, kA;
   private double kP, kI, kD, kMinOutput, kMaxOutput;
@@ -107,6 +109,7 @@ public class DriveTrain extends SubsystemBase {
     setToOpenLoopMode(); //Default drive mode set to open loop
     mGearMode = GearMode.UNKNOWN;
     shiftToLowGear(); // Always set to low gear at the start
+    isInvertedDriving = false;
 
     kS = 0.23123;
     kV = 4.5288;
@@ -267,7 +270,12 @@ public class DriveTrain extends SubsystemBase {
   public WheelSpeeds mArcadeDrive(XboxController controller){
     // double controller_leftX = controller.getLeftX();
     // if (Math.abs(controller_leftX) < 0.25) controller_leftX = 0;
-    return DifferentialDrive.arcadeDriveIK(controller.getRightTriggerAxis() - controller.getLeftTriggerAxis(), controller.getLeftX(), true);
+    if (isInvertedDriving){
+      return DifferentialDrive.arcadeDriveIK(controller.getRightTriggerAxis() - controller.getLeftTriggerAxis(), -controller.getLeftX(), true);
+    }
+    else{
+      return DifferentialDrive.arcadeDriveIK(controller.getRightTriggerAxis() - controller.getLeftTriggerAxis(), controller.getLeftX(), true);
+    }
     
   }
 
@@ -578,6 +586,19 @@ public class DriveTrain extends SubsystemBase {
 
     configurePIDController(mleftPIDController, kP, kI, kD, kMinOutput, kMaxOutput);
     configurePIDController(mrightPIDController, kP, kI, kD, kMinOutput, kMaxOutput);
+  }
+
+  public boolean getInvertedDriving(){
+    return isInvertedDriving;
+  }
+
+  public void switchInvertedDriving(){
+    if (isInvertedDriving){
+      isInvertedDriving = false;
+    }
+    else{
+      isInvertedDriving = true;
+    }
   }
 
   public enum DriveControlMode{
