@@ -187,7 +187,7 @@ public class RobotContainer {
 
     new POVButton(mainController, 180).whenPressed(
       new ConditionalCommand(
-        new SequentialCommand(
+        new SequentialCommandGroup(
           new InstantCommand(mShooter::stopShooter, mShooter), 
           new InstantCommand(mTower::goHome, mTower) 
         ),
