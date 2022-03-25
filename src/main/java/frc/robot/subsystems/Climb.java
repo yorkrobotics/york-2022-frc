@@ -203,14 +203,13 @@ public class Climb extends SubsystemBase {
 
 
   public void goHome(){
-    while (!mLeftLimitSwitch.isPressed() || !mRightLimitSwitch.isPressed()){
       if (!mLeftLimitSwitch.isPressed()){
         mLeftPrimaryMotor.set(0.4);
       }
       if (!mRightLimitSwitch.isPressed()){
         mRightPrimaryMotor.set(0.4);
       }
-    }
+    
     mSetpoint = 0;
     resetEncoders();
   }
@@ -227,6 +226,10 @@ public class Climb extends SubsystemBase {
   public void ClimbDownWithBumper(){
     mSetpoint += 1.5;
     runClimbPositionControl(mSetpoint);
+  }
+
+  public void zeroSetpoint(){
+    mSetpoint = 0;
   }
 
   public void stopMotors(){

@@ -39,6 +39,7 @@ public class Shooter extends SubsystemBase {
   @Override
   public void periodic() {
     power = SmartDashboard.getNumber("Target Power", 0);
+    SmartDashboard.putBoolean("Shooting", isShooting);
     // This method will be called once per scheduler run
   }
 
