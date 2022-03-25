@@ -239,7 +239,11 @@ public class Tower extends SubsystemBase {
   }
 
   public double computeTargetAngle() {
-    return 67.6818 - 0.101674 * x_field;
+    double targetAngle = 67.6818 - 0.101674 * x_field;
+    if (targetAngle > 79) {
+      return 79;
+    }
+    return targetAngle;
   }
 
   public void aimTarget()  {
