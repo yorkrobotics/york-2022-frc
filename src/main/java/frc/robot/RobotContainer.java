@@ -181,7 +181,7 @@ public class RobotContainer {
           new InstantCommand(mShooter::stopShooter, mShooter)
         ),
         new ParallelCommandGroup(
-          new RotateToTarget(mDrive, pycam),
+          // new RotateToTarget(mDrive, pycam),
           new AngleTowerVision(mTower, pycam),
           new InstantCommand(mShooter::shootTarget, mShooter)
         ), 
