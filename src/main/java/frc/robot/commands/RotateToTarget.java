@@ -9,8 +9,9 @@ import edu.wpi.first.wpilibj.shuffleboard.Shuffleboard;
 import edu.wpi.first.wpilibj2.command.PIDCommand;
 import frc.robot.subsystems.DriveTrain;
 import frc.robot.subsystems.PyCamera;
+import frc.robot.subsystems.VisionSubscriber;
 
-public class RotateToTarget extends PIDCommand {
+public class RotateToTarget extends PIDCommand implements VisionSubscriber {
 
     private final DriveTrain drive;
     private final PyCamera pycam;
@@ -35,13 +36,7 @@ public class RotateToTarget extends PIDCommand {
         m_setpoint = this::getTargetAngle;
 
         Shuffleboard.getTab("Vision Turning").add(m_controller);
-
-        // Install a listener for the translation_vector entry in the Vision subtable
-        NetworkTable visionTable = NetworkTableInstance.getDefault().getTable("Vision");
-        NetworkTableEntry translationVectorEntry = visionTable.getEntry("translation_vector");
-        translationVectorEntry.addListener((ev) -> {
-            targetAngle = getNewAngle();
-        }, EntryListenerFlags.kUpdate);
+        pycam.subscribe(this);
     }
 
     private double getTargetAngle() {
@@ -76,6 +71,12 @@ public class RotateToTarget extends PIDCommand {
     @Override
     public boolean isFinished() {
         return isDone;
+    }
+
+    @Override
+    public void handleNewValue(double x) {
+        targetAngle = getNewAngle();
+        // TODO Auto-generated method stub
     }
     
 }

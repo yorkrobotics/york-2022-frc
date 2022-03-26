@@ -254,17 +254,7 @@ public class Tower extends SubsystemBase {
     mSetpoint = encoderPos;
   }
 
-  public double computeTargetAngle() {
-    double targetAngle = 67.6818 - 0.101674 * x_field;
-    if (targetAngle > 79) {
-      return 79;
-    }
-    return targetAngle;
-  }
 
-  public void aimTarget()  {
-    this.setTowerAngle(computeTargetAngle());
-  }
 
   public boolean isHome() {
     return mLeftLimitSwitch.isPressed() && mRightLimitSwitch.isPressed();
@@ -288,9 +278,6 @@ public class Tower extends SubsystemBase {
     POSITION_CONTROL, OPEN_LOOP, OFF
   }
 
-  public boolean isAimed() {
-    return Math.abs(getTowerAngle() - computeTargetAngle()) < 1.0;
-  }
 
   public boolean isAtAngle(double angle){
     return Math.abs(getTowerAngle() - angle) < 1.0;

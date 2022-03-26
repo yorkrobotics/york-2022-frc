@@ -2,31 +2,59 @@ package frc.robot.commands;
 
 import edu.wpi.first.wpilibj.Timer;
 import edu.wpi.first.wpilibj2.command.CommandBase;
+import frc.robot.subsystems.PyCamera;
 import frc.robot.subsystems.Tower;
+import frc.robot.subsystems.VisionSubscriber;
 
-public class AngleTowerVision extends CommandBase {
+public class AngleTowerVision extends CommandBase implements VisionSubscriber {
 
     private Tower mTower;
+    private PyCamera pycam;
     private Timer mCutoff = new Timer();
+    private double mXField = 0;
 
-    public AngleTowerVision(Tower tower) {
+    public AngleTowerVision(Tower tower, PyCamera cam) {
         mTower = tower;
+        pycam = cam;
         addRequirements(tower);
+        pycam.subscribe(this);
     }
 
     @Override
     public void initialize() {
         mCutoff.reset();
+        mCutoff.start();
     }
 
     @Override
     public void execute() {
-        mTower.aimTarget();
+        aimTarget();
     }
 
     @Override
     public boolean isFinished() {
-        return mTower.isAimed() || mCutoff.hasElapsed(3);
+        return isAimed() || mCutoff.hasElapsed(3);
+    }
+
+    public boolean isAimed() {
+        return Math.abs(mTower.getTowerAngle() - computeTargetAngle()) < 1.0;
+    }
+
+    public double computeTargetAngle() {
+        double targetAngle = 67.6818 - 0.101674 * mXField;
+        if (targetAngle > 79) {
+        return 79;
+        }
+        return targetAngle;
+    }
+
+    public void aimTarget()  {
+        mTower.setTowerAngle(computeTargetAngle());
+    }
+
+    @Override
+    public void handleNewValue(double x_field) {
+        mXField = x_field;
     }
     
 }

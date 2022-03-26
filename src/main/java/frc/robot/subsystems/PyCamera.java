@@ -16,10 +16,15 @@ import frc.robot.Constants;
 
 import java.io.File;
 import java.lang.Double;
+import java.util.ArrayList;
+import java.util.concurrent.Flow.Subscriber;
 
 public class PyCamera extends SubsystemBase {
   public Number[] hoop_coord;
   public double x = 0;
+  public double last_x;
+  public double last_y;
+  public double last_z;
   public double y = 0;
   public double z = 0;
   public double filteredAngle = 0;
@@ -30,6 +35,8 @@ public class PyCamera extends SubsystemBase {
 
   public double x_field;
   public double y_field;
+  public double last_x_field;
+  public double last_y_field;
   
   public double towerAngle;
 
@@ -37,8 +44,11 @@ public class PyCamera extends SubsystemBase {
   NetworkTable table;
   public LinearFilter filter = LinearFilter.singlePoleIIR(0, 0.02);
   
+  public ArrayList<VisionSubscriber> subscribers = new ArrayList<VisionSubscriber>();
+  
   /** Creates a new PyCamera. */
   public PyCamera() {
+
     NetworkTableInstance inst = NetworkTableInstance.getDefault(); 
     table = inst.getTable("Vision");
     inst.startClientTeam(5171);
@@ -123,6 +133,15 @@ public class PyCamera extends SubsystemBase {
   //   fieldY = Constants.FIELD_CENTER_Y - fieldY;
   //   return fieldY;
   // }
+  public void subscribe(VisionSubscriber subscriber) {
+    subscribers.add(subscriber);
+  }
+
+  public void update() {
+    for (VisionSubscriber subscriber: subscribers) {
+      subscriber.handleNewValue(x_field);
+    }
+  }
 
   @Override
   public void periodic() {
@@ -143,6 +162,19 @@ public class PyCamera extends SubsystemBase {
       y_field = h_h - shooter_radius * Math.sin(shooter_angle) - h_r2g;
       x_field = Math.tan(shooter_angle) * (Math.sin(shooter_angle) *  z - y_field) + Math.cos(shooter_angle) * z;
     }
+
+    if (last_x != x || last_y != y || last_z != z) {
+        // this.subscribe(subscribers);
+        this.update();
+    }
+
+    last_x = x;
+    last_y = y;
+    last_z = z;
+
+    last_x_field = x_field;
+    last_y_field = y_field;
+
     // double shooter_angle = towerAngle / 180 * Math.PI;
     // y_field = h_h - shooter_radius * Math.sin(shooter_angle) - h_r2g;
     // x_field = Math.tan(shooter_angle) * (Math.sin(shooter_angle) *  z - y_field) + Math.cos(shooter_angle) * z;
