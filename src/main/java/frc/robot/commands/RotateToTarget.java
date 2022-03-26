@@ -6,6 +6,7 @@ import edu.wpi.first.networktables.NetworkTable;
 import edu.wpi.first.networktables.NetworkTableEntry;
 import edu.wpi.first.networktables.NetworkTableInstance;
 import edu.wpi.first.wpilibj.shuffleboard.Shuffleboard;
+import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.PIDCommand;
 import frc.robot.subsystems.DriveTrain;
 import frc.robot.subsystems.PyCamera;
@@ -66,6 +67,7 @@ public class RotateToTarget extends PIDCommand implements VisionSubscriber {
 
         // Apply the output to the drivetrain
         drive.driveOpenloop(output, -output);
+        SmartDashboard.putNumber("tun to taget output", output);
     }
 
     @Override
