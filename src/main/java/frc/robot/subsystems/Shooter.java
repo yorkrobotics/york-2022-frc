@@ -7,9 +7,13 @@ package frc.robot.subsystems;
 import com.ctre.phoenix.motorcontrol.VictorSPXControlMode;
 import com.ctre.phoenix.motorcontrol.can.VictorSPX;
 
+import edu.wpi.first.math.filter.LinearFilter;
+import edu.wpi.first.wpilibj.DutyCycleEncoder;
+import edu.wpi.first.wpilibj.Timer;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
 import frc.robot.Constants;
+import frc.robot.common.ThroughBoreEncoder;
 
 public class Shooter extends SubsystemBase {
   private static final Shooter mShooter = new Shooter();
@@ -18,15 +22,22 @@ public class Shooter extends SubsystemBase {
   }
 
   private VictorSPX mTop, mBottom;
+
+  private ThroughBoreEncoder mEncoderTop, mEncoderBottom;
+  
   private double testSpeed;
   private double x_field;
   private double power;
   private boolean isShooting = false;
 
+
   /** Creates a new Shooter. */
   public Shooter() {
     mTop = new VictorSPX(Constants.VictorSPX.SHOOTER_TOP);
     mBottom = new VictorSPX(Constants.VictorSPX.SHOOTER_BOTTOM);
+
+    mEncoderTop = new ThroughBoreEncoder(Constants.DIO.SHOOTER_ENCODER_TOP);
+    mEncoderBottom = new ThroughBoreEncoder(Constants.DIO.SHOOTER_ENCODER_BOTTOM);
 
     mTop.setInverted(false);
     mBottom.setInverted(false);
@@ -41,6 +52,11 @@ public class Shooter extends SubsystemBase {
     power = SmartDashboard.getNumber("Target Power", 0);
     SmartDashboard.putBoolean("Shooting", isShooting);
     // This method will be called once per scheduler run
+
+    updateEncoderVelocities();
+
+    SmartDashboard.putNumber("Encoder Top Velocity (raw)", mEncoderTop.getVelocityRaw());
+    SmartDashboard.putNumber("Encoder Top Velocity (filtered)", mEncoderTop.getVelocityFiltered());
   }
 
   /**
@@ -81,11 +97,11 @@ public class Shooter extends SubsystemBase {
   }
   
   /**
-   * TODO: To be implemented
-   * @return
+   * Get the average velocity of the shooter encoders.
+   * @return (Top velocity + bottom velocity) / 2
    */
   public double getSpeed() {
-    return 0;
+    return (mEncoderTop.getVelocityFiltered() + mEncoderBottom.getVelocityFiltered()) / 2;
   }
 
   // shoots target with field x and characterized angle
@@ -95,5 +111,10 @@ public class Shooter extends SubsystemBase {
 
   public boolean isShooting() {
     return isShooting;
+  }
+
+  private void updateEncoderVelocities() {
+    mEncoderTop.updateVelocity();
+    mEncoderBottom.updateVelocity();
   }
 }
