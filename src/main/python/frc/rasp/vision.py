@@ -20,8 +20,8 @@ class CameraConfig: pass
 
 # inRange HSV ranges for thresholding the input image for binary image
 BIN_LOW_H = 60  #106 
-BIN_LOW_S = 100 #168 
-BIN_LOW_V = 120 #147 
+BIN_LOW_S = 168 #168 
+BIN_LOW_V = 147 #147 
 
 BIN_HIGH_H = 90 #124 
 BIN_HIGH_S = 255#255 
@@ -248,7 +248,7 @@ def setupCameras():
         startSwitchedCamera(config)
 
     os.system("v4l2-ctl -c auto_exposure=1")
-    os.system("v4l2-ctl -c exposure_time_absolute=20")
+    os.system("v4l2-ctl -c exposure_time_absolute=10")
 
 # def framePerSecond(start_time):
 #     processing_time = time.time() - start_time

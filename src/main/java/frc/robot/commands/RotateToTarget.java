@@ -78,7 +78,6 @@ public class RotateToTarget extends PIDCommand implements VisionSubscriber {
     @Override
     public void handleNewValue(double x) {
         targetAngle = getNewAngle();
-        // TODO Auto-generated method stub
     }
     
 }

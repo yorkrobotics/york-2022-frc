@@ -175,19 +175,21 @@ public class RobotContainer {
     new POVButton(mainController, 90).whenPressed(new DeployIntake(mIntake, mTower));
     new POVButton(mainController, 270).whenPressed(new HomeTowerAndRetractIntake(mIntake, mTower));
 
-    new POVButton(mainController, 180).whenPressed(
-      new ConditionalCommand(
-        new ParallelCommandGroup(
-          new InstantCommand(mShooter::stopShooter, mShooter)
-        ),
-        new ParallelCommandGroup(
-          // new RotateToTarget(mDrive, pycam),
-          new AngleTowerVision(mTower, pycam),
-          new InstantCommand(mShooter::shootTarget, mShooter)
-        ), 
-        mShooter::isShooting
-      )
-    );
+    // new POVButton(mainController, 180).whenPressed(
+    //   new ConditionalCommand(
+    //     new ParallelCommandGroup(
+    //       new InstantCommand(mShooter::stopShooter, mShooter)
+    //     ),
+    //     new ParallelCommandGroup(
+    //       // new RotateToTarget(mDrive, pycam),
+    //       new AngleTowerVision(mTower, pycam),
+    //       new InstantCommand(mShooter::shootTarget, mShooter)
+    //     ), 
+    //     mShooter::isShooting
+    //   )
+    // );
+
+    new POVButton(mainController, 180).whenHeld(new RotateToTarget(mDrive, pycam));
     
     new POVButton(mainController, 0).whenPressed(
       new ConditionalCommand(
