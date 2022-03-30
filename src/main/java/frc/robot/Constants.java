@@ -54,6 +54,10 @@ public final class Constants {
     public static final double kI_POSITION_DRIVE_HIGH_GEAR = 0;
     public static final double kD_POSITION_DRIVE_HIGH_GEAR = 0;
 
+    public static final double kP_VELOCITY_SHOOTER = 0.003;
+    public static final double kI_VELOCITY_SHOOTER = 0;
+    public static final double kD_VELOCITY_SHOOTER = 0;
+
     public static final double kS_LOW_GEAR = 0.20874;
     public static final double kV_LOW_GEAR = 4.3531;
     public static final double kA_LOW_GEAR = 0.53187;
@@ -106,6 +110,11 @@ public final class Constants {
       public static final int SHOOTER_BOTTOM = 9;
       public static final int SHOOTER_CONVEYOR = 10;
       public static final int INTAKE_ROLLER = 12;
+    }
+
+    public final class DIO {
+      public static final int SHOOTER_ENCODER_TOP = 0;
+      public static final int SHOOTER_ENCODER_BOTTOM = 1;
     }
 
     public final class PCM{
