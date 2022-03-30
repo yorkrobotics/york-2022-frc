@@ -8,6 +8,7 @@ import frc.robot.autonomous.routines.BlueOneS1B1;
 import frc.robot.autonomous.routines.BlueOneS2B2;
 import frc.robot.autonomous.routines.BlueOneS3B3;
 import frc.robot.autonomous.routines.DoNothing;
+import frc.robot.autonomous.routines.DriveOutStraight;
 import frc.robot.subsystems.Conveyor;
 import frc.robot.subsystems.DriveTrain;
 import frc.robot.subsystems.Intake;
@@ -39,7 +40,8 @@ public class CommandBuilder {
 
         mAutoRoutines.add(new BlueOneS1B1(mIntake, mShooter, mConveyor, mTower));
         mAutoRoutines.add(new BlueOneS2B2(mIntake, mShooter, mConveyor, mTower));
-        mAutoRoutines.add(new BlueOneS3B3(mIntake, mShooter, mConveyor, mTower, mDrive));
+        mAutoRoutines.add(new BlueOneS3B3(mIntake, mShooter, mConveyor, mTower));
+        mAutoRoutines.add(new DriveOutStraight(mIntake, mShooter, mConveyor, mTower, mDrive));
 
     }
 

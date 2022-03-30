@@ -219,12 +219,12 @@ public class Climb extends SubsystemBase {
   }
 
   public void ClimbUpWithBumper(){
-    mSetpoint -= 1.5;
+    mSetpoint -= 1.8;
     runClimbPositionControl(mSetpoint);
   }
 
   public void ClimbDownWithBumper(){
-    mSetpoint += 1.5;
+    mSetpoint += 1.8;
     runClimbPositionControl(mSetpoint);
   }
 

@@ -13,6 +13,7 @@ import com.revrobotics.SparkMaxLimitSwitch.Type;
 import edu.wpi.first.math.controller.PIDController;
 import edu.wpi.first.math.controller.RamseteController;
 import edu.wpi.first.math.controller.SimpleMotorFeedforward;
+import edu.wpi.first.math.filter.SlewRateLimiter;
 import edu.wpi.first.math.geometry.Pose2d;
 import edu.wpi.first.math.geometry.Rotation2d;
 import edu.wpi.first.math.kinematics.DifferentialDriveKinematics;
@@ -67,6 +68,8 @@ public class DriveTrain extends SubsystemBase {
   private DifferentialDriveOdometry mOdometry;
   private ADXRS450_Gyro mGyro;
   private SimpleMotorFeedforward mFeedforward;
+
+  private SlewRateLimiter mTeleopRateLimiter = new SlewRateLimiter(Constants.FORWARDS_SLEW_RATE_LIMIT);
 
   private ShuffleboardTab driveTab;
   private final Field2d mField;
@@ -160,6 +163,7 @@ public class DriveTrain extends SubsystemBase {
     mOdometry.update(mGyro.getRotation2d(), totalDistanceLeft, totalDistanceRight);
     mField.setRobotPose(mOdometry.getPoseMeters());
   
+    SmartDashboard.putBoolean("driving is inverted", isInvertedDriving);
   }
 
   /**
@@ -273,13 +277,24 @@ public class DriveTrain extends SubsystemBase {
   public WheelSpeeds mArcadeDrive(XboxController controller){
     // double controller_leftX = controller.getLeftX();
     // if (Math.abs(controller_leftX) < 0.25) controller_leftX = 0;
+    double forwards = controller.getRightTriggerAxis() - controller.getLeftTriggerAxis();
+    double slewLimitedForwards = mTeleopRateLimiter.calculate(forwards);
+
+    double trueForwards = slewLimitedForwards; // Change this to `forwards` to eliminate slew rate limiter
+
+    if (isInvertedDriving) trueForwards *= -1;
+
+    return DifferentialDrive.arcadeDriveIK(trueForwards, controller.getLeftX(), true);
+    
+  }
+
+  public void switchInvertedDriving(){
     if (isInvertedDriving){
-      return DifferentialDrive.arcadeDriveIK(controller.getRightTriggerAxis() - controller.getLeftTriggerAxis(), -controller.getLeftX(), true);
+      isInvertedDriving = false;
     }
     else{
-      return DifferentialDrive.arcadeDriveIK(controller.getRightTriggerAxis() - controller.getLeftTriggerAxis(), controller.getLeftX(), true);
+      isInvertedDriving = true;
     }
-    
   }
 
   /**
@@ -593,15 +608,6 @@ public class DriveTrain extends SubsystemBase {
 
   public boolean getInvertedDriving(){
     return isInvertedDriving;
-  }
-
-  public void switchInvertedDriving(){
-    if (isInvertedDriving){
-      isInvertedDriving = false;
-    }
-    else{
-      isInvertedDriving = true;
-    }
   }
 
   public enum DriveControlMode{

@@ -66,8 +66,8 @@ public final class Constants {
     public static final String PATH_FOLDER = "paths/output";
 
 
-    public static final double INTAKE_ROLLER_SPEED = 0.5;
-    public static final double CONVEYOR_SPEED = 0.65;
+    public static final double INTAKE_ROLLER_SPEED = 0.55;
+    public static final double CONVEYOR_SPEED = 0.75;
 
 
     public static final IdleMode DRIVE_IDLE_MODE = IdleMode.kCoast;
@@ -75,12 +75,14 @@ public final class Constants {
     public static final IdleMode TOWER_IDLE_MODE = IdleMode.kBrake;
 
 
-    public static final float TOWER_FORWARD_LIMIT = 255;
+    public static final float TOWER_FORWARD_LIMIT = 247;
     public static final float CLIMB_REVERSE_LIMIT = -240;
 
 
     public static final double CLIMB_UPPER_PRESET = -262;
     public static final double CLIMB_LOWER_PRESET = 0;
+
+    public static final double FORWARDS_SLEW_RATE_LIMIT = 2;
 
 
 

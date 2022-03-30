@@ -4,8 +4,6 @@
 
 package frc.robot;
 
-import com.fasterxml.jackson.databind.jsontype.impl.MinimalClassNameIdResolver;
-
 import edu.wpi.first.wpilibj.GenericHID;
 import edu.wpi.first.wpilibj.XboxController;
 import edu.wpi.first.wpilibj.XboxController.Button;
@@ -78,9 +76,9 @@ public class RobotContainer {
   private CommandBuilder mCommandBuilder;
   private SendableChooser<AutoRoutine> mAutoChooser;
 
-  private BlueOneS1B1 blueOneS1B1;
-  private BlueOneS2B2 blueOneS2B2;
-  private BlueOneS3B3 blueOneS3B3;
+  // private BlueOneS1B1 blueOneS1B1;
+  // private BlueOneS2B2 blueOneS2B2;
+  // private BlueOneS3B3 blueOneS3B3;
 
   /** The container for the robot. Contains subsystems, OI devices, and commands. */
   public RobotContainer() {
@@ -127,9 +125,9 @@ public class RobotContainer {
     mCommandBuilder = new CommandBuilder(mIntake, mShooter, mConveyor, mTower, mDrive);
     mAutoChooser = new SendableChooser<AutoRoutine>();
 
-    blueOneS1B1 = new BlueOneS1B1(mIntake, mShooter, mConveyor, mTower);
-    blueOneS2B2 = new BlueOneS2B2(mIntake, mShooter, mConveyor, mTower);
-    blueOneS3B3 = new BlueOneS3B3(mIntake, mShooter, mConveyor, mTower, mDrive);
+    // blueOneS1B1 = new BlueOneS1B1(mIntake, mShooter, mConveyor, mTower);
+    // blueOneS2B2 = new BlueOneS2B2(mIntake, mShooter, mConveyor, mTower);
+    // blueOneS3B3 = new BlueOneS3B3(mIntake, mShooter, mConveyor, mTower);
 
 
     // Populate shuffleboard
@@ -156,7 +154,7 @@ public class RobotContainer {
     new JoystickButton(mainController, Button.kRightBumper.value).whileHeld(mClimb::ClimbUpWithBumper, mClimb);
     new JoystickButton(mainController, Button.kLeftBumper.value).whileHeld(mClimb::ClimbDownWithBumper, mClimb);
 
-    new JoystickButton(mainController, Button.kLeftStick.value).whenPressed(mDrive::switchDriveMode, mDrive);
+    new JoystickButton(mainController, Button.kLeftStick.value).whenPressed(mDrive::switchInvertedDriving, mDrive);
 
     new JoystickButton(mainController, Button.kA.value).whenPressed(new RunIntakeAndConveyor(mIntake, mConveyor))
       .whenReleased(new StopIntakeAndConveyor(mIntake, mConveyor));
@@ -166,7 +164,12 @@ public class RobotContainer {
     new JoystickButton(mainController, Button.kX.value).whenPressed(mDrive::shiftToLowGear, mDrive);
     new JoystickButton(mainController, Button.kB.value).whenPressed(mDrive::shiftToHighGear, mDrive);
 
-    new JoystickButton(mainController, Button.kStart.value).whenPressed(new TowerGoHome(mTower));
+    new JoystickButton(mainController, Button.kStart.value).whenPressed(
+      new ParallelCommandGroup(
+        new TowerGoHome(mTower),
+        new InstantCommand(mShooter::stopShooter, mShooter)
+      )
+      );
     new JoystickButton(mainController, Button.kBack.value).whenPressed(new ClimbGoHome(mClimb));
 
     // new JoystickButton(mainController, Button.kStart.value).whenPressed(mTower::goHome, mTower);
@@ -197,7 +200,7 @@ public class RobotContainer {
         ),
         new ParallelCommandGroup(
           new AngleTowerSetpoint(mTower, 60),
-          new InstantCommand(()->mShooter.runShooter(0.6), mShooter)
+          new InstantCommand(()->mShooter.runShooter(0.59), mShooter)
         ),
         mShooter::isShooting
       )
@@ -211,6 +214,6 @@ public class RobotContainer {
    */
   public Command getAutonomousCommand() {
     // A command to run in autonomous
-    return blueOneS3B3.getCommand(mTrajectoryBuilder, mDrive::makeTrajectoryToCommand);
+    return mAutoChooser.getSelected().getCommand(mTrajectoryBuilder, mDrive::makeTrajectoryToCommand);
   }
 }

@@ -29,14 +29,12 @@ public class BlueOneS3B3 implements AutoRoutine{
     private Shooter mShooter;
     private Conveyor mConveyor;
     private Tower mTower;
-    private DriveTrain mDrive;
     
-    public BlueOneS3B3(Intake intake, Shooter shooter, Conveyor conveyor, Tower tower, DriveTrain drive){
+    public BlueOneS3B3(Intake intake, Shooter shooter, Conveyor conveyor, Tower tower){
         mIntake = intake;
         mShooter = shooter;
         mConveyor = conveyor;
         mTower = tower;
-        mDrive = drive;
     }
     @Override
     public String getName() {
@@ -48,7 +46,7 @@ public class BlueOneS3B3 implements AutoRoutine{
             BiFunction<Trajectory, Boolean, Command> RamseteCommandBuilder) {
         return new SequentialCommandGroup(
             new ParallelCommandGroup(
-                new AutoDrive(mDrive),
+                RamseteCommandBuilder.apply(trajectoryBuilder.getTrajectory("Blue-S3-B3"), true),                
                 new SequentialCommandGroup(
                     new DeployIntake(mIntake, mTower),
                     new RunIntakeAndConveyor(mIntake, mConveyor)
@@ -59,7 +57,7 @@ public class BlueOneS3B3 implements AutoRoutine{
                 mIntake.stopRoller();
                 mConveyor.stopConveyor();
             }, mIntake, mConveyor),
-            new AutoRunShooter(mConveyor, mShooter, mTower, 0.61, 60),
+            new AutoRunShooter(mConveyor, mShooter, mTower, 0.62, 60),
             new InstantCommand(() -> {
                 mConveyor.stopConveyor();
                 mShooter.stopShooter();
