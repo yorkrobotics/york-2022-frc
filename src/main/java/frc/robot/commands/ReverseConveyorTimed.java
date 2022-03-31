@@ -4,42 +4,46 @@
 
 package frc.robot.commands;
 
+import edu.wpi.first.wpilibj.Timer;
 import edu.wpi.first.wpilibj2.command.CommandBase;
-import frc.robot.subsystems.Climb;
+import frc.robot.Constants;
+import frc.robot.subsystems.Conveyor;
 
-public class ClimbGoHome extends CommandBase {
-  private Climb mClimb;
-  
-  /** Creates a new ClimbGoHome. */
-  public ClimbGoHome(Climb climb) {
+public class ReverseConveyorTimed extends CommandBase {
+
+  private Conveyor mConveyor = Conveyor.getInstance();
+  private Timer mTimer;
+  private double seconds;
+  /** Creates a new AutoRetractConveyor. */
+  public ReverseConveyorTimed(double seconds) {
     // Use addRequirements() here to declare subsystem dependencies.
-    mClimb = climb;
-    addRequirements(mClimb);
+    mTimer = new Timer();
+    mTimer.reset();
+    addRequirements(mConveyor);
+    this.seconds = seconds;
   }
 
   // Called when the command is initially scheduled.
   @Override
-  public void initialize() {}
+  public void initialize() {
+    mTimer.start();
+  }
 
   // Called every time the scheduler runs while the command is scheduled.
   @Override
   public void execute() {
-    if (!mClimb.isHome()){
-      mClimb.runClimbOpenLoop(0.6);
-    }
+    mConveyor.runConveyor(-Constants.CONVEYOR_SPEED);
   }
 
   // Called once the command ends or is interrupted.
   @Override
   public void end(boolean interrupted) {
-    mClimb.stopMotors();
-    mClimb.zeroSetpoint();
-    mClimb.resetEncoders();
+    mConveyor.stopConveyor();
   }
 
   // Returns true when the command should end.
   @Override
   public boolean isFinished() {
-    return mClimb.isHome();
+    return mTimer.hasElapsed(seconds);
   }
 }

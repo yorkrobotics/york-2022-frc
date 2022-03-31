@@ -18,10 +18,10 @@ import frc.robot.autonomous.routines.BlueOneS2B2;
 import frc.robot.autonomous.routines.BlueOneS3B3;
 import frc.robot.commands.AngleTowerSetpoint;
 import frc.robot.commands.AngleTowerVision;
-import frc.robot.commands.ClimbGoHome;
+import frc.robot.commands.HomeClimb;
 import frc.robot.commands.RunIntakeAndConveyor;
 import frc.robot.commands.StopIntakeAndConveyor;
-import frc.robot.commands.TowerGoHome;
+import frc.robot.commands.HomeTower;
 import frc.robot.commands.DeployIntake;
 import frc.robot.commands.DriveTeleop;
 import frc.robot.commands.HomeTowerAndRetractIntake;
@@ -122,7 +122,7 @@ public class RobotContainer {
 
     // Autonomous
     mTrajectoryBuilder = new TrajectoryBuilder(Constants.PATH_FOLDER);
-    mCommandBuilder = new CommandBuilder(mIntake, mShooter, mConveyor, mTower, mDrive);
+    mCommandBuilder = new CommandBuilder();
     mAutoChooser = new SendableChooser<AutoRoutine>();
 
     // blueOneS1B1 = new BlueOneS1B1(mIntake, mShooter, mConveyor, mTower);
@@ -156,9 +156,9 @@ public class RobotContainer {
 
     new JoystickButton(mainController, Button.kLeftStick.value).whenPressed(mDrive::switchInvertedDriving, mDrive);
 
-    new JoystickButton(mainController, Button.kA.value).whenPressed(new RunIntakeAndConveyor(mIntake, mConveyor))
+    new JoystickButton(mainController, Button.kA.value).whenPressed(new RunIntakeAndConveyor())
       .whenReleased(new StopIntakeAndConveyor(mIntake, mConveyor));
-    new JoystickButton(mainController, Button.kY.value).whenPressed(new ReverseIntakeAndConveyor(mIntake, mConveyor))
+    new JoystickButton(mainController, Button.kY.value).whenPressed(new ReverseIntakeAndConveyor())
       .whenReleased(new StopIntakeAndConveyor(mIntake, mConveyor));
     
     new JoystickButton(mainController, Button.kX.value).whenPressed(mDrive::shiftToLowGear, mDrive);
@@ -166,17 +166,17 @@ public class RobotContainer {
 
     new JoystickButton(mainController, Button.kStart.value).whenPressed(
       new ParallelCommandGroup(
-        new TowerGoHome(mTower),
+        new HomeTower(),
         new InstantCommand(mShooter::stopShooter, mShooter)
       )
       );
-    new JoystickButton(mainController, Button.kBack.value).whenPressed(new ClimbGoHome(mClimb));
+    new JoystickButton(mainController, Button.kBack.value).whenPressed(new HomeClimb());
 
     // new JoystickButton(mainController, Button.kStart.value).whenPressed(mTower::goHome, mTower);
     // new JoystickButton(mainController, Button.kBack.value).whenPressed(mClimb::goHome, mClimb);
     
-    new POVButton(mainController, 90).whenPressed(new DeployIntake(mIntake, mTower));
-    new POVButton(mainController, 270).whenPressed(new HomeTowerAndRetractIntake(mIntake, mTower));
+    new POVButton(mainController, 90).whenPressed(new DeployIntake());
+    new POVButton(mainController, 270).whenPressed(new HomeTowerAndRetractIntake());
 
     new POVButton(mainController, 180).whenPressed(
       new ConditionalCommand(
@@ -185,7 +185,7 @@ public class RobotContainer {
         ),
         new ParallelCommandGroup(
           // new RotateToTarget(mDrive, pycam),
-          new AngleTowerVision(mTower, pycam),
+          new AngleTowerVision(),
           new InstantCommand(mShooter::shootTarget, mShooter)
         ), 
         mShooter::isShooting
@@ -196,11 +196,13 @@ public class RobotContainer {
       new ConditionalCommand(
         new SequentialCommandGroup(        
           new InstantCommand(mShooter::stopShooter, mShooter),
-          new TowerGoHome(mTower)
+          new HomeTower()
         ),
-        new ParallelCommandGroup(
-          new AngleTowerSetpoint(mTower, 60),
-          new InstantCommand(()->mShooter.runShooter(0.59), mShooter)
+        new SequentialCommandGroup(
+          new ParallelCommandGroup(
+            new AngleTowerSetpoint(60),
+            new InstantCommand(()->mShooter.runShooter(0.59), mShooter)
+          )  
         ),
         mShooter::isShooting
       )

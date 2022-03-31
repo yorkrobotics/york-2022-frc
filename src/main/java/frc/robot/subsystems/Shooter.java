@@ -55,6 +55,7 @@ public class Shooter extends SubsystemBase {
 
     updateEncoderVelocities();
 
+    SmartDashboard.putNumber("Encoder Bottom", mEncoderBottom.get());
     SmartDashboard.putNumber("Encoder Top Velocity (raw)", mEncoderTop.getVelocityRaw());
     SmartDashboard.putNumber("Encoder Top Velocity (filtered)", mEncoderTop.getVelocityFiltered());
   }

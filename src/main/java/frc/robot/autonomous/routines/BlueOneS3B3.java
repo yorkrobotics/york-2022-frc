@@ -11,8 +11,8 @@ import edu.wpi.first.wpilibj2.command.SequentialCommandGroup;
 import frc.robot.autonomous.AutoRoutine;
 import frc.robot.autonomous.TrajectoryBuilder;
 import frc.robot.commands.RunIntakeAndConveyor;
-import frc.robot.commands.TowerGoHome;
-import frc.robot.commands.AutoDrive;
+import frc.robot.commands.HomeTower;
+import frc.robot.commands.ReverseDriveTimed;
 import frc.robot.commands.AutoRunShooter;
 import frc.robot.commands.DeployIntake;
 import frc.robot.commands.DriveTeleop;
@@ -25,17 +25,11 @@ import frc.robot.subsystems.Tower;
 
 public class BlueOneS3B3 implements AutoRoutine{
 
-    private Intake mIntake;
-    private Shooter mShooter;
-    private Conveyor mConveyor;
-    private Tower mTower;
-    
-    public BlueOneS3B3(Intake intake, Shooter shooter, Conveyor conveyor, Tower tower){
-        mIntake = intake;
-        mShooter = shooter;
-        mConveyor = conveyor;
-        mTower = tower;
-    }
+    private Intake mIntake = Intake.getInstance();
+    private Shooter mShooter = Shooter.getInstance();
+    private Conveyor mConveyor = Conveyor.getInstance();
+    private Tower mTower = Tower.getInstance();
+
     @Override
     public String getName() {
         return "Blue-OneBall-S3-B3";
@@ -48,8 +42,8 @@ public class BlueOneS3B3 implements AutoRoutine{
             new ParallelCommandGroup(
                 RamseteCommandBuilder.apply(trajectoryBuilder.getTrajectory("Blue-S3-B3"), true),                
                 new SequentialCommandGroup(
-                    new DeployIntake(mIntake, mTower),
-                    new RunIntakeAndConveyor(mIntake, mConveyor)
+                    new DeployIntake(),
+                    new RunIntakeAndConveyor()
                 )
             ),
             new InstantCommand(() -> Timer.delay(2)),
@@ -62,8 +56,8 @@ public class BlueOneS3B3 implements AutoRoutine{
                 mConveyor.stopConveyor();
                 mShooter.stopShooter();
             }),
-            new TowerGoHome(mTower),
-            new RetractIntake(mIntake, mTower)
+            new HomeTower(),
+            new RetractIntake()
         );
     }
     

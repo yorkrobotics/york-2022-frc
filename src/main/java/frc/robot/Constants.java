@@ -86,7 +86,7 @@ public final class Constants {
     public static final double CLIMB_UPPER_PRESET = -262;
     public static final double CLIMB_LOWER_PRESET = 0;
 
-    public static final double FORWARDS_SLEW_RATE_LIMIT = 2;
+    public static final double FORWARDS_SLEW_RATE_LIMIT = 2.5;
 
 
 

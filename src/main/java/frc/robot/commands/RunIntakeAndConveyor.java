@@ -13,13 +13,11 @@ import frc.robot.subsystems.Intake;
 // information, see:
 // https://docs.wpilib.org/en/stable/docs/software/commandbased/convenience-features.html
 public class RunIntakeAndConveyor extends InstantCommand {
-  private Intake mIntake;
-  private Conveyor mConveyor;
+  private Intake mIntake = Intake.getInstance();
+  private Conveyor mConveyor = Conveyor.getInstance();
   
-  public RunIntakeAndConveyor(Intake intake, Conveyor conveyor) {
+  public RunIntakeAndConveyor() {
     // Use addRequirements() here to declare subsystem dependencies.
-    mIntake = intake;
-    mConveyor = conveyor;
     addRequirements(mIntake, mConveyor);
   }
 

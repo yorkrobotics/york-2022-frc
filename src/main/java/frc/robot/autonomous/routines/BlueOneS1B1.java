@@ -23,17 +23,11 @@ import frc.robot.subsystems.Tower;
 
 public class BlueOneS1B1 implements AutoRoutine{
 
-    private Intake mIntake;
-    private Shooter mShooter;
-    private Conveyor mConveyor;
-    private Tower mTower;
+    private Intake mIntake = Intake.getInstance();
+    private Shooter mShooter = Shooter.getInstance();
+    private Conveyor mConveyor = Conveyor.getInstance();
+    private Tower mTower = Tower.getInstance();
     
-    public BlueOneS1B1(Intake intake, Shooter shooter, Conveyor conveyor, Tower tower){
-        mIntake = intake;
-        mShooter = shooter;
-        mConveyor = conveyor;
-        mTower = tower;
-    }
     @Override
     public String getName() {
         return "Blue-OneBall-S1-B1";
@@ -46,8 +40,8 @@ public class BlueOneS1B1 implements AutoRoutine{
             new ParallelCommandGroup(
                 RamseteCommandBuilder.apply(trajectoryBuilder.getTrajectory("Blue-S1-B1"), true),
                 new SequentialCommandGroup(
-                    new DeployIntake(mIntake, mTower),
-                    new RunIntakeAndConveyor(mIntake, mConveyor)
+                    new DeployIntake(),
+                    new RunIntakeAndConveyor()
                 )
             ),
             new InstantCommand(() -> Timer.delay(2)),
@@ -61,7 +55,7 @@ public class BlueOneS1B1 implements AutoRoutine{
                 mShooter.stopShooter();
             }),
             new InstantCommand(mTower::goHome, mTower),
-            new RetractIntake(mIntake, mTower)
+            new RetractIntake()
 
         );
     }

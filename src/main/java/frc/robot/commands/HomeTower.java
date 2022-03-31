@@ -7,12 +7,11 @@ package frc.robot.commands;
 import edu.wpi.first.wpilibj2.command.CommandBase;
 import frc.robot.subsystems.Tower;
 
-public class TowerGoHome extends CommandBase {
-  private Tower mTower;
+public class HomeTower extends CommandBase {
+  private Tower mTower = Tower.getInstance();
   /** Creates a new TowerGoHome. */
-  public TowerGoHome(Tower tower) {
+  public HomeTower() {
     // Use addRequirements() here to declare subsystem dependencies.
-    mTower = tower;
     addRequirements(mTower);
   }
 

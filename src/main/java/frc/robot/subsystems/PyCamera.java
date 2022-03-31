@@ -20,6 +20,10 @@ import java.util.ArrayList;
 import java.util.concurrent.Flow.Subscriber;
 
 public class PyCamera extends SubsystemBase {
+  
+  private static final PyCamera mPyCamera = new PyCamera();
+  public static PyCamera getInstantce() {return mPyCamera;}
+
   public Number[] hoop_coord;
   public double x = 0;
   public double last_x;

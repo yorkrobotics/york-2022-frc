@@ -8,15 +8,13 @@ import frc.robot.subsystems.VisionSubscriber;
 
 public class AngleTowerVision extends CommandBase implements VisionSubscriber {
 
-    private Tower mTower;
-    private PyCamera pycam;
+    private Tower mTower = Tower.getInstance();
+    private PyCamera pycam = PyCamera.getInstantce();
     private Timer mCutoff = new Timer();
     private double mXField = 0;
 
-    public AngleTowerVision(Tower tower, PyCamera cam) {
-        mTower = tower;
-        pycam = cam;
-        addRequirements(tower);
+    public AngleTowerVision() {
+        addRequirements(mTower);
         pycam.subscribe(this);
     }
 

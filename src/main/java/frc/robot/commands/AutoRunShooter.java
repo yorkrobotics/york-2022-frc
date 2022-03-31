@@ -28,7 +28,7 @@ public class AutoRunShooter extends SequentialCommandGroup {
     // Add your commands in the addCommands() call, e.g.
     // addCommands(new FooCommand(), new BarCommand());
     addCommands(
-      new AutoRetractConveyor(mConveyor), 
+      new ReverseConveyorTimed(0.25), 
       new InstantCommand(()->mShooter.runShooter(speed), mShooter), 
       new InstantCommand(()->mTower.setTowerAngle(angle)),
       new InstantCommand(() -> Timer.delay(2)),

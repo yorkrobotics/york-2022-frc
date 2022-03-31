@@ -10,14 +10,12 @@ import frc.robot.subsystems.Tower;
 
 public class DeployIntake extends InstantCommand {
 
-  private Intake mIntake;
-  private Tower mTower;
+  private Intake mIntake = Intake.getInstance();
+  private Tower mTower = Tower.getInstance();
   
   /** Creates a new DeployIntake. */
-  public DeployIntake(Intake intake, Tower tower) {
+  public DeployIntake() {
     // Use addRequirements() here to declare subsystem dependencies.
-    mIntake = intake;
-    mTower = tower;
     addRequirements(mIntake, mTower);
   }
 

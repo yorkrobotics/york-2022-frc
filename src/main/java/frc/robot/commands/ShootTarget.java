@@ -13,18 +13,15 @@ import frc.robot.subsystems.Shooter;
 import frc.robot.subsystems.Tower;
 
 public class ShootTarget extends CommandBase {
-  private final PyCamera pycam;
-  private final Shooter shooter;
-  private final Tower tower;
+  private final PyCamera pycam = PyCamera.getInstantce();
+  private final Shooter shooter = Shooter.getInstance();
+  private final Tower tower = Tower.getInstance();
 
   private double x_field; 
   private double power;
   private double targetAngle;
   /** Creates a new getHoopCenter. */
-  public ShootTarget(PyCamera pc, Shooter st, Tower tr) {
-    pycam = pc;
-    shooter = st;
-    tower = tr;
+  public ShootTarget() {
     addRequirements(pycam, shooter, tower);
     // Use addRequirements() here to declare subsystem dependencies.
   }

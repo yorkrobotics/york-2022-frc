@@ -12,12 +12,9 @@ import frc.robot.subsystems.Tower;
 // information, see:
 // https://docs.wpilib.org/en/stable/docs/software/commandbased/convenience-features.html
 public class RetractIntake extends InstantCommand {
-  private Intake mIntake;
-  private Tower mTower;
-  public RetractIntake(Intake intake, Tower tower) {
-    // Use addRequirements() here to declare subsystem dependencies.
-    mIntake = intake;
-    mTower = tower;
+  private Intake mIntake = Intake.getInstance();
+  private Tower mTower = Tower.getInstance();
+  public RetractIntake() {
     addRequirements(mIntake, mTower);
   }
 
