@@ -20,6 +20,7 @@ import frc.robot.commands.AngleTowerSetpoint;
 import frc.robot.commands.AngleTowerVision;
 import frc.robot.commands.HomeClimb;
 import frc.robot.commands.RunIntakeAndConveyor;
+import frc.robot.commands.RunShooterPID;
 import frc.robot.commands.StopIntakeAndConveyor;
 import frc.robot.commands.HomeTower;
 import frc.robot.commands.DeployIntake;
@@ -178,19 +179,19 @@ public class RobotContainer {
     new POVButton(mainController, 90).whenPressed(new DeployIntake());
     new POVButton(mainController, 270).whenPressed(new HomeTowerAndRetractIntake());
 
-    new POVButton(mainController, 180).whenPressed(
-      new ConditionalCommand(
-        new ParallelCommandGroup(
-          new InstantCommand(mShooter::stopShooter, mShooter)
-        ),
-        new ParallelCommandGroup(
-          // new RotateToTarget(mDrive, pycam),
-          new AngleTowerVision(),
-          new InstantCommand(mShooter::shootTarget, mShooter)
-        ), 
-        mShooter::isShooting
-      )
-    );
+    // new POVButton(mainController, 180).whenPressed(
+    //   new ConditionalCommand(
+    //     new ParallelCommandGroup(
+    //       new InstantCommand(mShooter::stopShooter, mShooter)
+    //     ),
+    //     new ParallelCommandGroup(
+    //       // new RotateToTarget(mDrive, pycam),
+    //       new AngleTowerVision(),
+    //       new InstantCommand(mShooter::shootTarget, mShooter)
+    //     ), 
+    //     mShooter::isShooting
+    //   )
+    // );
     
     new POVButton(mainController, 0).whenPressed(
       new ConditionalCommand(
@@ -201,11 +202,18 @@ public class RobotContainer {
         new SequentialCommandGroup(
           new ParallelCommandGroup(
             new AngleTowerSetpoint(60),
-            new InstantCommand(()->mShooter.runShooter(0.59), mShooter)
+            new InstantCommand(()->mShooter.runShooter(0.60), mShooter)
           )  
         ),
         mShooter::isShooting
       )
+    );
+
+    new POVButton(mainController, 180).whenPressed(
+      new ConditionalCommand(
+        new InstantCommand(mShooter::stopShooter, mShooter), 
+        new RunShooterPID(-20), 
+        mShooter::isShooting)
     );
   }
   

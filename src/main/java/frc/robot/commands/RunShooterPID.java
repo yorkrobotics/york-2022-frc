@@ -1,6 +1,7 @@
 package frc.robot.commands;
 
 import edu.wpi.first.math.controller.PIDController;
+import edu.wpi.first.wpilibj.shuffleboard.Shuffleboard;
 import edu.wpi.first.wpilibj2.command.PIDCommand;
 import frc.robot.Constants;
 import frc.robot.subsystems.Shooter;
@@ -15,6 +16,8 @@ public class RunShooterPID extends PIDCommand {
             Shooter.getInstance()::runShooter,
             Shooter.getInstance()
         );
+
+        Shuffleboard.getTab("Shooter").add(this.getController());
     }
     
 }

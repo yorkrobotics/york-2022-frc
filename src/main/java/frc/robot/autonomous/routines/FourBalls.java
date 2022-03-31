@@ -43,7 +43,7 @@ public class FourBalls implements AutoRoutine{
                     new RunIntakeAndConveyor()
                 )
             ),
-            new InstantCommand(() -> Timer.delay(1)),
+            new WaitCommand(1),
             new InstantCommand(() -> {
                 mIntake.stopRoller();
                 mConveyor.stopConveyor();
@@ -57,12 +57,21 @@ public class FourBalls implements AutoRoutine{
             new RetractIntake(),
             new ParallelCommandGroup(
                 RamseteCommandBuilder.apply(trajectoryBuilder.getTrajectory("Blue-B2-T"), false),
-                new DeployIntake(),
-                new RunIntakeAndConveyor()
+                new SequentialCommandGroup(
+                    new DeployIntake(),
+                    new RunIntakeAndConveyor()
+                )
             ),
             new WaitCommand(1),
             RamseteCommandBuilder.apply(trajectoryBuilder.getTrajectory("Blue-T-Shoot"), false),
-            new AutoRunShooter(mConveyor, mShooter, mTower, 0.62, 60)
+            new AutoRunShooter(mConveyor, mShooter, mTower, 0.62, 60),
+            new InstantCommand(()->{
+                mConveyor.stopConveyor();
+                mShooter.stopShooter();
+                mIntake.stopRoller();
+            }),
+            new HomeTower(),
+            new RetractIntake()
             
         );
     }

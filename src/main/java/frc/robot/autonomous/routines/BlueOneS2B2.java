@@ -13,6 +13,7 @@ import frc.robot.autonomous.TrajectoryBuilder;
 import frc.robot.commands.RunIntakeAndConveyor;
 import frc.robot.commands.AutoRunShooter;
 import frc.robot.commands.DeployIntake;
+import frc.robot.commands.HomeTower;
 import frc.robot.commands.RetractIntake;
 import frc.robot.subsystems.Conveyor;
 import frc.robot.subsystems.Intake;
@@ -52,7 +53,7 @@ public class BlueOneS2B2 implements AutoRoutine{
                 mConveyor.stopConveyor();
                 mShooter.stopShooter();
             }),
-            new InstantCommand(mTower::goHome, mTower),
+            new HomeTower(),
             new RetractIntake()
 
         );

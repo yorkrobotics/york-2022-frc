@@ -19,7 +19,7 @@ public final class Constants {
     public static final int CONTROLLER_PORT = 0;
     public static final int CONTROLLER_PORT_SECONDARY = 1;
 
-    public static final double MAX_OPENLOOP_SPEED = 0.5;
+    public static final double MAX_OPENLOOP_SPEED = 0.8;
 
     public static final double DRIVE_MAX_RPM = 5400;
 
@@ -54,7 +54,7 @@ public final class Constants {
     public static final double kI_POSITION_DRIVE_HIGH_GEAR = 0;
     public static final double kD_POSITION_DRIVE_HIGH_GEAR = 0;
 
-    public static final double kP_VELOCITY_SHOOTER = 0.003;
+    public static final double kP_VELOCITY_SHOOTER = 0.3;
     public static final double kI_VELOCITY_SHOOTER = 0;
     public static final double kD_VELOCITY_SHOOTER = 0;
 
@@ -74,7 +74,7 @@ public final class Constants {
     public static final double CONVEYOR_SPEED = 0.75;
 
 
-    public static final IdleMode DRIVE_IDLE_MODE = IdleMode.kCoast;
+    public static final IdleMode DRIVE_IDLE_MODE = IdleMode.kBrake;
     public static final IdleMode CLIMB_IDLE_MODE = IdleMode.kBrake;
     public static final IdleMode TOWER_IDLE_MODE = IdleMode.kBrake;
 
@@ -86,7 +86,7 @@ public final class Constants {
     public static final double CLIMB_UPPER_PRESET = -262;
     public static final double CLIMB_LOWER_PRESET = 0;
 
-    public static final double FORWARDS_SLEW_RATE_LIMIT = 2.5;
+    public static final double FORWARDS_SLEW_RATE_LIMIT = 1.75;
 
 
 

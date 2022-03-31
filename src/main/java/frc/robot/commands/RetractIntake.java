@@ -22,7 +22,7 @@ public class RetractIntake extends InstantCommand {
   @Override
   public void initialize() {
     mTower.whenIntakeRetracted();
-    mIntake.retract();
+    // mIntake.retract();
   }
 
 }
