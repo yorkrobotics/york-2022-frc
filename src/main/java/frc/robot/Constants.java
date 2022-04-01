@@ -54,15 +54,17 @@ public final class Constants {
     public static final double kI_POSITION_DRIVE_HIGH_GEAR = 0;
     public static final double kD_POSITION_DRIVE_HIGH_GEAR = 0;
 
-    public static final double kP_VELOCITY_SHOOTER = 0.3;
-    public static final double kI_VELOCITY_SHOOTER = 0;
-    public static final double kD_VELOCITY_SHOOTER = 0;
+    public static final double kP_VELOCITY_SHOOTER = 0.04;
+    public static final double kI_VELOCITY_SHOOTER = 0.05;
+    public static final double kD_VELOCITY_SHOOTER = 0.002;
+    public static final double kFF_SHOOTER = 0;
+
 
     public static final double kS_LOW_GEAR = 0.20874;
     public static final double kV_LOW_GEAR = 4.3531;
     public static final double kA_LOW_GEAR = 0.53187;
 
-    
+
 
     public static final double FIELD_CENTER_X = 19.16;
     public static final double FIELD_CENTER_Y = 0;
@@ -87,9 +89,7 @@ public final class Constants {
     public static final double CLIMB_LOWER_PRESET = 0;
 
     public static final double FORWARDS_SLEW_RATE_LIMIT = 1.75;
-
-
-
+    public static final float STATIONARY_CLIMB_REVERSE_LIMIT = 100;
 
 
 
@@ -103,6 +103,8 @@ public final class Constants {
       public static final int CLIMB_RIGHT_PRIMARY = 7;
       public static final int TOWER_ACTUATOR_LEFT = 6;
       public static final int TOWER_ACTUATOR_RIGHT = 5;
+      public static final int STATIONARY_CLIMB_LEFT = 13;
+      public static final int STATIONARY_CLIMB_RIGHT = 14;
     }
 
     public final class VictorSPX{
@@ -123,4 +125,5 @@ public final class Constants {
       public static final int INTAKE_FORWARD = 5;
       public static final int INTAKE_REVERSE = 2;
     }
+
 }
