@@ -1,6 +1,7 @@
 package frc.robot.commands;
 
 import edu.wpi.first.wpilibj.Timer;
+import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.CommandBase;
 import frc.robot.subsystems.PyCamera;
 import frc.robot.subsystems.Tower;
@@ -49,7 +50,9 @@ public class AngleTowerVision extends CommandBase implements VisionSubscriber {
     }
 
     public void aimTarget()  {
-        mTower.setTowerAngle(computeTargetAngle());
+        double tagetAngle = computeTargetAngle();
+        SmartDashboard.putNumber("ComputeTagetAngle", tagetAngle);
+        mTower.setTowerAngle(tagetAngle);
     }
 
     @Override
