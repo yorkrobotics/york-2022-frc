@@ -13,14 +13,16 @@ import edu.wpi.first.wpilibj.smartdashboard.SendableChooser;
 import frc.robot.autonomous.AutoRoutine;
 import frc.robot.autonomous.CommandBuilder;
 import frc.robot.autonomous.TrajectoryBuilder;
-import frc.robot.autonomous.routines.BlueOneS1B1;
-import frc.robot.autonomous.routines.BlueOneS2B2;
-import frc.robot.autonomous.routines.BlueOneS3B3;
+import frc.robot.autonomous.routines.OneBallTop;
+import frc.robot.autonomous.routines.OneBallMid;
+import frc.robot.autonomous.routines.OneBallBottom;
 import frc.robot.commands.AngleTowerSetpoint;
 import frc.robot.commands.AngleTowerVision;
 import frc.robot.commands.HomeClimb;
+import frc.robot.commands.HomeStationaryClimb;
 import frc.robot.commands.RunIntakeAndConveyor;
 import frc.robot.commands.RunShooterPID;
+import frc.robot.commands.RunShooterPIDToSetpoint;
 import frc.robot.commands.StopIntakeAndConveyor;
 import frc.robot.commands.HomeTower;
 import frc.robot.commands.DeployIntake;
@@ -36,6 +38,7 @@ import frc.robot.subsystems.Conveyor;
 import frc.robot.subsystems.Intake;
 import frc.robot.subsystems.PyCamera;
 import frc.robot.subsystems.Shooter;
+import frc.robot.subsystems.StationaryClimb;
 import frc.robot.subsystems.Tower;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.ConditionalCommand;
@@ -61,13 +64,14 @@ public class RobotContainer {
   private Tower mTower;
   private ColorSensor mColorSensor;
   private Conveyor mConveyor;
+  private StationaryClimb mStationaryClimb;
 
   // Commands
   private DriveTeleop driveTeleop;
 
   // XboxController
   public static XboxController mainController;
-  // public static XboxController secondaryController;
+  public static XboxController secondaryController;
 
   // Camera
   private PyCamera pycam;
@@ -86,7 +90,7 @@ public class RobotContainer {
 
     // Driver's controller
     mainController = new XboxController(Constants.CONTROLLER_PORT);
-    // secondaryController = new XboxController(Constants.CONTROLLER_PORT_SECONDARY);
+    secondaryController = new XboxController(Constants.CONTROLLER_PORT_SECONDARY);
 
     // DriveTrain subsystem
     mDrive = DriveTrain.getInstance();
@@ -97,6 +101,10 @@ public class RobotContainer {
     mClimb = Climb.getInstance();
     // mClimb.setDefaultCommand(new RunCommand(()-> mClimb.runClimbWithJoystick(mainController), mClimb));
     
+    // Stationary Climb
+    mStationaryClimb = StationaryClimb.getInstance();
+    mStationaryClimb.setDefaultCommand(new RunCommand(()->mStationaryClimb.runClimbWithJoystick(secondaryController), mStationaryClimb));
+
     // Intake
     mIntake = Intake.getInstance();
 
@@ -173,9 +181,6 @@ public class RobotContainer {
       );
     new JoystickButton(mainController, Button.kBack.value).whenPressed(new HomeClimb());
 
-    // new JoystickButton(mainController, Button.kStart.value).whenPressed(mTower::goHome, mTower);
-    // new JoystickButton(mainController, Button.kBack.value).whenPressed(mClimb::goHome, mClimb);
-    
     new POVButton(mainController, 90).whenPressed(new DeployIntake());
     new POVButton(mainController, 270).whenPressed(new HomeTowerAndRetractIntake());
 
@@ -209,24 +214,19 @@ public class RobotContainer {
       )
     );
 
-    // new POVButton(mainController, 180).whenPressed(
+    Command runShooter = new RunShooterPID(50);
+    new POVButton(mainController, 180).toggleWhenPressed(runShooter);
+    // .whenPressed(
     //   new ConditionalCommand(
-    //     new InstantCommand(mShooter::stopShooter, mShooter),
-    //     new SequentialCommandGroup(
-    //       new RotateToTarget(mDrive, pycam),
-    //       new AngleTowerVision(),
-    //       new RunShooterPID(20)
-    //     ),
+    //     new InstantCommand(runShooter::cancel), 
+    //     runShooter, 
     //     mShooter::isShooting)
     // );
 
-    new POVButton(mainController, 180).whenPressed(
-        new SequentialCommandGroup(
-          new RotateToTarget(mDrive, pycam),
-          new AngleTowerVision()
-          // new RunShooterPID(20)
-        )
-    );
+    /**
+     * Secondary Controller
+     */
+    new JoystickButton(secondaryController, Button.kA.value).whenPressed(new HomeStationaryClimb());
   }
 
 

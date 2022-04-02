@@ -30,6 +30,8 @@ public class Shooter extends SubsystemBase {
   private double power;
   private boolean isShooting = false;
 
+  private double kFF = Constants.kFF_SHOOTER;
+
 
   /** Creates a new Shooter. */
   public Shooter() {
@@ -45,6 +47,7 @@ public class Shooter extends SubsystemBase {
     testSpeed = 0;
 
     SmartDashboard.putNumber("Test speed", testSpeed);
+    SmartDashboard.putNumber("Shooter FF", kFF);
   }
 
   @Override
@@ -58,6 +61,11 @@ public class Shooter extends SubsystemBase {
     SmartDashboard.putNumber("Encoder Bottom", mEncoderBottom.get());
     SmartDashboard.putNumber("Encoder Top Velocity (raw)", mEncoderTop.getVelocityRaw());
     SmartDashboard.putNumber("Encoder Top Velocity (filtered)", mEncoderTop.getVelocityFiltered());
+
+    SmartDashboard.putNumber("Shooter 'speed'", Shooter.getInstance().getSpeed());
+    
+    double newkFF = SmartDashboard.getNumber("Shooter FF", 0.0);
+    if (newkFF != kFF) kFF = newkFF;
   }
 
   /**
@@ -102,7 +110,7 @@ public class Shooter extends SubsystemBase {
    * @return (Top velocity + bottom velocity) / 2
    */
   public double getSpeed() {
-    return (mEncoderTop.getVelocityFiltered() + mEncoderBottom.getVelocityFiltered()) / 2;
+    return -(mEncoderTop.getVelocityFiltered() + mEncoderBottom.getVelocityFiltered()) / 2;
   }
 
   // shoots target with field x and characterized angle
@@ -117,5 +125,9 @@ public class Shooter extends SubsystemBase {
   private void updateEncoderVelocities() {
     mEncoderTop.updateVelocity();
     mEncoderBottom.updateVelocity();
+  }
+
+  public double getkFF() {
+      return kFF;
   }
 }
