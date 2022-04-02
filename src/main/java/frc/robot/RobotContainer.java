@@ -4,6 +4,8 @@
 
 package frc.robot;
 
+import java.util.Optional;
+
 import edu.wpi.first.wpilibj.GenericHID;
 import edu.wpi.first.wpilibj.XboxController;
 import edu.wpi.first.wpilibj.XboxController.Button;
@@ -71,7 +73,7 @@ public class RobotContainer {
 
   // XboxController
   public static XboxController mainController;
-  public static XboxController secondaryController;
+  public static Optional<XboxController> secondaryController = Optional.empty();
 
   // Camera
   private PyCamera pycam;
@@ -90,7 +92,11 @@ public class RobotContainer {
 
     // Driver's controller
     mainController = new XboxController(Constants.CONTROLLER_PORT);
-    secondaryController = new XboxController(Constants.CONTROLLER_PORT_SECONDARY);
+    
+    XboxController secondaryControllerOptional = new XboxController(Constants.CONTROLLER_PORT_SECONDARY);
+    if (secondaryControllerOptional.isConnected()) {
+      secondaryController = Optional.of(secondaryControllerOptional);
+    }
 
     // DriveTrain subsystem
     mDrive = DriveTrain.getInstance();
@@ -103,7 +109,9 @@ public class RobotContainer {
     
     // Stationary Climb
     mStationaryClimb = StationaryClimb.getInstance();
-    mStationaryClimb.setDefaultCommand(new RunCommand(()->mStationaryClimb.runClimbWithJoystick(secondaryController), mStationaryClimb));
+    if (secondaryController.isPresent()){
+      mStationaryClimb.setDefaultCommand(new RunCommand(()->mStationaryClimb.runClimbWithJoystick(secondaryController.get()), mStationaryClimb));
+    }
 
     // Intake
     mIntake = Intake.getInstance();
@@ -147,6 +155,9 @@ public class RobotContainer {
 
     // Configure the button bindings
     configureButtonBindings();
+    if (secondaryController.isPresent()){
+      ConfigureSecondaryController();
+    }
   }
 
   /**
@@ -222,11 +233,10 @@ public class RobotContainer {
     //     runShooter, 
     //     mShooter::isShooting)
     // );
+  }
 
-    /**
-     * Secondary Controller
-     */
-    new JoystickButton(secondaryController, Button.kA.value).whenPressed(new HomeStationaryClimb());
+  private void ConfigureSecondaryController(){
+    new JoystickButton(secondaryController.get(), Button.kA.value).whenPressed(new HomeStationaryClimb());
   }
   
   /**

@@ -82,7 +82,7 @@ public final class Constants {
 
 
     public static final float TOWER_FORWARD_LIMIT = 247;
-    public static final float CLIMB_REVERSE_LIMIT = -240;
+    public static final float CLIMB_REVERSE_LIMIT = -258;
 
     public static final float STATIONARY_CLIMB_FORWARD_LIMIT = 207;
 

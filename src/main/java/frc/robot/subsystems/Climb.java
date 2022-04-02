@@ -202,18 +202,6 @@ public class Climb extends SubsystemBase {
   }
 
 
-  public void goHome(){
-      if (!mLeftLimitSwitch.isPressed()){
-        mLeftPrimaryMotor.set(0.4);
-      }
-      if (!mRightLimitSwitch.isPressed()){
-        mRightPrimaryMotor.set(0.4);
-      }
-    
-    mSetpoint = 0;
-    resetEncoders();
-  }
-
   public boolean isHome(){
     return mLeftLimitSwitch.isPressed() && mRightLimitSwitch.isPressed();
   }
