@@ -37,7 +37,7 @@ public class DriveOutStraight implements AutoRoutine{
             BiFunction<Trajectory, Boolean, Command> RamseteCommandBuilder) {
         return new SequentialCommandGroup(
             new ParallelCommandGroup(
-                new ReverseDriveTimed(1.5),
+                new ReverseDriveTimed(1),
                 new SequentialCommandGroup(
                     new DeployIntake(),
                     new RunIntakeAndConveyor(),
@@ -49,7 +49,7 @@ public class DriveOutStraight implements AutoRoutine{
                 mIntake.stopRoller();
                 mConveyor.stopConveyor();
             }, mIntake, mConveyor),
-            new ShootBallSequence(50),
+            new ShootBallSequence(48),
             new InstantCommand(() -> {
                 mConveyor.stopConveyor();
                 mShooter.stopShooter();

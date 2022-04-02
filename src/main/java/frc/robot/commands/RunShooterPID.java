@@ -15,9 +15,7 @@ public class RunShooterPID extends PIDCommand {
             new PIDController(Constants.kP_VELOCITY_SHOOTER, Constants.kI_VELOCITY_SHOOTER, Constants.kD_VELOCITY_SHOOTER),
             Shooter.getInstance()::getSpeed,
             () -> 0,
-            (output) -> {
-                Shooter.getInstance().runShooter(output + Shooter.getInstance().getkFF() * velocity);
-            },
+            (output) -> {},
             Shooter.getInstance()
         );
 
@@ -25,6 +23,7 @@ public class RunShooterPID extends PIDCommand {
 
         m_controller.setTolerance(0.5, 40);
         m_setpoint = this::getVelocity;
+        m_useOutput = this::useOutput;
 
         Shuffleboard.getTab("Shooter").add(this.getController());
     }
@@ -53,6 +52,10 @@ public class RunShooterPID extends PIDCommand {
 
     public double getVelocity() {
         return m_velocity;
+    }
+
+    private void useOutput(double output) {
+        Shooter.getInstance().runShooter(output + Shooter.getInstance().getkFF() * getVelocity());
     }
     
 }

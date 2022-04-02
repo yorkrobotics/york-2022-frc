@@ -24,7 +24,7 @@ public class AutoVisionShoot extends SequentialCommandGroup {
     // addCommands(new FooCommand(), new BarCommand());
     addCommands(
       new ConditionalCommand(
-        null,
+        new InstantCommand(),
         new SequentialCommandGroup(
           new RotateToTarget(drive, pycam),
           new InstantCommand(()->{shootBallSequence.setVelocity(pycam.calcVelocity());}),
