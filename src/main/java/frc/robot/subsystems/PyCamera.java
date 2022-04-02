@@ -151,15 +151,17 @@ public class PyCamera extends SubsystemBase {
   public void periodic() {
     towerAngle = SmartDashboard.getNumber("Tower angle", 0);
 
-    if (!(Double.valueOf(x).isNaN() || z == 0)) {
-      double angle = Math.atan(x / z) / Math.PI * 180;
-      filteredAngle = angle;
-    }
-
     hoop_coord = table.getEntry("translation_vector").getNumberArray(default_hoop_center_coord);
     x = hoop_coord[0].doubleValue();
     y = hoop_coord[1].doubleValue();
     z = hoop_coord[2].doubleValue();
+
+     if (!(Double.valueOf(x).isNaN() || z == 0)) {
+      double angle = Math.atan(x / z) / Math.PI * 180;
+      if (!Double.valueOf(angle).isNaN()) {
+        filteredAngle = angle;
+      }
+    } 
 
     if (towerAngle < 46.6 && towerAngle > 46.4) {
       double shooter_angle = towerAngle / 180 * Math.PI;

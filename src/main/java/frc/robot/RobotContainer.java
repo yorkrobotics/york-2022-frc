@@ -209,13 +209,27 @@ public class RobotContainer {
       )
     );
 
+    // new POVButton(mainController, 180).whenPressed(
+    //   new ConditionalCommand(
+    //     new InstantCommand(mShooter::stopShooter, mShooter),
+    //     new SequentialCommandGroup(
+    //       new RotateToTarget(mDrive, pycam),
+    //       new AngleTowerVision(),
+    //       new RunShooterPID(20)
+    //     ),
+    //     mShooter::isShooting)
+    // );
+
     new POVButton(mainController, 180).whenPressed(
-      new ConditionalCommand(
-        new InstantCommand(mShooter::stopShooter, mShooter), 
-        new RunShooterPID(-20), 
-        mShooter::isShooting)
+        new SequentialCommandGroup(
+          new RotateToTarget(mDrive, pycam),
+          new AngleTowerVision()
+          // new RunShooterPID(20)
+        )
     );
   }
+
+
   
   /**
    * Use this to pass the autonomous command to the main {@link Robot} class.
