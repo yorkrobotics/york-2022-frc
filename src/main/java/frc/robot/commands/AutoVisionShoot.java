@@ -4,6 +4,7 @@
 
 package frc.robot.commands;
 
+import edu.wpi.first.wpilibj2.command.ConditionalCommand;
 import edu.wpi.first.wpilibj2.command.InstantCommand;
 import edu.wpi.first.wpilibj2.command.SequentialCommandGroup;
 import frc.robot.subsystems.DriveTrain;
@@ -16,15 +17,21 @@ public class AutoVisionShoot extends SequentialCommandGroup {
   /** Creates a new AutoVisionShoot. */
   private final PyCamera pycam = PyCamera.getInstantce();
   private final DriveTrain drive = DriveTrain.getInstance();
-  ShootBallSequence shootBallSequence = new ShootBallSequence(0);
+  ShootBallAndAngleTowerSequence shootBallSequence = new ShootBallAndAngleTowerSequence(0);
 
   public AutoVisionShoot() {
     // Add your commands in the addCommands() call, e.g.
     // addCommands(new FooCommand(), new BarCommand());
     addCommands(
-      new RotateToTarget(drive, pycam),
-      new InstantCommand(()->{shootBallSequence.setVelocity(pycam.calcVelocity());}),
-      shootBallSequence
+      new ConditionalCommand(
+        null,
+        new SequentialCommandGroup(
+          new RotateToTarget(drive, pycam),
+          new InstantCommand(()->{shootBallSequence.setVelocity(pycam.calcVelocity());}),
+          shootBallSequence
+        ),
+        () -> pycam.isNaN() // TODO: concu with the last value
+      )
     );
   }
 }

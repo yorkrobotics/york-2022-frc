@@ -43,6 +43,7 @@ public class PyCamera extends SubsystemBase {
   public double last_y_field;
   
   public double towerAngle;
+  public boolean isNaN = false;
 
   Number[] default_hoop_center_coord = new Number[] {0,0,0};
   NetworkTable table;
@@ -147,6 +148,10 @@ public class PyCamera extends SubsystemBase {
     }
   }
 
+  public boolean isNaN() {
+    return isNaN;
+  }
+
   public double calcVelocity() {
     double power = 0.490304 + 0.000745817 * x_field;
     power = power * 100;
@@ -168,6 +173,10 @@ public class PyCamera extends SubsystemBase {
         filteredAngle = angle;
       }
     } 
+
+    if (Double.valueOf(x).isNaN() || Double.valueOf(z).isNaN() || Double.valueOf(y).isNaN()) {
+      isNaN = true;
+    }
 
     if (towerAngle < 46.6 && towerAngle > 46.4) {
       double shooter_angle = towerAngle / 180 * Math.PI;
