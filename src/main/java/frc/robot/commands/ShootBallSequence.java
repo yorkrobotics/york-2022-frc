@@ -14,14 +14,12 @@ public class ShootBallSequence extends SequentialCommandGroup {
 
   RunShooterPIDToSetpoint runShooter = new RunShooterPIDToSetpoint(0);
   RunShooterPID runShooterNoSetpoint = new RunShooterPID(0);
-  AngleTowerVision angleTowerVision = new AngleTowerVision();
 
   /** Creates a new ShootBallSequence. */
   public ShootBallSequence(double velocity) {
     // Add your commands in the addCommands() call, e.g.
     // addCommands(new FooCommand(), new BarCommand());
     addCommands(
-      angleTowerVision,
       new ReverseConveyorTimed(0.25),
       runShooter,
       new ParallelRaceGroup(
@@ -29,6 +27,8 @@ public class ShootBallSequence extends SequentialCommandGroup {
         new RunConveyorTimed(1.5)
       )
     );
+
+    setVelocity(velocity);
   }
 
   public void setVelocity(double velocity) {
