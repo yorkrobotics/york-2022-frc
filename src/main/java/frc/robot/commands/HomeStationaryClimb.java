@@ -23,7 +23,7 @@ public class HomeStationaryClimb extends CommandBase {
   @Override
   public void execute() {
     if (!mStationaryClimb.isHome()){
-      mStationaryClimb.runClimbOpenLoop(-0.6);
+      mStationaryClimb.runClimbOpenLoop(-0.2);
     }
   }
 

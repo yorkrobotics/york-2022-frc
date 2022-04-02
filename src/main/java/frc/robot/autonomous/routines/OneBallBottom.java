@@ -11,28 +11,23 @@ import edu.wpi.first.wpilibj2.command.SequentialCommandGroup;
 import frc.robot.autonomous.AutoRoutine;
 import frc.robot.autonomous.TrajectoryBuilder;
 import frc.robot.commands.RunIntakeAndConveyor;
-import frc.robot.commands.HomeTower;
-import frc.robot.commands.ReverseDriveTimed;
-import frc.robot.commands.AutoRunShooter;
+import frc.robot.commands.ShootBallSequence;
+import frc.robot.commands.HomeTowerAndRetractIntake;
+import frc.robot.commands.AngleTowerSetpoint;
 import frc.robot.commands.DeployIntake;
-import frc.robot.commands.DriveTeleop;
-import frc.robot.commands.RetractIntake;
 import frc.robot.subsystems.Conveyor;
-import frc.robot.subsystems.DriveTrain;
 import frc.robot.subsystems.Intake;
 import frc.robot.subsystems.Shooter;
-import frc.robot.subsystems.Tower;
 
-public class BlueOneS3B3 implements AutoRoutine{
+public class OneBallBottom implements AutoRoutine{
 
     private Intake mIntake = Intake.getInstance();
     private Shooter mShooter = Shooter.getInstance();
     private Conveyor mConveyor = Conveyor.getInstance();
-    private Tower mTower = Tower.getInstance();
 
     @Override
     public String getName() {
-        return "Blue-OneBall-S3-B3";
+        return "OneBall-Bottom-S3-B3";
     }
 
     @Override
@@ -43,7 +38,8 @@ public class BlueOneS3B3 implements AutoRoutine{
                 RamseteCommandBuilder.apply(trajectoryBuilder.getTrajectory("Blue-S3-B3"), true),                
                 new SequentialCommandGroup(
                     new DeployIntake(),
-                    new RunIntakeAndConveyor()
+                    new RunIntakeAndConveyor(),
+                    new AngleTowerSetpoint(60)
                 )
             ),
             new InstantCommand(() -> Timer.delay(2)),
@@ -51,13 +47,12 @@ public class BlueOneS3B3 implements AutoRoutine{
                 mIntake.stopRoller();
                 mConveyor.stopConveyor();
             }, mIntake, mConveyor),
-            new AutoRunShooter(mConveyor, mShooter, mTower, 0.62, 60),
+            new ShootBallSequence(50),
             new InstantCommand(() -> {
                 mConveyor.stopConveyor();
                 mShooter.stopShooter();
             }),
-            new HomeTower(),
-            new RetractIntake()
+            new HomeTowerAndRetractIntake()
         );
     }
     

@@ -13,9 +13,9 @@ import edu.wpi.first.wpilibj.smartdashboard.SendableChooser;
 import frc.robot.autonomous.AutoRoutine;
 import frc.robot.autonomous.CommandBuilder;
 import frc.robot.autonomous.TrajectoryBuilder;
-import frc.robot.autonomous.routines.BlueOneS1B1;
-import frc.robot.autonomous.routines.BlueOneS2B2;
-import frc.robot.autonomous.routines.BlueOneS3B3;
+import frc.robot.autonomous.routines.OneBallTop;
+import frc.robot.autonomous.routines.OneBallMid;
+import frc.robot.autonomous.routines.OneBallBottom;
 import frc.robot.commands.AngleTowerSetpoint;
 import frc.robot.commands.AngleTowerVision;
 import frc.robot.commands.HomeClimb;
@@ -90,7 +90,7 @@ public class RobotContainer {
 
     // Driver's controller
     mainController = new XboxController(Constants.CONTROLLER_PORT);
-    // secondaryController = new XboxController(Constants.CONTROLLER_PORT_SECONDARY);
+    secondaryController = new XboxController(Constants.CONTROLLER_PORT_SECONDARY);
 
     // DriveTrain subsystem
     mDrive = DriveTrain.getInstance();
@@ -103,7 +103,7 @@ public class RobotContainer {
     
     // Stationary Climb
     mStationaryClimb = StationaryClimb.getInstance();
-    // mStationaryClimb.setDefaultCommand(new RunCommand(()->mStationaryClimb.runClimbWithJoystick(secondaryController), mStationaryClimb));
+    mStationaryClimb.setDefaultCommand(new RunCommand(()->mStationaryClimb.runClimbWithJoystick(secondaryController), mStationaryClimb));
 
     // Intake
     mIntake = Intake.getInstance();
@@ -226,7 +226,7 @@ public class RobotContainer {
     /**
      * Secondary Controller
      */
-    // new JoystickButton(secondaryController, Button.kA.value).whenPressed(new HomeStationaryClimb());
+    new JoystickButton(secondaryController, Button.kA.value).whenPressed(new HomeStationaryClimb());
   }
   
   /**

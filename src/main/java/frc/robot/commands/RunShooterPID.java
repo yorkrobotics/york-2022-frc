@@ -15,12 +15,12 @@ public class RunShooterPID extends PIDCommand {
             Shooter.getInstance()::getSpeed,
             velocity,
             (output) -> {
-                Shooter.getInstance().runShooter(output + Constants.kFF_SHOOTER * velocity);
+                Shooter.getInstance().runShooter(output + Shooter.getInstance().getkFF() * velocity);
             },
             Shooter.getInstance()
         );
 
-        m_controller.setTolerance(0.5);
+        m_controller.setTolerance(0.5, 40);
 
         Shuffleboard.getTab("Shooter").add(this.getController());
     }
@@ -33,8 +33,8 @@ public class RunShooterPID extends PIDCommand {
 
     @Override
     public void end(boolean interrupted) {
-        Shooter.getInstance().stopShooter();
         super.end(interrupted);
+        Shooter.getInstance().stopShooter();
     }
 
     @Override

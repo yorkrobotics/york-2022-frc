@@ -54,18 +54,17 @@ public class StationaryClimb extends SubsystemBase {
     mRightLimitSwitch.enableLimitSwitch(true);
 
 
-    mLeftMotor.enableSoftLimit(CANSparkMax.SoftLimitDirection.kForward, false);
+    mLeftMotor.enableSoftLimit(CANSparkMax.SoftLimitDirection.kForward, true);
     mLeftMotor.enableSoftLimit(CANSparkMax.SoftLimitDirection.kReverse, false);
-    mRightMotor.enableSoftLimit(CANSparkMax.SoftLimitDirection.kForward, false);
+    mRightMotor.enableSoftLimit(CANSparkMax.SoftLimitDirection.kForward, true);
     mRightMotor.enableSoftLimit(CANSparkMax.SoftLimitDirection.kReverse, false);
 
-    //the lifters extends in kReverse direction
-    mLeftMotor.setSoftLimit(SoftLimitDirection.kForward, 0);
-    mLeftMotor.setSoftLimit(SoftLimitDirection.kReverse, Constants.STATIONARY_CLIMB_REVERSE_LIMIT);
-    mRightMotor.setSoftLimit(SoftLimitDirection.kForward, 0);
-    mRightMotor.setSoftLimit(SoftLimitDirection.kReverse, Constants.STATIONARY_CLIMB_REVERSE_LIMIT);
+    mLeftMotor.setSoftLimit(SoftLimitDirection.kForward, Constants.STATIONARY_CLIMB_FORWARD_LIMIT);
+    mLeftMotor.setSoftLimit(SoftLimitDirection.kReverse, 0);
+    mRightMotor.setSoftLimit(SoftLimitDirection.kForward, Constants.STATIONARY_CLIMB_FORWARD_LIMIT);
+    mRightMotor.setSoftLimit(SoftLimitDirection.kReverse, 0);
 
-    mClimbMode = StationaryClimbMode.OPEN_LOOP;
+    mClimbMode = StationaryClimbMode.POSITION_CONTROL;
 
     kP = 0.1;
     kI = 0;
@@ -84,6 +83,8 @@ public class StationaryClimb extends SubsystemBase {
 
     SmartDashboard.putBoolean("Stationary Climb Left isPressed", mLeftLimitSwitch.isPressed());
     SmartDashboard.putBoolean("Stationary Climb Right isPressed", mRightLimitSwitch.isPressed());
+
+    SmartDashboard.putNumber("Stationary Climb Setpoint", mSetpoint);
   }
 
     /**
@@ -91,8 +92,8 @@ public class StationaryClimb extends SubsystemBase {
    * @param setPoint setpoint in rotations
    */
   public void runClimbPositionControl(double setPoint){
-    setPoint = Double.min(setPoint, 0);
-    setPoint = Double.max(setPoint, (double) Constants.STATIONARY_CLIMB_REVERSE_LIMIT);
+    setPoint = Double.max(setPoint, 0);
+    setPoint = Double.min(setPoint, (double) Constants.STATIONARY_CLIMB_FORWARD_LIMIT);
     mLeftPIDController.setReference(setPoint, CANSparkMax.ControlType.kPosition);
     mRightPIDController.setReference(setPoint, CANSparkMax.ControlType.kPosition);
   }
@@ -115,8 +116,8 @@ public class StationaryClimb extends SubsystemBase {
     
     if (mClimbMode == StationaryClimbMode.POSITION_CONTROL){
       mSetpoint += controller.getRightY() * 1.5;
-      mSetpoint = Double.min(mSetpoint, 0);
-      mSetpoint = Double.max(mSetpoint, (double)Constants.STATIONARY_CLIMB_REVERSE_LIMIT);
+      mSetpoint = Double.min(mSetpoint, (double)Constants.STATIONARY_CLIMB_FORWARD_LIMIT);
+      mSetpoint = Double.max(mSetpoint, 0);
       runClimbPositionControl(mSetpoint);
     }
     if (mClimbMode == StationaryClimbMode.OPEN_LOOP){
