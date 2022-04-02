@@ -18,7 +18,7 @@ public class RotateToTarget extends PIDCommand implements VisionSubscriber {
     private final PyCamera pycam;
 
     private double targetAngle = 0;
-    private boolean isDone = false;
+    private boolean isDone;
 
     public RotateToTarget(DriveTrain drive, PyCamera pycam) {
         super(
@@ -40,6 +40,12 @@ public class RotateToTarget extends PIDCommand implements VisionSubscriber {
         pycam.subscribe(this);
     }
 
+
+    @Override
+    public void initialize() {
+        isDone=false;
+    }
+
     private double getTargetAngle() {
         return targetAngle;
     }
@@ -51,7 +57,7 @@ public class RotateToTarget extends PIDCommand implements VisionSubscriber {
 
     @Override
     public void execute() {
-        if (Math.abs(pycam.getHorizontalAngle()) < 1 ) {
+        if (Math.abs(pycam.getHorizontalAngle()) == 0 ) {
             isDone = true;
         }
         super.execute();
