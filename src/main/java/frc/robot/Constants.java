@@ -54,10 +54,10 @@ public final class Constants {
     public static final double kI_POSITION_DRIVE_HIGH_GEAR = 0;
     public static final double kD_POSITION_DRIVE_HIGH_GEAR = 0;
 
-    public static final double kP_VELOCITY_SHOOTER = 0.03;
+    public static final double kP_VELOCITY_SHOOTER = 0.05;
     public static final double kI_VELOCITY_SHOOTER = 0.001;
     public static final double kD_VELOCITY_SHOOTER = 0.0;
-    public static final double kFF_SHOOTER = 0.0105;
+    public static final double kFF_SHOOTER = 0.011;
 
 
     public static final double kS_LOW_GEAR = 0.20874;

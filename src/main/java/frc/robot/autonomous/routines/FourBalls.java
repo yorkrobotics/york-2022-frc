@@ -13,6 +13,8 @@ import frc.robot.autonomous.TrajectoryBuilder;
 import frc.robot.commands.AngleTowerSetpoint;
 import frc.robot.commands.DeployIntake;
 import frc.robot.commands.RunIntakeAndConveyor;
+import frc.robot.commands.RunShooterPID;
+import frc.robot.commands.RunShooterPIDToSetpoint;
 import frc.robot.commands.ShootBallSequence;
 import frc.robot.commands.HomeTowerAndRetractIntake;
 import frc.robot.subsystems.Intake;
@@ -44,11 +46,13 @@ public class FourBalls implements AutoRoutine{
                 )
             ),
             new WaitCommand(0.5),
-            new InstantCommand(() -> {
-                mIntake.stopRoller();
-            }, mIntake),
+            // new InstantCommand(() -> {
+            //     mIntake.stopRoller();
+            // }, mIntake),
             new ShootBallSequence(SHOOTER_SPEED),
-            new InstantCommand(mShooter::stopShooter, mShooter),
+            new InstantCommand(() -> {
+                mShooter.stopShooter();
+            }, mShooter),
             new ParallelCommandGroup(
                 RamseteCommandBuilder.apply(trajectoryBuilder.getTrajectory("Blue-B2-T"), false),
                 new RunIntakeAndConveyor()
@@ -57,7 +61,9 @@ public class FourBalls implements AutoRoutine{
             RamseteCommandBuilder.apply(trajectoryBuilder.getTrajectory("Blue-T-Shoot"), false),
             new InstantCommand(mIntake::stopRoller, mIntake),
             new ShootBallSequence(SHOOTER_SPEED),
-            new InstantCommand(mShooter::stopShooter, mShooter),
+            new InstantCommand(()->{
+                mShooter.stopShooter();
+            }, mShooter),
             new HomeTowerAndRetractIntake() 
         );
     }
