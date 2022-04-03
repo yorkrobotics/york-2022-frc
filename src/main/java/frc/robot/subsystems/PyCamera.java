@@ -162,10 +162,66 @@ public class PyCamera extends SubsystemBase {
   public void periodic() {
     towerAngle = SmartDashboard.getNumber("Tower angle", 0);
 
-    hoop_coord = table.getEntry("translation_vector").getNumberArray(default_hoop_center_coord);
-    x = hoop_coord[0].doubleValue();
-    y = hoop_coord[1].doubleValue();
-    z = hoop_coord[2].doubleValue();
+    double[][] rRc = {
+      {1,2,3},
+      {4,5,6},
+      {7,8,9}
+    };
+
+    double[] cL = table.getEntry("cam vec").getNumberArray(default_cam_vec);
+    double rLx = 0, rLy = 0, rLz = 0;
+    for (int i = 0; i < 3; i++) {
+      for (int j = 0; j < 3; j++) {
+        rLx += rRc[i][j] * cL[0];
+        rLy += rRc[i][j] * cL[1];
+        rLz += rRc[i][j] * cL[2];
+      }
+    }
+
+    double[][] rL = {
+      {rLx,rLy,rLz},
+    };
+   
+    double[][] rLo = { 
+      {1},
+      {2},
+      {3}
+    };
+    double[][] p = {{0}, {104}, {0}};
+    double[][] n = {{0}, {1}, {0}};
+    
+    double[] diff = new double[3];
+    for (int i = 0; i < 3; i++) {
+      diff[i] = p[i][0] - rLo[i][0];
+    }
+    
+    double numerator = 0;
+    for (int i = 0; i < 3; i++) {
+      numerator += diff[i] * n[i][0];
+    }
+ 
+    double denominator = 0;
+    for (int i = 0; i < 3; i++) {
+      denominator += rL[0][i] * n[i][0];
+    }
+
+    double quotient = numerator / denominator;
+
+    double[][] product = new double[3][1];
+    for (int i = 0; i < 3; i++) {
+      product[i][0] = rL[i][0] * quotient;
+    }
+
+    double[][] points = new double[3][1];
+    for (int i = 0; i < 3; i++) {
+      points[i][0] = rLo[i][0] + product[i][0];
+    }
+    x = points[0][0];
+    y = points[0][1];
+    z = points[0][2];
+
+
+    //points = rLo + rL * quotient;
 
      if (!(Double.valueOf(x).isNaN() || z == 0)) {
       double angle = Math.atan(x / z) / Math.PI * 180;
