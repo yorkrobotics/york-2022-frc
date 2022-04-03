@@ -94,24 +94,24 @@ public class PyCamera extends SubsystemBase {
   }
 
   // returns the needed velocity to shoot the target at the current angle
-  public double calcVelocity() {
-    double shooter_angle = towerAngle / 180 * Math.PI;
+  // public double calcVelocity() {
+  //   double shooter_angle = towerAngle / 180 * Math.PI;
 
-    double x_field = Math.sin(shooter_angle) * Math.tan(shooter_angle) * z + Math.cos(shooter_angle) * z;
-    double y_field = h_h - shooter_radius * Math.sin(shooter_angle) - h_r2g;
+  //   double x_field = Math.sin(shooter_angle) * Math.tan(shooter_angle) * z + Math.cos(shooter_angle) * z;
+  //   double y_field = h_h - shooter_radius * Math.sin(shooter_angle) - h_r2g;
 
-    double g = 32.2 * 12;
-    double towerAngleRad = towerAngle / 180 * Math.PI;
-    double v_0 = Math.sqrt(Math.pow(x_field, 2) * g/(x_field*Math.sin(2*towerAngleRad) - 2*y_field*Math.pow(Math.cos(towerAngleRad), 2)));
-    double motor_power = (v_0 - 132.9) / 242.48 ;
-    if (motor_power > 1) {
-      motor_power = 1;
-    } else if (motor_power < 0) {
-      motor_power = 0;
-    }
+  //   double g = 32.2 * 12;
+  //   double towerAngleRad = towerAngle / 180 * Math.PI;
+  //   double v_0 = Math.sqrt(Math.pow(x_field, 2) * g/(x_field*Math.sin(2*towerAngleRad) - 2*y_field*Math.pow(Math.cos(towerAngleRad), 2)));
+  //   double motor_power = (v_0 - 132.9) / 242.48 ;
+  //   if (motor_power > 1) {
+  //     motor_power = 1;
+  //   } else if (motor_power < 0) {
+  //     motor_power = 0;
+  //   }
 
-    return motor_power;
-  }
+  //   return motor_power;
+  // }
 
   public double getHorizontalAngle() {
 
@@ -145,6 +145,12 @@ public class PyCamera extends SubsystemBase {
     for (VisionSubscriber subscriber: subscribers) {
       subscriber.handleNewValue(x_field);
     }
+  }
+
+  public double calcVelocity() {
+    double power = 0.490304 + 0.000745817 * x_field;
+    power = power * 100;
+    return power;
   }
 
   @Override

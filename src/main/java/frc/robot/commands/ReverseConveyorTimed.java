@@ -18,7 +18,6 @@ public class ReverseConveyorTimed extends CommandBase {
   public ReverseConveyorTimed(double seconds) {
     // Use addRequirements() here to declare subsystem dependencies.
     mTimer = new Timer();
-    mTimer.reset();
     addRequirements(mConveyor);
     this.seconds = seconds;
   }
@@ -26,6 +25,7 @@ public class ReverseConveyorTimed extends CommandBase {
   // Called when the command is initially scheduled.
   @Override
   public void initialize() {
+    mTimer.reset();
     mTimer.start();
   }
 

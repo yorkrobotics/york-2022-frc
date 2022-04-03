@@ -8,19 +8,23 @@ import frc.robot.Constants;
 import frc.robot.subsystems.Shooter;
 
 public class RunShooterPID extends PIDCommand {
+    public double m_velocity;
 
     public RunShooterPID(double velocity) {
         super(
             new PIDController(Constants.kP_VELOCITY_SHOOTER, Constants.kI_VELOCITY_SHOOTER, Constants.kD_VELOCITY_SHOOTER),
             Shooter.getInstance()::getSpeed,
-            velocity,
+            () -> 0,
             (output) -> {
                 Shooter.getInstance().runShooter(output + Shooter.getInstance().getkFF() * velocity);
             },
             Shooter.getInstance()
         );
 
+        m_velocity = velocity;
+
         m_controller.setTolerance(0.5, 40);
+        m_setpoint = this::getVelocity;
 
         Shuffleboard.getTab("Shooter").add(this.getController());
     }
@@ -41,6 +45,14 @@ public class RunShooterPID extends PIDCommand {
     public void initialize() {
         m_controller.reset();
         super.initialize();
+    }
+
+    public void setVelocity(double velocity) {
+        m_velocity = velocity;
+    }
+
+    public double getVelocity() {
+        return m_velocity;
     }
     
 }

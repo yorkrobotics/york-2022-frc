@@ -18,13 +18,13 @@ public class RunConveyorTimed extends CommandBase {
     // Use addRequirements() here to declare subsystem dependencies.
     addRequirements(mConveyor);
     mTimer = new Timer();
-    mTimer.reset();
     this.seconds = seconds;
   }
 
   // Called when the command is initially scheduled.
   @Override
   public void initialize() {
+    mTimer.reset();
     mTimer.start();
   }
 

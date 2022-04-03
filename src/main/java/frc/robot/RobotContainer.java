@@ -18,6 +18,7 @@ import frc.robot.autonomous.routines.OneBallMid;
 import frc.robot.autonomous.routines.OneBallBottom;
 import frc.robot.commands.AngleTowerSetpoint;
 import frc.robot.commands.AngleTowerVision;
+import frc.robot.commands.AutoVisionShoot;
 import frc.robot.commands.HomeClimb;
 import frc.robot.commands.HomeStationaryClimb;
 import frc.robot.commands.RunIntakeAndConveyor;
@@ -184,19 +185,9 @@ public class RobotContainer {
     new POVButton(mainController, 90).whenPressed(new DeployIntake());
     new POVButton(mainController, 270).whenPressed(new HomeTowerAndRetractIntake());
 
-    // new POVButton(mainController, 180).whenPressed(
-    //   new ConditionalCommand(
-    //     new ParallelCommandGroup(
-    //       new InstantCommand(mShooter::stopShooter, mShooter)
-    //     ),
-    //     new ParallelCommandGroup(
-    //       // new RotateToTarget(mDrive, pycam),
-    //       new AngleTowerVision(),
-    //       new InstantCommand(mShooter::shootTarget, mShooter)
-    //     ), 
-    //     mShooter::isShooting
-    //   )
-    // );
+    new POVButton(mainController, 180).toggleWhenPressed(
+      new AutoVisionShoot()
+    );
     
     new POVButton(mainController, 0).whenPressed(
       new ConditionalCommand(
@@ -214,8 +205,8 @@ public class RobotContainer {
       )
     );
 
-    Command runShooter = new RunShooterPID(50);
-    new POVButton(mainController, 180).toggleWhenPressed(runShooter);
+    // Command runShooter = new RunShooterPID(50);
+    // new POVButton(mainController, 180).toggleWhenPressed(runShooter);
     // .whenPressed(
     //   new ConditionalCommand(
     //     new InstantCommand(runShooter::cancel), 

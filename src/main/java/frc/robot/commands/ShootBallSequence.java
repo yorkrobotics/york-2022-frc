@@ -11,17 +11,28 @@ import edu.wpi.first.wpilibj2.command.SequentialCommandGroup;
 // information, see:
 // https://docs.wpilib.org/en/stable/docs/software/commandbased/convenience-features.html
 public class ShootBallSequence extends SequentialCommandGroup {
+
+  RunShooterPIDToSetpoint runShooter = new RunShooterPIDToSetpoint(0);
+  RunShooterPID runShooterNoSetpoint = new RunShooterPID(0);
+  AngleTowerVision angleTowerVision = new AngleTowerVision();
+
   /** Creates a new ShootBallSequence. */
   public ShootBallSequence(double velocity) {
     // Add your commands in the addCommands() call, e.g.
     // addCommands(new FooCommand(), new BarCommand());
     addCommands(
+      angleTowerVision,
       new ReverseConveyorTimed(0.25),
-      new RunShooterPIDToSetpoint(velocity),
+      runShooter,
       new ParallelRaceGroup(
-        new RunShooterPID(velocity),
-        new RunConveyorTimed(1)
+        runShooterNoSetpoint,
+        new RunConveyorTimed(1.5)
       )
     );
+  }
+
+  public void setVelocity(double velocity) {
+    runShooter.setVelocity(velocity);
+    runShooterNoSetpoint.setVelocity(velocity);
   }
 }
