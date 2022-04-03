@@ -181,50 +181,43 @@ public class PyCamera extends SubsystemBase {
       }
     }
 
-    double[][] rL = {
-      {rLx,rLy,rLz},
-    };
+    double[] rL = {rLx,rLy,rLz};
    
-    double[][] rLo = { 
-      {0},
-      {2},
-      {3}
-    };
+    double[] rLo = {0,2,3};
 
-    double[][] p = {{0}, {104}, {0}};
-    double[][] n = {{0}, {1}, {0}};
+    double[] p = {0, 104, 0};
+    double[] n = {0, 1, 0};
     
     double[] diff = new double[3];
     for (int i = 0; i < 3; i++) {
-      diff[i] = p[i][0] - rLo[i][0];
+      diff[i] = p[i] - rLo[i];
     }
     
     double numerator = 0;
     for (int i = 0; i < 3; i++) {
-      numerator += diff[i] * n[i][0];
+      numerator += diff[i] * n[i];
     }
  
     double denominator = 0;
     for (int i = 0; i < 3; i++) {
-      denominator += rL[0][i] * n[i][0];
+      denominator += rL[i] * n[i];
     }
 
     double quotient = numerator / denominator;
 
-    double[][] product = new double[3][1];
+    double[] product = new double[3];
     for (int i = 0; i < 3; i++) {
-      product[i][0] = rL[i][0] * quotient;
+      product[i] = rL[i] * quotient;
     }
 
-    double[][] points = new double[3][1];
+    double[] points = new double[3];
     for (int i = 0; i < 3; i++) {
-      points[i][0] = rLo[i][0] + product[i][0];
+      points[i] = rLo[i] + product[i];
     }
-    x = points[0][0];
-    y = points[0][1];
-    z = points[0][2];
+    x = points[0];
+    y = points[1];
+    z = points[2];
     
-
     //points = rLo + rL * quotient;
 
      if (!(Double.valueOf(x).isNaN() || z == 0)) {
