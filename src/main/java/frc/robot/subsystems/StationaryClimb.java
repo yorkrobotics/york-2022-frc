@@ -11,6 +11,7 @@ import com.revrobotics.SparkMaxPIDController;
 import com.revrobotics.CANSparkMax.SoftLimitDirection;
 import com.revrobotics.CANSparkMaxLowLevel.MotorType;
 
+import edu.wpi.first.math.MathUtil;
 import edu.wpi.first.wpilibj.XboxController;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
@@ -92,8 +93,7 @@ public class StationaryClimb extends SubsystemBase {
    * @param setPoint setpoint in rotations
    */
   public void runClimbPositionControl(double setPoint){
-    setPoint = Double.max(setPoint, 0);
-    setPoint = Double.min(setPoint, (double) Constants.STATIONARY_CLIMB_FORWARD_LIMIT);
+    setPoint = MathUtil.clamp(setPoint, 0, Constants.STATIONARY_CLIMB_FORWARD_LIMIT);
     mLeftPIDController.setReference(setPoint, CANSparkMax.ControlType.kPosition);
     mRightPIDController.setReference(setPoint, CANSparkMax.ControlType.kPosition);
   }
@@ -113,15 +113,17 @@ public class StationaryClimb extends SubsystemBase {
    */
   public void runClimbWithJoystick(XboxController controller){
     // updateFromSmartDashboard();
+
+    double controllerValue = controller.getRightY();
+    controllerValue = MathUtil.applyDeadband(controllerValue, 0.1);
     
     if (mClimbMode == StationaryClimbMode.POSITION_CONTROL){
-      mSetpoint += controller.getRightY() * 1.5;
-      mSetpoint = Double.min(mSetpoint, (double)Constants.STATIONARY_CLIMB_FORWARD_LIMIT);
-      mSetpoint = Double.max(mSetpoint, 0);
+      mSetpoint += controllerValue * 1.5;
+      mSetpoint = MathUtil.clamp(mSetpoint, 0, Constants.STATIONARY_CLIMB_FORWARD_LIMIT);
       runClimbPositionControl(mSetpoint);
     }
     if (mClimbMode == StationaryClimbMode.OPEN_LOOP){
-      runClimbOpenLoop(-controller.getRightY() * 0.2);
+      runClimbOpenLoop(-controllerValue * 0.2);
     }
   }
 
@@ -189,19 +191,6 @@ public class StationaryClimb extends SubsystemBase {
    */
   public void setControlMode(StationaryClimbMode mode){
     mClimbMode = mode;
-  }
-
-
-  public void goHome(){
-      if (!mLeftLimitSwitch.isPressed()){
-        mLeftMotor.set(0.4);
-      }
-      if (!mRightLimitSwitch.isPressed()){
-        mRightMotor.set(0.4);
-      }
-    
-    mSetpoint = 0;
-    resetEncoders();
   }
 
   public boolean isHome(){
