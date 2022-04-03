@@ -46,6 +46,7 @@ public class PyCamera extends SubsystemBase {
   public boolean isNaN = false;
 
   Number[] default_hoop_center_coord = new Number[] {0,0,0};
+  Number[] default_cam_vec = new Number[] {0,0,0};
   NetworkTable table;
   public LinearFilter filter = LinearFilter.singlePoleIIR(0, 0.02);
   
@@ -161,20 +162,22 @@ public class PyCamera extends SubsystemBase {
   @Override
   public void periodic() {
     towerAngle = SmartDashboard.getNumber("Tower angle", 0);
+    Tower mTower = Tower.getInstance();
+    double theAngle = (mTower.getTowerAngle() + 90 - 30) / 180 * Math.PI;
 
     double[][] rRc = {
-      {1,2,3},
-      {4,5,6},
-      {7,8,9}
+      {1,0,0},
+      {0,Math.cos(theAngle),-Math.sin(theAngle)},
+      {0,Math.sin(theAngle),Math.cos(theAngle)}
     };
 
-    double[] cL = table.getEntry("cam vec").getNumberArray(default_cam_vec);
+    Number[] cL = table.getEntry("cam vec").getNumberArray(default_cam_vec);
     double rLx = 0, rLy = 0, rLz = 0;
     for (int i = 0; i < 3; i++) {
       for (int j = 0; j < 3; j++) {
-        rLx += rRc[i][j] * cL[0];
-        rLy += rRc[i][j] * cL[1];
-        rLz += rRc[i][j] * cL[2];
+        rLx += rRc[i][j] * (double) cL[0];
+        rLy += rRc[i][j] * (double) cL[1];
+        rLz += rRc[i][j] * (double) cL[2];
       }
     }
 
@@ -183,10 +186,11 @@ public class PyCamera extends SubsystemBase {
     };
    
     double[][] rLo = { 
-      {1},
+      {0},
       {2},
       {3}
     };
+
     double[][] p = {{0}, {104}, {0}};
     double[][] n = {{0}, {1}, {0}};
     
@@ -219,7 +223,7 @@ public class PyCamera extends SubsystemBase {
     x = points[0][0];
     y = points[0][1];
     z = points[0][2];
-
+    
 
     //points = rLo + rL * quotient;
 
