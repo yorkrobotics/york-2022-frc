@@ -12,7 +12,6 @@ import com.revrobotics.CANSparkMax.SoftLimitDirection;
 import com.revrobotics.CANSparkMaxLowLevel.MotorType;
 
 import edu.wpi.first.math.MathUtil;
-import edu.wpi.first.wpilibj.XboxController;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
 import frc.robot.Constants;
@@ -107,24 +106,10 @@ public class StationaryClimb extends SubsystemBase {
     mRightMotor.set(speed);
   }
 
-  /**
-   * Run climb motors according to climb mode
-   * @param controller Xbox controller
-   */
-  public void runClimbWithJoystick(XboxController controller){
-    // updateFromSmartDashboard();
-
-    double controllerValue = controller.getRightY();
-    controllerValue = MathUtil.applyDeadband(controllerValue, 0.1);
-    
-    if (mClimbMode == StationaryClimbMode.POSITION_CONTROL){
-      mSetpoint += controllerValue * 1.5;
-      mSetpoint = MathUtil.clamp(mSetpoint, 0, Constants.STATIONARY_CLIMB_FORWARD_LIMIT);
-      runClimbPositionControl(mSetpoint);
-    }
-    if (mClimbMode == StationaryClimbMode.OPEN_LOOP){
-      runClimbOpenLoop(-controllerValue * 0.2);
-    }
+  public void updateSetpoint(double value){
+    mSetpoint += value;
+    mSetpoint = MathUtil.clamp(mSetpoint, 0, Constants.STATIONARY_CLIMB_FORWARD_LIMIT);
+    runClimbPositionControl(mSetpoint);
   }
 
   /**
@@ -216,7 +201,7 @@ public class StationaryClimb extends SubsystemBase {
     mRightMotor.stopMotor();
   }
 
-  private enum StationaryClimbMode{
+  public enum StationaryClimbMode{
     OPEN_LOOP, POSITION_CONTROL
   }
 }

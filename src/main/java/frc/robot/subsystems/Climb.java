@@ -10,7 +10,8 @@ import com.revrobotics.SparkMaxLimitSwitch;
 import com.revrobotics.SparkMaxPIDController;
 import com.revrobotics.CANSparkMax.SoftLimitDirection;
 import com.revrobotics.CANSparkMaxLowLevel.MotorType;
-import edu.wpi.first.wpilibj.XboxController;
+
+import edu.wpi.first.math.MathUtil;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
 import frc.robot.Constants;
@@ -118,24 +119,6 @@ public class Climb extends SubsystemBase {
   }
 
   /**
-   * Run climb motors according to climb mode
-   * @param controller Xbox controller
-   */
-  public void runClimbWithJoystick(XboxController controller){
-    updateFromSmartDashboard();
-    
-    if (mClimbMode == ClimbMode.POSITION_CONTROL){
-      mSetpoint += controller.getRightY() * 1.5;
-      mSetpoint = Double.min(mSetpoint, 0);
-      mSetpoint = Double.max(mSetpoint, (double)Constants.CLIMB_REVERSE_LIMIT);
-      runClimbPositionControl(mSetpoint);
-    }
-    if (mClimbMode == ClimbMode.OPEN_LOOP){
-      runClimbOpenLoop(controller.getRightY() * 0.6);
-    }
-  }
-
-  /**
    * Reset left and right encoders
    */
   public void resetEncoders(){
@@ -201,6 +184,11 @@ public class Climb extends SubsystemBase {
     mClimbMode = mode;
   }
 
+  public void updateSetpoint(double value){
+    mSetpoint += value;
+    mSetpoint = MathUtil.clamp(mSetpoint, Constants.CLIMB_REVERSE_LIMIT, 0);
+    mClimb.runClimbPositionControl(mSetpoint);
+  }
 
   public boolean isHome(){
     return mLeftLimitSwitch.isPressed() && mRightLimitSwitch.isPressed();

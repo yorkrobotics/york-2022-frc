@@ -12,7 +12,6 @@ import com.revrobotics.CANSparkMax.SoftLimitDirection;
 import com.revrobotics.CANSparkMaxLowLevel.MotorType;
 
 import edu.wpi.first.math.MathUtil;
-import edu.wpi.first.wpilibj.XboxController;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
 import frc.robot.Constants;
@@ -140,23 +139,10 @@ public class Tower extends SubsystemBase {
     mRightController.setReference(setpoint, CANSparkMax.ControlType.kPosition);
   }
 
-  /**
-   * Run the tower actuators with controller
-   * @param controller Xbox controller
-   */
-  public void runTowerWithController(XboxController controller){
-    updateFromSmartDashboard();
-    double controllerValue = controller.getRightY();
-    controllerValue = MathUtil.applyDeadband(controllerValue, 0.1);
-
-    if (mActuatorMode == TowerActuatorMode.POSITION_CONTROL){
-      mSetpoint += controllerValue * 1.8;
-      mSetpoint = MathUtil.clamp(mSetpoint, 0, Constants.TOWER_FORWARD_LIMIT);
-      runActuatorsPositionControl(mSetpoint);
-    }
-    if (mActuatorMode == TowerActuatorMode.OPEN_LOOP){
-      runActuatorsOpenLoop(controllerValue * 0.2);
-    }
+  public void updateSetpoint(double value){
+    mSetpoint += value;
+    mSetpoint = MathUtil.clamp(mSetpoint, 0, Constants.TOWER_FORWARD_LIMIT);
+    runActuatorsPositionControl(mSetpoint);
   }
 
   public void resetEncoders(){
@@ -263,10 +249,9 @@ public class Tower extends SubsystemBase {
     mSetpoint = 0;
   }
 
-  private enum TowerActuatorMode{
-    POSITION_CONTROL, OPEN_LOOP, OFF
+  public TowerActuatorMode getControlMode(){
+    return mActuatorMode;
   }
-
 
   public boolean isAtAngle(double angle){
     return Math.abs(getTowerAngle() - angle) < 1.0;
@@ -275,5 +260,9 @@ public class Tower extends SubsystemBase {
   public void stopMotors(){
     mLeftMotor.stopMotor();
     mRightMotor.stopMotor();
+  }
+
+  public enum TowerActuatorMode{
+    POSITION_CONTROL, OPEN_LOOP, OFF
   }
 }

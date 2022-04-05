@@ -16,26 +16,21 @@ import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import frc.robot.autonomous.AutoRoutine;
 import frc.robot.autonomous.CommandBuilder;
 import frc.robot.autonomous.TrajectoryBuilder;
-import frc.robot.autonomous.routines.OneBallTop;
-import frc.robot.autonomous.routines.OneBallMid;
-import frc.robot.autonomous.routines.OneBallBottom;
 import frc.robot.commands.AngleTowerSetpoint;
-import frc.robot.commands.AngleTowerVision;
 import frc.robot.commands.AutoVisionShoot;
 import frc.robot.commands.HomeClimb;
 import frc.robot.commands.HomeStationaryClimb;
 import frc.robot.commands.RunIntakeAndConveyor;
-import frc.robot.commands.RunShooterPID;
-import frc.robot.commands.RunShooterPIDToSetpoint;
+import frc.robot.commands.ControllerRunStationaryClimb;
+import frc.robot.commands.ControllerRunTower;
 import frc.robot.commands.ShootBallAndAngleTowerSequence;
+import frc.robot.commands.ShootBallSequence;
 import frc.robot.commands.StopIntakeAndConveyor;
 import frc.robot.commands.HomeTower;
 import frc.robot.commands.DeployIntake;
 import frc.robot.commands.DriveTeleop;
 import frc.robot.commands.HomeTowerAndRetractIntake;
-import frc.robot.commands.RetractIntake;
 import frc.robot.commands.ReverseIntakeAndConveyor;
-import frc.robot.commands.RotateToTarget;
 import frc.robot.subsystems.DriveTrain;
 import frc.robot.subsystems.Climb;
 import frc.robot.subsystems.ColorSensor;
@@ -86,10 +81,6 @@ public class RobotContainer {
   private CommandBuilder mCommandBuilder;
   private SendableChooser<AutoRoutine> mAutoChooser;
 
-  // private BlueOneS1B1 blueOneS1B1;
-  // private BlueOneS2B2 blueOneS2B2;
-  // private BlueOneS3B3 blueOneS3B3;
-
   /** The container for the robot. Contains subsystems, OI devices, and commands. */
   public RobotContainer() {
 
@@ -108,12 +99,11 @@ public class RobotContainer {
 
     // Climb
     mClimb = Climb.getInstance();
-    // mClimb.setDefaultCommand(new RunCommand(()-> mClimb.runClimbWithJoystick(mainController), mClimb));
     
     // Stationary Climb
     mStationaryClimb = StationaryClimb.getInstance();
     if (secondaryController.isPresent()){
-      mStationaryClimb.setDefaultCommand(new RunCommand(()->mStationaryClimb.runClimbWithJoystick(secondaryController.get()), mStationaryClimb));
+      mStationaryClimb.setDefaultCommand(new ControllerRunStationaryClimb(mainController));
     }
 
     // Intake
@@ -130,7 +120,7 @@ public class RobotContainer {
     mTower.setDefaultCommand(
       new RunCommand(()-> {
         if (!mTower.isHome()) mIntake.deploy();
-        mTower.runTowerWithController(mainController);
+        new ControllerRunTower(mainController);
       }, mTower, mIntake)
     );
 
@@ -219,21 +209,12 @@ public class RobotContainer {
         new SequentialCommandGroup(
           new ParallelCommandGroup(
             new AngleTowerSetpoint(60),
-            new InstantCommand(()->mShooter.runShooter(0.60), mShooter)
+            new ShootBallSequence(50)
           )  
         ),
         mShooter::isShooting
       )
     );
-
-    // Command runShooter = new RunShooterPID(50);
-    // new POVButton(mainController, 180).toggleWhenPressed(runShooter);
-    // .whenPressed(
-    //   new ConditionalCommand(
-    //     new InstantCommand(runShooter::cancel), 
-    //     runShooter, 
-    //     mShooter::isShooting)
-    // );
   }
 
   private void ConfigureSecondaryController(){
