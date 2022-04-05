@@ -51,23 +51,20 @@ public class DriveTrain extends SubsystemBase {
   private DoubleSolenoid mShifter;
 
   //Controller setup
-  private PIDController mLeftAutoController, mRightAutoController;
   private SparkMaxPIDController mleftPIDController, mrightPIDController;
 
   private DriveControlMode mDriveControlMode;
   private GearMode mGearMode;
   private boolean isInvertedDriving;
 
-  private double gearRatio, kS, kV, kA;
+  private double gearRatio;
   private double kP, kI, kD, kMinOutput, kMaxOutput;
-  private NetworkTableEntry kPEntry, kIEntry, kDEntry, kMinOutputEntry, kMaxOutputEntry;
   private double totalDistanceLeft = 0, totalDistanceRight = 0;
   private double lastLeftEncoderPos = 0, lastRightEncoderPos = 0;
 
   private DifferentialDriveKinematics mKinematics;
   private DifferentialDriveOdometry mOdometry;
   private ADXRS450_Gyro mGyro;
-  private SimpleMotorFeedforward mFeedforward;
 
   private SlewRateLimiter mTeleopRateLimiter = new SlewRateLimiter(Constants.FORWARDS_SLEW_RATE_LIMIT);
 
@@ -81,12 +78,9 @@ public class DriveTrain extends SubsystemBase {
     mLeftBack = new CANSparkMax(Constants.SparkMax.DRIVE_LEFT_BACK, MotorType.kBrushless);
     mRightFront = new CANSparkMax(Constants.SparkMax.DRIVE_RIGHT_FRONT, MotorType.kBrushless);
     mRightBack = new CANSparkMax(Constants.SparkMax.DRIVE_RIGHT_BACK, MotorType.kBrushless);
+
     mShifter = new DoubleSolenoid(PneumaticsModuleType.CTREPCM, Constants.PCM.DRIVE_GEAR_SHIFT_FORWARD, Constants.PCM.DRIVE_GEAR_SHIFT_REVERSE);
 
-    // mLeftFront.restoreFactoryDefaults();
-    // mLeftBack.restoreFactoryDefaults();
-    // mRightFront.restoreFactoryDefaults();
-    // mRightBack.restoreFactoryDefaults();
 
     mLeftFront.setIdleMode(Constants.DRIVE_IDLE_MODE);
     mLeftBack.setIdleMode(Constants.DRIVE_IDLE_MODE);
@@ -106,20 +100,13 @@ public class DriveTrain extends SubsystemBase {
     mleftPIDController = mLeftFront.getPIDController();
     mrightPIDController = mRightFront.getPIDController();
 
-    mLeftAutoController = new PIDController(Constants.kP_AUTO_LOW_GEAR, 0, 0);
-    mRightAutoController = new PIDController(Constants.kP_AUTO_LOW_GEAR, 0, 0);
-    
     mLeftFront.getReverseLimitSwitch(Type.kNormallyOpen).enableLimitSwitch(false);
     mRightFront.getReverseLimitSwitch(Type.kNormallyOpen).enableLimitSwitch(false);
 
     setToOpenLoopMode(); //Default drive mode set to open loop
     mGearMode = GearMode.UNKNOWN;
-    shiftToLowGear(); // Always set to low gear at the start
+    shiftToHighGear();; // Always set to low gear at the start
     isInvertedDriving = false;
-
-    kS = 0.23123;
-    kV = 4.5288;
-    kA = 0.4136;
 
     mGyro = new ADXRS450_Gyro();
     mGyro.calibrate();
@@ -129,7 +116,6 @@ public class DriveTrain extends SubsystemBase {
 
     mKinematics = new DifferentialDriveKinematics(Constants.TRACK_WIDTH);
     mOdometry = new DifferentialDriveOdometry(Rotation2d.fromDegrees(this.getGyroAngle()));
-    mFeedforward = new SimpleMotorFeedforward(kS, kV, kA);
 
     // Update to Shuffleboard
     driveTab = Shuffleboard.getTab("Drive");
@@ -142,11 +128,6 @@ public class DriveTrain extends SubsystemBase {
     driveTab.addNumber("right Encoder Meters", ()-> this.rotationsToMeters(mRightFrontEncoder.getPosition()));
     driveTab.add(mGyro);
 
-    kPEntry = driveTab.add("P Gain", kP).getEntry();
-    kIEntry = driveTab.add("I Gain", kI).getEntry();
-    kDEntry = driveTab.add("D Gain", kD).getEntry();
-    kMinOutputEntry = driveTab.add("Min Output", kMinOutput).getEntry();
-    kMaxOutputEntry = driveTab.add("Max Output", kMaxOutput).getEntry();
   }
 
   @Override
@@ -404,9 +385,27 @@ public class DriveTrain extends SubsystemBase {
    * @return motor feedforward
    */
   public SimpleMotorFeedforward getFeedForward(){
-    return mFeedforward;
+    switch (mGearMode){
+      case LOW_GEAR:
+        return new SimpleMotorFeedforward(Constants.kS_LOW_GEAR, Constants.kV_LOW_GEAR, Constants.kA_LOW_GEAR);
+      case HIGH_GEAR:
+        return new SimpleMotorFeedforward(Constants.kS_HIGH_GEAR, Constants.kV_HIGH_GEAR, Constants.kA_HIGH_GEAR);
+      default:
+        return null;
+    }
   }
 
+  public PIDController getAutoPIDController() {
+    switch (mGearMode){
+      case LOW_GEAR:
+        return new PIDController(Constants.kP_AUTO_LOW_GEAR, 0, 0);
+      case HIGH_GEAR:
+        return new PIDController(Constants.kP_AUTO_HIGH_GEAR, 0, 0);
+      default:
+        return null;
+    }
+
+  }
   /**
    * Get the kinematics
    * @return kinematics
@@ -520,8 +519,8 @@ public class DriveTrain extends SubsystemBase {
         this.getFeedForward(), 
         this.getKinematics(), 
         this::getWheelSpeeds, 
-        mLeftAutoController, 
-        mRightAutoController, 
+        this.getAutoPIDController(), 
+        this.getAutoPIDController(), 
         this::tankDriveVolts, 
         this);
     return resetOdometry ? 
@@ -568,11 +567,6 @@ public class DriveTrain extends SubsystemBase {
       kMinOutput = -0.7;
       kMaxOutput = 0.7;
     }
-    // if(kPEntry.getDouble(0) != kP) kP = kPEntry.getDouble(0);
-    // if(kIEntry.getDouble(0) != kI) kI = kIEntry.getDouble(0);
-    // if(kDEntry.getDouble(0) != kD) kD = kDEntry.getDouble(0);
-    // if(kMaxOutputEntry.getDouble(0) != kMaxOutput) kMaxOutput = kMaxOutputEntry.getDouble(0);
-    // if(kMinOutputEntry.getDouble(0) != kMinOutput) kMinOutput = kMinOutputEntry.getDouble(0);
 
     configurePIDController(mleftPIDController, kP, kI, kD, kMinOutput, kMaxOutput);
     configurePIDController(mrightPIDController, kP, kI, kD, kMinOutput, kMaxOutput);
@@ -596,11 +590,6 @@ public class DriveTrain extends SubsystemBase {
       kMinOutput = -0.5;
       kMaxOutput = 0.5;
     }
-    // if(kPEntry.getDouble(0) != kP) kP = kPEntry.getDouble(0);
-    // if(kIEntry.getDouble(0) != kI) kI = kIEntry.getDouble(0);
-    // if(kDEntry.getDouble(0) != kD) kD = kDEntry.getDouble(0);
-    // if(kMaxOutputEntry.getDouble(0) != kMaxOutput) kMaxOutput = kMaxOutputEntry.getDouble(0);
-    // if(kMinOutputEntry.getDouble(0) != kMinOutput) kMinOutput = kMinOutputEntry.getDouble(0);
 
     configurePIDController(mleftPIDController, kP, kI, kD, kMinOutput, kMaxOutput);
     configurePIDController(mrightPIDController, kP, kI, kD, kMinOutput, kMaxOutput);

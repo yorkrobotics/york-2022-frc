@@ -36,7 +36,6 @@ public final class Constants {
     public static final double kMaxVelocity = 1; // m/s
     public static final double kMaxAcceleration = 1; // m/s^2
 
-    public static final double kP_AUTO_LOW_GEAR = 5.5181;
 
     public static final double kP_VELOCITY_DRIVE_LOW_GEAR = 0.000097988;
     public static final double kI_VELOCITY_DRIVE_LOW_GEAR = 0;
@@ -59,12 +58,17 @@ public final class Constants {
     public static final double kD_VELOCITY_SHOOTER = 0.0;
     public static final double kFF_SHOOTER = 0.011;
 
+    public static final double kP_AUTO_LOW_GEAR = 1.2314;
 
-    public static final double kS_LOW_GEAR = 0.20874;
-    public static final double kV_LOW_GEAR = 4.3531;
-    public static final double kA_LOW_GEAR = 0.53187;
+    public static final double kS_LOW_GEAR = 0.20274;
+    public static final double kV_LOW_GEAR = 4.2658;
+    public static final double kA_LOW_GEAR = 0.63221;
 
+    public static final double kP_AUTO_HIGH_GEAR = 3.6108;
 
+    public static final double kS_HIGH_GEAR = 0.25126;
+    public static final double kV_HIGH_GEAR = 3.6168;
+    public static final double kA_HIGH_GEAR = 1.4465;
 
     public static final double FIELD_CENTER_X = 19.16;
     public static final double FIELD_CENTER_Y = 0;
@@ -81,9 +85,8 @@ public final class Constants {
     public static final IdleMode TOWER_IDLE_MODE = IdleMode.kBrake;
 
 
-    public static final float TOWER_FORWARD_LIMIT = 247;
+    public static final float TOWER_FORWARD_LIMIT = 243;
     public static final float CLIMB_REVERSE_LIMIT = -258;
-
     public static final float STATIONARY_CLIMB_FORWARD_LIMIT = 207;
 
 
