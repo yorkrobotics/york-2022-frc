@@ -12,6 +12,7 @@ import edu.wpi.first.networktables.NetworkTable;
 import edu.wpi.first.networktables.NetworkTableInstance;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.networktables.NetworkTableEntry;
+import org.opencv.core.*;
 import frc.robot.Constants;
 
 import java.io.File;
@@ -153,15 +154,19 @@ public class PyCamera extends SubsystemBase {
   }
 
   public double calcVelocity() {
-    double power = 0.490304 + 0.000745817 * x_field;
-    power = power * 100;
+    double power = 42.36 + 0.074 * x_field;
     return power;
+  }
+
+  public double calcAngle() {
+    double angle = 63.94 - 0.0444 * x_field;
+    return angle;
   }
 
   @Override
   public void periodic() {
     towerAngle = SmartDashboard.getNumber("Tower angle", 0);
-
+    
     hoop_coord = table.getEntry("translation_vector").getNumberArray(default_hoop_center_coord);
     x = hoop_coord[0].doubleValue();
     y = hoop_coord[1].doubleValue();
