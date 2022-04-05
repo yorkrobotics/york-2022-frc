@@ -428,7 +428,8 @@ if __name__ == "__main__":
         points = np.argwhere(binary_img)
         if len(points) > 0:
             avg_points = np.mean(points, axis = 0).reshape(2, 1)
-            cv2.circle(output_img, center=tuple(avg_points[::-1]), radius = 3, color = (0,0,255), thickness = 3)
+            avg_points = avg_points[::-1]
+            cv2.circle(output_img, center=tuple(avg_points), radius = 3, color = (0,0,255), thickness = 3)
 
             avg_points = np.vstack((avg_points, [[1]]))
             vector = np.linalg.inv(CAMERA_MATRIX) @ avg_points

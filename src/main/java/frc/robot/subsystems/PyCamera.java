@@ -155,12 +155,12 @@ public class PyCamera extends SubsystemBase {
   }
 
   public double calcVelocity() {
-    double power = 42.36 + 0.074 * x_field;
+    double power = 37.77 + 0.0723 * x_field;
     return power;
   }
 
   public double calcAngle() {
-    double angle = 63.94 - 0.0444 * x_field;
+    double angle = 67.62 - 0.04615 * x_field;
     return angle;
   }
 
@@ -168,30 +168,31 @@ public class PyCamera extends SubsystemBase {
   public void periodic() {
     towerAngle = SmartDashboard.getNumber("Tower angle", 0);
     Tower mTower = Tower.getInstance();
-    double theAngle = (mTower.getTowerAngle() + 90 - 30) / 180 * Math.PI;
+    double theAngle = (mTower.getTowerAngle() - 30) / 180 * Math.PI;
 
     double[][] rRc = {
       {1,0,0},
-      {0,Math.cos(theAngle),-Math.sin(theAngle)},
-      {0,Math.sin(theAngle),Math.cos(theAngle)}
+      {0, Math.cos(theAngle),-Math.sin(theAngle)},
+      {0, Math.sin(theAngle),Math.cos(theAngle)},
     };
 
     Number[] cL = table.getEntry("cam vec").getNumberArray(default_cam_vec);
     double rLx = 0, rLy = 0, rLz = 0;
-    for (int i = 0; i < 3; i++) {
-      for (int j = 0; j < 3; j++) {
-        rLx += rRc[i][j] * (double) cL[0];
-        rLy += rRc[i][j] * (double) cL[1];
-        rLz += rRc[i][j] * (double) cL[2];
-      }
+    for (int j = 0; j < 3; j++) {
+      rLx += rRc[0][j] * (double) cL[j];
+      rLy += rRc[1][j] * (double) cL[j];
+      rLz += rRc[2][j] * (double) cL[j];
     }
 
     double[] rL = {rLx,rLy,rLz};
+    SmartDashboard.putNumber("L x", rL[0]);
+    SmartDashboard.putNumber("L y", rL[1]);
+    SmartDashboard.putNumber("L z", rL[2]);
    
-    double[] rLo = {0,2,3};
+    double[] rLo = {0,-28,-6};
 
-    double[] p = {0, 104, 0};
-    double[] n = {0, 1, 0};
+    double[] p = {0, -104, 0};
+    double[] n = {0, -1, 0};
     
     double[] diff = new double[3];
     for (int i = 0; i < 3; i++) {
@@ -239,7 +240,8 @@ public class PyCamera extends SubsystemBase {
     if (towerAngle < 46.6 && towerAngle > 46.4) {
       double shooter_angle = towerAngle / 180 * Math.PI;
       y_field = h_h - shooter_radius * Math.sin(shooter_angle) - h_r2g;
-      x_field = Math.tan(shooter_angle) * (Math.sin(shooter_angle) *  z - y_field) + Math.cos(shooter_angle) * z;
+      // x_field = Math.tan(shooter_angle) * (Math.sin(shooter_angle) *  z - y_field) + Math.cos(shooter_angle) * z;
+      x_field = Math.sqrt(x * x + z * z);
     }
 
     if (last_x != x || last_y != y || last_z != z) {
@@ -259,6 +261,9 @@ public class PyCamera extends SubsystemBase {
     // x_field = Math.tan(shooter_angle) * (Math.sin(shooter_angle) *  z - y_field) + Math.cos(shooter_angle) * z;
     // x_field = filter.calculate(x_field); // TODO: to be tested
 
+    SmartDashboard.putNumber("x", x);
+    SmartDashboard.putNumber("y", y);
+    SmartDashboard.putNumber("z", z);
     SmartDashboard.putNumber("filterdAngle", filteredAngle);
     // filteredAngle = filter.calculate(angle);
     // This method will be called once per scheduler run

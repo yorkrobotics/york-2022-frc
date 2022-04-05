@@ -32,7 +32,7 @@ public class RotateToTarget extends PIDCommand implements VisionSubscriber {
         this.drive = drive;
         this.pycam = pycam;
 
-        m_controller.setTolerance(0.5);
+        m_controller.setTolerance(1, 2);
         m_useOutput = this::useOutput;
         m_measurement = drive::getGyroAngle;
         m_setpoint = this::getTargetAngle;
@@ -44,7 +44,7 @@ public class RotateToTarget extends PIDCommand implements VisionSubscriber {
 
     @Override
     public void initialize() {
-        isDone=false;
+        m_controller.reset();
     }
 
     private double getTargetAngle() {
@@ -58,9 +58,6 @@ public class RotateToTarget extends PIDCommand implements VisionSubscriber {
 
     @Override
     public void execute() {
-        if (m_controller.atSetpoint()) {
-            isDone = true;
-        }
         super.execute();
     }
 
@@ -70,7 +67,7 @@ public class RotateToTarget extends PIDCommand implements VisionSubscriber {
         else if (output < -1) output = -1;
 
         // Rescale the output
-        output *= 0.1;
+        output *= 0.3;
 
         // Apply the output to the drivetrain
         drive.driveOpenloop(output, -output);
@@ -79,7 +76,7 @@ public class RotateToTarget extends PIDCommand implements VisionSubscriber {
 
     @Override
     public boolean isFinished() {
-        return isDone;
+        return m_controller.atSetpoint();
     }
 
     @Override
