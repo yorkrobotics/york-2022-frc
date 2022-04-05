@@ -14,14 +14,14 @@ public class ShootBallAndAngleTowerSequence extends SequentialCommandGroup {
 
   RunShooterPIDToSetpoint runShooter = new RunShooterPIDToSetpoint(0);
   RunShooterPID runShooterNoSetpoint = new RunShooterPID(0);
-  AngleTowerVision angleTowerVision = new AngleTowerVision();
+  AngleTowerSetpoint angleTowerSetpoint = new AngleTowerSetpoint(0);
 
   /** Creates a new ShootBallSequence. */
   public ShootBallAndAngleTowerSequence(double velocity) {
     // Add your commands in the addCommands() call, e.g.
     // addCommands(new FooCommand(), new BarCommand());
     addCommands(
-      angleTowerVision,
+      angleTowerSetpoint,
       new ReverseConveyorTimed(0.25),
       runShooter,
       new ParallelRaceGroup(
@@ -32,8 +32,13 @@ public class ShootBallAndAngleTowerSequence extends SequentialCommandGroup {
   }
 
   public void setVelocity(double velocity) {
+    System.out.println("set velocity to " + velocity);
     runShooter.setVelocity(velocity);
     runShooterNoSetpoint.setVelocity(velocity);
+  }
+  public void setAngle(double angle) {
+    System.out.println("set angle to " + angle);
+    angleTowerSetpoint.setSetpoint(angle);
   }
   // TODO set angle
 }

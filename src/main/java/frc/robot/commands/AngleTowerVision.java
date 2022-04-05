@@ -39,7 +39,8 @@ public class AngleTowerVision extends CommandBase implements VisionSubscriber {
     }
 
     public double computeTargetAngle() {
-        double targetAngle = 67.6818 - 0.101674 * mXField;
+        double targetAngle = 63.94 - 0.0444 * mXField;
+
         if (targetAngle > 79) {
         return 79;
         }

@@ -12,6 +12,7 @@ import edu.wpi.first.wpilibj.XboxController.Button;
 import edu.wpi.first.wpilibj.shuffleboard.Shuffleboard;
 import edu.wpi.first.wpilibj.shuffleboard.ShuffleboardTab;
 import edu.wpi.first.wpilibj.smartdashboard.SendableChooser;
+import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import frc.robot.autonomous.AutoRoutine;
 import frc.robot.autonomous.CommandBuilder;
 import frc.robot.autonomous.TrajectoryBuilder;
@@ -26,6 +27,7 @@ import frc.robot.commands.HomeStationaryClimb;
 import frc.robot.commands.RunIntakeAndConveyor;
 import frc.robot.commands.RunShooterPID;
 import frc.robot.commands.RunShooterPIDToSetpoint;
+import frc.robot.commands.ShootBallAndAngleTowerSequence;
 import frc.robot.commands.StopIntakeAndConveyor;
 import frc.robot.commands.HomeTower;
 import frc.robot.commands.DeployIntake;
@@ -196,8 +198,16 @@ public class RobotContainer {
     new POVButton(mainController, 90).whenPressed(new DeployIntake());
     new POVButton(mainController, 270).whenPressed(new HomeTowerAndRetractIntake());
 
+    ShootBallAndAngleTowerSequence shootBallAndAngleTowerSequence = new ShootBallAndAngleTowerSequence(0);
+    SmartDashboard.putNumber("towe angle", 0);
+    SmartDashboard.putNumber("velocity", 0);
     new POVButton(mainController, 180).toggleWhenPressed(
+      // new InstantCommand(()->{
+      //   shootBallAndAngleTowerSequence.setAngle(SmartDashboard.getNumber("towe angle", 0));
+      //   shootBallAndAngleTowerSequence.setVelocity(SmartDashboard.getNumber("velocity", 0));
+      // }).andThen(shootBallAndAngleTowerSequence)
       new AutoVisionShoot()
+      // new AutoVisionShoot()
     );
     
     new POVButton(mainController, 0).whenPressed(
