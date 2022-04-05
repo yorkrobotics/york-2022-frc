@@ -421,12 +421,22 @@ if __name__ == "__main__":
         # getCenterHSV(output_img) # for tuning binary image HSV range
 
         # get the center of the hoop and upload it to the network table
-        vertice_list = verticesFromBin(binary_img, output_img)
-        hoop_centers = getHoopCenter(output_img, vertice_list)
-        center = getBestCenter(hoop_centers)
+        # vertice_list = verticesFromBin(binary_img, output_img)
+        # hoop_centers = getHoopCenter(output_img, vertice_list)
+        # center = getBestCenter(hoop_centers)
 
-        cv2.putText(output_img, str(center), (167, 40), 0, (1), (128, 255, 0), 1)
-        vision_nt.putNumberArray('translation_vector', center)
+        points = np.argwhere(binary_img)
+        if len(points) > 0:
+            avg_points = np.mean(points, axis = 0).reshape(2, 1)
+            cv2.circle(output_img, center=tuple(avg_points[::-1]), radius = 3, color = (0,0,255), thickness = 3)
+
+            avg_points = np.vstack((avg_points, [[1]]))
+            vector = np.linalg.inv(CAMERA_MATRIX) @ avg_points
+            vision_nt.putNumberArray('cam vec', vector.flatten())
+        
+
+        # cv2.putText(output_img, str(center), (167, 40), 0, (1), (128, 255, 0), 1)
+        # vision_nt.putNumberArray('translation_vector', center)
 
         # display the frames 
         output_stream.putFrame(output_img) # on port 1182

@@ -27,10 +27,13 @@ public class AutoVisionShoot extends SequentialCommandGroup {
         new InstantCommand(),
         new SequentialCommandGroup(
           new RotateToTarget(drive, pycam),
-          new InstantCommand(()->{shootBallSequence.setVelocity(pycam.calcVelocity());}),
+          new InstantCommand(()->{
+            shootBallSequence.setVelocity(pycam.calcVelocity());
+            shootBallSequence.setAngle(pycam.calcAngle());
+          }),
           shootBallSequence
         ),
-        () -> pycam.isNaN() // TODO: concu with the last value
+        () -> false // TODO: concu with the last value
       )
     );
   }

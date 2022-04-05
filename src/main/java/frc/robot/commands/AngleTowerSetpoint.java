@@ -40,4 +40,8 @@ public class AngleTowerSetpoint extends CommandBase {
   public boolean isFinished() {
     return mTower.isAtAngle(mSetAngle);
   }
+
+public void setSetpoint(double angle) {
+  mSetAngle = angle;
+}
 }
