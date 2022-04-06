@@ -6,6 +6,7 @@ package frc.robot.commands;
 
 import edu.wpi.first.wpilibj2.command.InstantCommand;
 import edu.wpi.first.wpilibj2.command.SequentialCommandGroup;
+import edu.wpi.first.wpilibj2.command.WaitCommand;
 import frc.robot.subsystems.DriveTrain;
 import frc.robot.subsystems.PyCamera;
 
@@ -23,6 +24,7 @@ public class AutoVisionShoot extends SequentialCommandGroup {
     // addCommands(new FooCommand(), new BarCommand());
     addCommands(
           new RotateToTarget(drive, pycam),
+          new WaitCommand(0.2),
           new InstantCommand(()->{
             shootBallSequence.setVelocity(pycam.calcVelocity());
             shootBallSequence.setAngle(pycam.calcAngle());

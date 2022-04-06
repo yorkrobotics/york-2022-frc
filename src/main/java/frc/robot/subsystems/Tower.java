@@ -76,8 +76,8 @@ public class Tower extends SubsystemBase {
     kP = 0.1;
     kI = 0;
     kD = 0;
-    kMinOutput = -0.5;
-    kMaxOutput = 0.5;
+    kMinOutput = -0.7;
+    kMaxOutput = 0.7;
 
     configurePIDController();
 

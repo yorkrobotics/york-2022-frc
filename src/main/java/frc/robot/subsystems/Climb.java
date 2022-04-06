@@ -71,8 +71,8 @@ public class Climb extends SubsystemBase {
     kP = 0.1;
     kI = 0;
     kD = 0;
-    kMinOutput = -0.5;
-    kMaxOutput = 0.5;
+    kMinOutput = -0.8;
+    kMaxOutput = 0.8;
 
     configurePIDController();
 
@@ -196,11 +196,13 @@ public class Climb extends SubsystemBase {
 
   public void ClimbUpWithBumper(){
     mSetpoint -= 1.8;
+    mSetpoint = MathUtil.clamp(mSetpoint, Constants.CLIMB_REVERSE_LIMIT, 0);
     runClimbPositionControl(mSetpoint);
   }
 
   public void ClimbDownWithBumper(){
     mSetpoint += 1.8;
+    mSetpoint = MathUtil.clamp(mSetpoint, Constants.CLIMB_REVERSE_LIMIT, 0);
     runClimbPositionControl(mSetpoint);
   }
 

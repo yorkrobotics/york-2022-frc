@@ -18,6 +18,9 @@ import frc.robot.autonomous.CommandBuilder;
 import frc.robot.autonomous.TrajectoryBuilder;
 import frc.robot.commands.AngleTowerSetpoint;
 import frc.robot.commands.AutoVisionShoot;
+import frc.robot.commands.Bop;
+import frc.robot.commands.Burp;
+import frc.robot.commands.ControllerRunClimb;
 import frc.robot.commands.HomeClimb;
 import frc.robot.commands.HomeStationaryClimb;
 import frc.robot.commands.RunIntakeAndConveyor;
@@ -46,6 +49,7 @@ import edu.wpi.first.wpilibj2.command.InstantCommand;
 import edu.wpi.first.wpilibj2.command.ParallelCommandGroup;
 import edu.wpi.first.wpilibj2.command.RunCommand;
 import edu.wpi.first.wpilibj2.command.SequentialCommandGroup;
+import edu.wpi.first.wpilibj2.command.WaitCommand;
 import edu.wpi.first.wpilibj2.command.button.JoystickButton;
 import edu.wpi.first.wpilibj2.command.button.POVButton;
 
@@ -71,7 +75,7 @@ public class RobotContainer {
 
   // XboxController
   public static XboxController mainController;
-  public static Optional<XboxController> secondaryController = Optional.empty();
+  public static XboxController secondaryController;
 
   // Camera
   private PyCamera pycam;
@@ -87,10 +91,7 @@ public class RobotContainer {
     // Driver's controller
     mainController = new XboxController(Constants.CONTROLLER_PORT);
     
-    XboxController secondaryControllerOptional = new XboxController(Constants.CONTROLLER_PORT_SECONDARY);
-    if (secondaryControllerOptional.isConnected()) {
-      secondaryController = Optional.of(secondaryControllerOptional);
-    }
+    secondaryController = new XboxController(Constants.CONTROLLER_PORT_SECONDARY);
 
     // DriveTrain subsystem
     mDrive = DriveTrain.getInstance();
@@ -99,12 +100,10 @@ public class RobotContainer {
 
     // Climb
     mClimb = Climb.getInstance();
+    mClimb.setDefaultCommand(new ControllerRunClimb(secondaryController));
     
     // Stationary Climb
     mStationaryClimb = StationaryClimb.getInstance();
-    if (secondaryController.isPresent()){
-      mStationaryClimb.setDefaultCommand(new ControllerRunStationaryClimb(mainController));
-    }
 
     // Intake
     mIntake = Intake.getInstance();
@@ -117,12 +116,7 @@ public class RobotContainer {
 
     // Tower
     mTower = Tower.getInstance();
-    mTower.setDefaultCommand(
-      new RunCommand(()-> {
-        if (!mTower.isHome()) mIntake.deploy();
-        new ControllerRunTower(mainController);
-      }, mTower, mIntake)
-    );
+    mTower.setDefaultCommand(new ControllerRunTower(mainController, secondaryController));
 
     //pycam
     pycam = new PyCamera();
@@ -135,11 +129,6 @@ public class RobotContainer {
     mCommandBuilder = new CommandBuilder();
     mAutoChooser = new SendableChooser<AutoRoutine>();
 
-    // blueOneS1B1 = new BlueOneS1B1(mIntake, mShooter, mConveyor, mTower);
-    // blueOneS2B2 = new BlueOneS2B2(mIntake, mShooter, mConveyor, mTower);
-    // blueOneS3B3 = new BlueOneS3B3(mIntake, mShooter, mConveyor, mTower);
-
-
     // Populate shuffleboard
     ShuffleboardTab autoTab = Shuffleboard.getTab("Autonomous");
     autoTab.add(mAutoChooser);
@@ -148,9 +137,7 @@ public class RobotContainer {
 
     // Configure the button bindings
     configureButtonBindings();
-    if (secondaryController.isPresent()){
-      ConfigureSecondaryController();
-    }
+    configureSecondaryController();
   }
 
   /**
@@ -164,15 +151,15 @@ public class RobotContainer {
     /**
      * main controller
      */
-    new JoystickButton(mainController, Button.kRightBumper.value).whileHeld(mClimb::ClimbUpWithBumper, mClimb);
-    new JoystickButton(mainController, Button.kLeftBumper.value).whileHeld(mClimb::ClimbDownWithBumper, mClimb);
+    new JoystickButton(mainController, Button.kRightBumper.value).whileHeld(mStationaryClimb::ClimbDownWithBumper, mStationaryClimb);
+    new JoystickButton(mainController, Button.kLeftBumper.value).whileHeld(mStationaryClimb::ClimbUpWithBumper, mStationaryClimb);
 
     new JoystickButton(mainController, Button.kLeftStick.value).whenPressed(mDrive::switchInvertedDriving, mDrive);
 
     new JoystickButton(mainController, Button.kA.value).whenPressed(new RunIntakeAndConveyor())
-      .whenReleased(new StopIntakeAndConveyor(mIntake, mConveyor));
+      .whenReleased(new StopIntakeAndConveyor());
     new JoystickButton(mainController, Button.kY.value).whenPressed(new ReverseIntakeAndConveyor())
-      .whenReleased(new StopIntakeAndConveyor(mIntake, mConveyor));
+      .whenReleased(new StopIntakeAndConveyor());
     
     new JoystickButton(mainController, Button.kX.value).whenPressed(mDrive::shiftToLowGear, mDrive);
     new JoystickButton(mainController, Button.kB.value).whenPressed(mDrive::shiftToHighGear, mDrive);
@@ -183,7 +170,7 @@ public class RobotContainer {
         new InstantCommand(mShooter::stopShooter, mShooter)
       )
       );
-    new JoystickButton(mainController, Button.kBack.value).whenPressed(new HomeClimb());
+    new JoystickButton(mainController, Button.kBack.value).whenPressed(new HomeStationaryClimb());
 
     new POVButton(mainController, 90).whenPressed(new DeployIntake());
     new POVButton(mainController, 270).whenPressed(new HomeTowerAndRetractIntake());
@@ -196,8 +183,7 @@ public class RobotContainer {
       //   shootBallAndAngleTowerSequence.setAngle(SmartDashboard.getNumber("towe angle", 0));
       //   shootBallAndAngleTowerSequence.setVelocity(SmartDashboard.getNumber("velocity", 0));
       // }).andThen(shootBallAndAngleTowerSequence)
-      new AutoVisionShoot()
-      // new AutoVisionShoot()
+      new HomeTower().andThen(new AutoVisionShoot())
     );
     
     new POVButton(mainController, 0).whenPressed(
@@ -217,8 +203,23 @@ public class RobotContainer {
     );
   }
 
-  private void ConfigureSecondaryController(){
-    new JoystickButton(secondaryController.get(), Button.kA.value).whenPressed(new HomeStationaryClimb());
+  private void configureSecondaryController(){
+    new JoystickButton(secondaryController, Button.kB.value).whenPressed(new HomeClimb());
+    
+    new JoystickButton(secondaryController, Button.kY.value).whenPressed(new ReverseIntakeAndConveyor())
+      .whenReleased(new StopIntakeAndConveyor());
+    new JoystickButton(secondaryController, Button.kA.value).whenPressed(new RunIntakeAndConveyor())
+      .whenReleased(new StopIntakeAndConveyor());
+
+    new JoystickButton(secondaryController, Button.kStart.value).whenPressed(new Bop())
+      .whenReleased(new StopIntakeAndConveyor());
+    new JoystickButton(secondaryController, Button.kBack.value).whenPressed(new Burp())
+      .whenReleased(new StopIntakeAndConveyor());
+
+    new POVButton(secondaryController, 90).whenPressed(new DeployIntake());
+    new POVButton(secondaryController, 270).whenPressed(new HomeTowerAndRetractIntake());
+    
+    new POVButton(secondaryController, 180).toggleWhenPressed(new HomeTower().andThen(new AutoVisionShoot()));
   }
 
 

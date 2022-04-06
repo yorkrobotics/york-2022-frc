@@ -8,6 +8,7 @@ import edu.wpi.first.networktables.NetworkTableInstance;
 import edu.wpi.first.wpilibj.shuffleboard.Shuffleboard;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.PIDCommand;
+import frc.robot.Constants;
 import frc.robot.subsystems.DriveTrain;
 import frc.robot.subsystems.PyCamera;
 import frc.robot.subsystems.VisionSubscriber;
@@ -22,7 +23,7 @@ public class RotateToTarget extends PIDCommand implements VisionSubscriber {
 
     public RotateToTarget(DriveTrain drive, PyCamera pycam) {
         super(
-            new PIDController(0.3, 0, 0),
+            new PIDController(Constants.kP_VISION_YAW, Constants.kI_VISION_YAW, 0),
             () -> 0.,
             () -> 0.,
             (v) -> {},
@@ -32,7 +33,7 @@ public class RotateToTarget extends PIDCommand implements VisionSubscriber {
         this.drive = drive;
         this.pycam = pycam;
 
-        m_controller.setTolerance(1, 2);
+        m_controller.setTolerance(0.5, 3);
         m_useOutput = this::useOutput;
         m_measurement = drive::getGyroAngle;
         m_setpoint = this::getTargetAngle;

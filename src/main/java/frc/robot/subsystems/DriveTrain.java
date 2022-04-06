@@ -104,7 +104,7 @@ public class DriveTrain extends SubsystemBase {
 
     setToOpenLoopMode(); //Default drive mode set to open loop
     mGearMode = GearMode.UNKNOWN;
-    shiftToHighGear();; // Always set to low gear at the start
+    shiftToLowGear();; // Always set to low gear at the start
     isInvertedDriving = false;
 
     mGyro = new ADXRS450_Gyro();
