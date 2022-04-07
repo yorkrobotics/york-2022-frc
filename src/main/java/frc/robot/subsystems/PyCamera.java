@@ -237,7 +237,8 @@ public class PyCamera extends SubsystemBase {
       isNaN = true;
     }
 
-    if (towerAngle < 46.6 && towerAngle > 46.4) {
+
+    if (mTower.isHome()) {
       double shooter_angle = towerAngle / 180 * Math.PI;
       y_field = h_h - shooter_radius * Math.sin(shooter_angle) - h_r2g;
       // x_field = Math.tan(shooter_angle) * (Math.sin(shooter_angle) *  z - y_field) + Math.cos(shooter_angle) * z;

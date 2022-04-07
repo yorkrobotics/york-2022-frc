@@ -12,10 +12,11 @@ import frc.robot.subsystems.Tower.TowerActuatorMode;
 
 public class ControllerRunTower extends CommandBase {
   private Tower mTower = Tower.getInstance();
-  private XboxController mController;
+  private XboxController mController, mSecondController;
   /** Creates a new RunTower. */
-  public ControllerRunTower(XboxController controller) {
-    mController = controller;
+  public ControllerRunTower(XboxController mainController, XboxController secondController) {
+    mController = mainController;
+    mSecondController = secondController;
     addRequirements(mTower);
   }
 
@@ -26,7 +27,7 @@ public class ControllerRunTower extends CommandBase {
   // Called every time the scheduler runs while the command is scheduled.
   @Override
   public void execute() {
-    double controllerValue = mController.getRightY();
+    double controllerValue = mController.getRightY() + mSecondController.getRightY();
     controllerValue = MathUtil.applyDeadband(controllerValue, 0.1);
 
     if (mTower.getControlMode() == TowerActuatorMode.OPEN_LOOP){
@@ -34,7 +35,7 @@ public class ControllerRunTower extends CommandBase {
     }
 
     if (mTower.getControlMode() == TowerActuatorMode.POSITION_CONTROL){
-      mTower.updateSetpoint(controllerValue * 1.8);
+      mTower.updateSetpoint(controllerValue * 2.3);
     }
   }
 

@@ -58,6 +58,9 @@ public final class Constants {
     public static final double kD_VELOCITY_SHOOTER = 0.0;
     public static final double kFF_SHOOTER = 0.011;
 
+    public static final double kP_VISION_YAW = 0.04;
+    public static final double kI_VISION_YAW = 0.04;
+
     public static final double kP_AUTO_LOW_GEAR = 1.2314;
 
     public static final double kS_LOW_GEAR = 0.20274;
@@ -87,13 +90,14 @@ public final class Constants {
 
     public static final float TOWER_FORWARD_LIMIT = 243;
     public static final float CLIMB_REVERSE_LIMIT = -258;
-    public static final float STATIONARY_CLIMB_FORWARD_LIMIT = 207;
+    public static final float STATIONARY_CLIMB_FORWARD_LIMIT = 209;
 
 
     public static final double CLIMB_UPPER_PRESET = -262;
     public static final double CLIMB_LOWER_PRESET = 0;
 
-    public static final double FORWARDS_SLEW_RATE_LIMIT = 1.75;
+    public static final double SLEW_RATE_LIMIT_LOW_GEAR = 1.75;
+    public static final double SLEW_RATE_LIMIT_HIGH_GEAR = 1.5;
 
 
 
@@ -129,5 +133,6 @@ public final class Constants {
       public static final int INTAKE_FORWARD = 5;
       public static final int INTAKE_REVERSE = 2;
     }
+
 
 }

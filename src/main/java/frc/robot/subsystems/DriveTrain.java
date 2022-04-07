@@ -13,7 +13,6 @@ import com.revrobotics.SparkMaxLimitSwitch.Type;
 import edu.wpi.first.math.controller.PIDController;
 import edu.wpi.first.math.controller.RamseteController;
 import edu.wpi.first.math.controller.SimpleMotorFeedforward;
-import edu.wpi.first.math.filter.SlewRateLimiter;
 import edu.wpi.first.math.geometry.Pose2d;
 import edu.wpi.first.math.geometry.Rotation2d;
 import edu.wpi.first.math.kinematics.DifferentialDriveKinematics;
@@ -23,10 +22,7 @@ import edu.wpi.first.math.trajectory.Trajectory;
 import edu.wpi.first.wpilibj.ADXRS450_Gyro;
 import edu.wpi.first.wpilibj.DoubleSolenoid;
 import edu.wpi.first.wpilibj.PneumaticsModuleType;
-import edu.wpi.first.wpilibj.XboxController;
 import edu.wpi.first.wpilibj.DoubleSolenoid.Value;
-import edu.wpi.first.wpilibj.drive.DifferentialDrive;
-import edu.wpi.first.wpilibj.drive.DifferentialDrive.WheelSpeeds;
 import edu.wpi.first.wpilibj.shuffleboard.Shuffleboard;
 import edu.wpi.first.wpilibj.shuffleboard.ShuffleboardTab;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
@@ -65,8 +61,6 @@ public class DriveTrain extends SubsystemBase {
   private DifferentialDriveOdometry mOdometry;
   private ADXRS450_Gyro mGyro;
 
-  private SlewRateLimiter mTeleopRateLimiter = new SlewRateLimiter(Constants.FORWARDS_SLEW_RATE_LIMIT);
-
   private ShuffleboardTab driveTab;
   private final Field2d mField;
 
@@ -104,7 +98,7 @@ public class DriveTrain extends SubsystemBase {
 
     setToOpenLoopMode(); //Default drive mode set to open loop
     mGearMode = GearMode.UNKNOWN;
-    shiftToHighGear();; // Always set to low gear at the start
+    shiftToLowGear();; // Always set to low gear at the start
     isInvertedDriving = false;
 
     mGyro = new ADXRS450_Gyro();
@@ -249,24 +243,6 @@ public class DriveTrain extends SubsystemBase {
     }
   }
 
-  /**
-   * Arcade drive that uses controller triggers and joystick
-   * @param controller xbox controller
-   * @return wheelspeeds
-   */
-  public WheelSpeeds mArcadeDrive(XboxController controller){
-    // double controller_leftX = controller.getLeftX();
-    // if (Math.abs(controller_leftX) < 0.25) controller_leftX = 0;
-    double forwards = controller.getRightTriggerAxis() - controller.getLeftTriggerAxis();
-    double slewLimitedForwards = mTeleopRateLimiter.calculate(forwards);
-
-    double trueForwards = slewLimitedForwards; // Change this to `forwards` to eliminate slew rate limiter
-
-    if (isInvertedDriving) trueForwards *= -1;
-
-    return DifferentialDrive.arcadeDriveIK(trueForwards, controller.getLeftX(), true);
-    
-  }
 
   public void switchInvertedDriving(){
     if (isInvertedDriving){
@@ -594,8 +570,12 @@ public class DriveTrain extends SubsystemBase {
     configurePIDController(mrightPIDController, kP, kI, kD, kMinOutput, kMaxOutput);
   }
 
-  public boolean getInvertedDriving(){
+  public boolean isInvertedDriving(){
     return isInvertedDriving;
+  }
+
+  public GearMode getGearMode(){
+    return mGearMode;
   }
 
   public enum DriveControlMode{

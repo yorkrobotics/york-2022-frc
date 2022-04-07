@@ -3,7 +3,6 @@
 // the WPILib BSD license file in the root directory of this project.
 
 package frc.robot.subsystems;
-
 import com.revrobotics.CANSparkMax;
 import com.revrobotics.RelativeEncoder;
 import com.revrobotics.SparkMaxLimitSwitch;
@@ -184,11 +183,13 @@ public class StationaryClimb extends SubsystemBase {
 
   public void ClimbUpWithBumper(){
     mSetpoint -= 1.8;
+    mSetpoint = MathUtil.clamp(mSetpoint, 0, Constants.STATIONARY_CLIMB_FORWARD_LIMIT);
     runClimbPositionControl(mSetpoint);
   }
 
   public void ClimbDownWithBumper(){
     mSetpoint += 1.8;
+    mSetpoint = MathUtil.clamp(mSetpoint, 0, Constants.STATIONARY_CLIMB_FORWARD_LIMIT);
     runClimbPositionControl(mSetpoint);
   }
 

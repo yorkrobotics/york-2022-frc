@@ -22,6 +22,7 @@ public class DeployIntake extends InstantCommand {
   // Called when the command is initially scheduled.
   @Override
   public void initialize() {
+    mTower.zeroSetpoint();
     mTower.whenIntakeDeployed();
     mIntake.deploy();
   }
