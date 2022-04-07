@@ -4,8 +4,6 @@
 
 package frc.robot;
 
-import java.util.Optional;
-
 import edu.wpi.first.wpilibj.GenericHID;
 import edu.wpi.first.wpilibj.XboxController;
 import edu.wpi.first.wpilibj.XboxController.Button;
@@ -95,8 +93,7 @@ public class RobotContainer {
 
     // DriveTrain subsystem
     mDrive = DriveTrain.getInstance();
-    driveTeleop = new DriveTeleop(mDrive);
-    mDrive.setDefaultCommand(driveTeleop);
+    mDrive.setDefaultCommand(new DriveTeleop(mainController));
 
     // Climb
     mClimb = Climb.getInstance();
