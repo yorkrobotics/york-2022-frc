@@ -425,16 +425,39 @@ if __name__ == "__main__":
         # hoop_centers = getHoopCenter(output_img, vertice_list)
         # center = getBestCenter(hoop_centers)
 
-        points = np.argwhere(binary_img)
-        if len(points) > 0:
-            avg_points = np.mean(points, axis = 0).reshape(2, 1)
-            avg_points = avg_points[::-1]
-            cv2.circle(output_img, center=tuple(avg_points), radius = 3, color = (0,0,255), thickness = 3)
+        binary_img = cv2.morphologyEx(binary_img, cv2.MORPH_OPEN, cv2.getStructuringElement(cv2.MORPH_ELLIPSE, (5,5)))
+        _, contour_list, _ = cv2.findContours(binary_img, mode=cv2.RETR_EXTERNAL, method=cv2.CHAIN_APPROX_TC89_L1)
 
-            avg_points = np.vstack((avg_points, [[1]]))
-            vector = np.linalg.inv(CAMERA_MATRIX) @ avg_points
-            vision_nt.putNumberArray('cam vec', vector.flatten())
-        
+        if contour_list:
+            centerX = 0
+            centerY = 0
+            idx = 0
+            for contour in contour_list:
+                if cv2.contourArea(contour) < 5:
+                    continue
+                rect = cv2.minAreaRect(contour)
+                cx, cy = rect[0]
+                # w, h = rect[1]
+                centerX += cx
+                centerY += cy
+                idx += 1
+                
+            if idx != 0:
+                avgX = centerX / idx
+                avgY = centerY / idx
+
+            # points = np.argwhere(binary_img)
+            # if len(points) > 0:
+            # avg_points = np.mean(points, axis = 0).reshape(2, 1)
+            # avg_points = avg_points[::-1]
+            # cv2.circle(output_img, center=tuple(avg_points), radius = 3, color = (0,0,255), thickness = 3)
+                avg_points = (int(avgX), int(avgY))
+                cv2.circle(output_img, center=avg_points, radius = 3, color = (0,0,255), thickness = 3)
+                avg_points = [np.array(x) for x in [avg_points]]
+                avg_points = np.vstack(([[avgX],[avgY]], [[1]]))
+                vector = np.linalg.inv(CAMERA_MATRIX) @ avg_points
+                vision_nt.putNumberArray('cam vec', vector.flatten())
+            
 
         # cv2.putText(output_img, str(center), (167, 40), 0, (1), (128, 255, 0), 1)
         # vision_nt.putNumberArray('translation_vector', center)
