@@ -442,20 +442,21 @@ if __name__ == "__main__":
                 centerY += cy
                 idx += 1
                 
-            avgX = centerX / idx
-            avgY = centerY / idx
+            if idx != 0:
+                avgX = centerX / idx
+                avgY = centerY / idx
 
             # points = np.argwhere(binary_img)
             # if len(points) > 0:
             # avg_points = np.mean(points, axis = 0).reshape(2, 1)
             # avg_points = avg_points[::-1]
             # cv2.circle(output_img, center=tuple(avg_points), radius = 3, color = (0,0,255), thickness = 3)
-            avg_points = (int(avgX), int(avgY))
-            cv2.circle(output_img, center=avg_points, radius = 3, color = (0,0,255), thickness = 3)
-            avg_points = [np.array(x) for x in [avg_points]]
-            avg_points = np.vstack(([[avgX],[avgY]], [[1]]))
-            vector = np.linalg.inv(CAMERA_MATRIX) @ avg_points
-            vision_nt.putNumberArray('cam vec', vector.flatten())
+                avg_points = (int(avgX), int(avgY))
+                cv2.circle(output_img, center=avg_points, radius = 3, color = (0,0,255), thickness = 3)
+                avg_points = [np.array(x) for x in [avg_points]]
+                avg_points = np.vstack(([[avgX],[avgY]], [[1]]))
+                vector = np.linalg.inv(CAMERA_MATRIX) @ avg_points
+                vision_nt.putNumberArray('cam vec', vector.flatten())
             
 
         # cv2.putText(output_img, str(center), (167, 40), 0, (1), (128, 255, 0), 1)
