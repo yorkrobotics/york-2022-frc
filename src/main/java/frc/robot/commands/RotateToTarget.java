@@ -1,7 +1,7 @@
 package frc.robot.commands;
 
+import edu.wpi.first.math.MathUtil;
 import edu.wpi.first.math.controller.PIDController;
-import edu.wpi.first.wpilibj.shuffleboard.Shuffleboard;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.PIDCommand;
 import frc.robot.Constants;
@@ -14,11 +14,13 @@ public class RotateToTarget extends PIDCommand implements VisionSubscriber {
     private final DriveTrain drive;
     private final PyCamera pycam;
 
+    private final double fudgeFactor = 2;
+
     private double targetAngle = 0;
 
     public RotateToTarget(DriveTrain drive, PyCamera pycam) {
         super(
-            new PIDController(Constants.kP_VISION_YAW, Constants.kI_VISION_YAW, 0),
+            new PIDController(Constants.kP_ROTATE_LOW_GEAR, Constants.kI_ROTATE_LOW_GEAR, 0),
             () -> 0.,
             () -> 0.,
             (v) -> {},
@@ -28,12 +30,13 @@ public class RotateToTarget extends PIDCommand implements VisionSubscriber {
         this.drive = drive;
         this.pycam = pycam;
 
-        m_controller.setTolerance(0.5, 3);
+        
+
+        m_controller.setTolerance(0.75, 3);
         m_useOutput = this::useOutput;
         m_measurement = drive::getGyroAngle;
         m_setpoint = this::getTargetAngle;
 
-        Shuffleboard.getTab("Vision Turning").add(m_controller);
         pycam.subscribe(this);
     }
 
@@ -48,22 +51,22 @@ public class RotateToTarget extends PIDCommand implements VisionSubscriber {
         super.execute();
     }
 
-    private PIDController getPIDController(){
-        switch (DriveTrain.getInstance().getGearMode()){
-            case HIGH_GEAR:
-                return new PIDController(0, 0, 0);
-            case LOW_GEAR:
-                return new PIDController(Constants.kP_VISION_YAW, Constants.kI_VISION_YAW, 0);
-            case UNKNOWN:
-                return null;
-            default:
-                return null;
+    // private PIDController getPIDController(){
+    //     switch (DriveTrain.getInstance().getGearMode()){
+    //         case HIGH_GEAR:
+    //             return new PIDController(Constants.kP_ROTATE_HIGH_GEAR, Constants.kI_ROTATE_LOW_GEAR, 0);
+    //         case LOW_GEAR:
+    //             return new PIDController(Constants.kP_ROTATE_LOW_GEAR, Constants.kI_ROTATE_LOW_GEAR, 0);
+    //         case UNKNOWN:
+    //             return null;
+    //         default:
+    //             return null;
 
-        }
-    }
+    //     }
+    // }
 
     private double getTargetAngle() {
-        return targetAngle;
+        return targetAngle + fudgeFactor;
     }
 
     private double getNewAngle() {
@@ -77,7 +80,15 @@ public class RotateToTarget extends PIDCommand implements VisionSubscriber {
         else if (output < -1) output = -1;
 
         // Rescale the output
-        output *= 0.3;
+        // output *= 0.4;
+
+        // if (Math.abs(output) < 0.15){
+        //     output *= 2;
+        // }
+
+        double maxOutput = 0.12;
+
+        output = MathUtil.clamp(output, -maxOutput, maxOutput);
 
         // Apply the output to the drivetrain
         drive.driveOpenloop(output, -output);

@@ -52,6 +52,8 @@ public class DriveTrain extends SubsystemBase {
   private GearMode mGearMode;
   private boolean isInvertedDriving;
 
+  // private PIDController rotatePIDController = new PIDController(0, 0, 0);
+
   private double gearRatio;
   private double kP, kI, kD, kMinOutput, kMaxOutput;
   private double totalDistanceLeft = 0, totalDistanceRight = 0;
@@ -260,6 +262,10 @@ public class DriveTrain extends SubsystemBase {
     mShifter.set(Value.kReverse);
     gearRatio = Constants.GEAR_RATIO_HIGH;
     mGearMode = GearMode.HIGH_GEAR;
+
+    // rotatePIDController.setP(Constants.kP_ROTATE_HIGH_GEAR);
+    // rotatePIDController.setI(Constants.kI_ROTATE_HIGH_GEAR);
+
     System.out.println("[Drive] High Gear");
   }
 
@@ -270,8 +276,15 @@ public class DriveTrain extends SubsystemBase {
     mShifter.set(Value.kForward);
     gearRatio = Constants.GEAR_RATIO_LOW;
     mGearMode = GearMode.LOW_GEAR;
+
+    // rotatePIDController.setP(Constants.kP_ROTATE_LOW_GEAR);
+    // rotatePIDController.setI(Constants.kI_ROTATE_LOW_GEAR);
     System.out.println("[Drive] Low Gear");
   }
+
+  // public PIDController getRotatePIDController(){
+  //   return rotatePIDController;
+  // }
 
   /**
    * Convert motor rotations to meters

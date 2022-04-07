@@ -51,6 +51,10 @@ public class DriveTeleop extends CommandBase {
         break;
     }
 
+    if (mDrive.isInvertedDriving()){
+      limitedForwards = - limitedForwards;
+    }
+
     mWheelSpeeds = DifferentialDrive.arcadeDriveIK(limitedForwards, mController.getLeftX(), true);
 
     if (mDrive.getDriveControlMode() == DriveControlMode.OPEN_LOOP){
