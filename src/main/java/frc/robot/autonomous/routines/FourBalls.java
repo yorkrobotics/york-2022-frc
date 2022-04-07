@@ -13,8 +13,6 @@ import frc.robot.autonomous.TrajectoryBuilder;
 import frc.robot.commands.AngleTowerSetpoint;
 import frc.robot.commands.DeployIntake;
 import frc.robot.commands.RunIntakeAndConveyor;
-import frc.robot.commands.RunShooterPID;
-import frc.robot.commands.RunShooterPIDToSetpoint;
 import frc.robot.commands.ShootBallSequence;
 import frc.robot.commands.HomeTowerAndRetractIntake;
 import frc.robot.subsystems.Intake;

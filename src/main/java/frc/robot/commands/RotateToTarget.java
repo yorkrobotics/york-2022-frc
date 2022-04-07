@@ -1,10 +1,6 @@
 package frc.robot.commands;
 
 import edu.wpi.first.math.controller.PIDController;
-import edu.wpi.first.networktables.EntryListenerFlags;
-import edu.wpi.first.networktables.NetworkTable;
-import edu.wpi.first.networktables.NetworkTableEntry;
-import edu.wpi.first.networktables.NetworkTableInstance;
 import edu.wpi.first.wpilibj.shuffleboard.Shuffleboard;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.PIDCommand;
@@ -19,7 +15,6 @@ public class RotateToTarget extends PIDCommand implements VisionSubscriber {
     private final PyCamera pycam;
 
     private double targetAngle = 0;
-    private boolean isDone;
 
     public RotateToTarget(DriveTrain drive, PyCamera pycam) {
         super(
@@ -48,6 +43,25 @@ public class RotateToTarget extends PIDCommand implements VisionSubscriber {
         m_controller.reset();
     }
 
+    @Override
+    public void execute() {
+        super.execute();
+    }
+
+    private PIDController getPIDController(){
+        switch (DriveTrain.getInstance().getGearMode()){
+            case HIGH_GEAR:
+                return new PIDController(0, 0, 0);
+            case LOW_GEAR:
+                return new PIDController(Constants.kP_VISION_YAW, Constants.kI_VISION_YAW, 0);
+            case UNKNOWN:
+                return null;
+            default:
+                return null;
+
+        }
+    }
+
     private double getTargetAngle() {
         return targetAngle;
     }
@@ -55,11 +69,6 @@ public class RotateToTarget extends PIDCommand implements VisionSubscriber {
     private double getNewAngle() {
         // Compute the shifted angle as the current angle + the computed angle error
         return drive.getGyroAngle() + pycam.getHorizontalAngle();
-    }
-
-    @Override
-    public void execute() {
-        super.execute();
     }
 
     private void useOutput(double output) {
@@ -83,7 +92,6 @@ public class RotateToTarget extends PIDCommand implements VisionSubscriber {
     @Override
     public void handleNewValue(double x) {
         targetAngle = getNewAngle();
-        // TODO Auto-generated method stub
     }
 
     @Override
