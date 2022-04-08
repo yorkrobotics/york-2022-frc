@@ -202,6 +202,7 @@ public class RobotContainer {
 
   private void configureSecondaryController(){
     new JoystickButton(secondaryController, Button.kB.value).whenPressed(new HomeClimb());
+    new JoystickButton(secondaryController, Button.kX.value).whenPressed(new HomeTower());
     
     new JoystickButton(secondaryController, Button.kY.value).whenPressed(new ReverseIntakeAndConveyor())
       .whenReleased(new StopIntakeAndConveyor());
