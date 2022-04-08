@@ -20,8 +20,8 @@ class CameraConfig: pass
 
 # inRange HSV ranges for thresholding the input image for binary image
 BIN_LOW_H = 60  #106 
-BIN_LOW_S = 100 #168 
-BIN_LOW_V = 120 #147 
+BIN_LOW_S = 180 #168 
+BIN_LOW_V = 180 #147 
 
 BIN_HIGH_H = 90 #124 
 BIN_HIGH_S = 255#255 
@@ -418,7 +418,7 @@ if __name__ == "__main__":
         binary_img = cv2.inRange(hsv_img, (BIN_LOW_H, BIN_LOW_S, BIN_LOW_V), (BIN_HIGH_H, BIN_HIGH_S, BIN_HIGH_V))
         output_img = np.copy(input_img)
 
-        # getCenterHSV(output_img) # for tuning binary image HSV range
+        getCenterHSV(output_img) # for tuning binary image HSV range
 
         # get the center of the hoop and upload it to the network table
         # vertice_list = verticesFromBin(binary_img, output_img)
@@ -433,7 +433,7 @@ if __name__ == "__main__":
             centerY = 0
             idx = 0
             for contour in contour_list:
-                if cv2.contourArea(contour) < 5:
+                if cv2.contourArea(contour) < 10:
                     continue
                 rect = cv2.minAreaRect(contour)
                 cx, cy = rect[0]
