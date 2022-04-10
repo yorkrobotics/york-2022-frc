@@ -20,8 +20,8 @@ import frc.robot.subsystems.Shooter;
 
 public class FourBalls implements AutoRoutine{
 
-    private static final double WAIT_TIME_SECONDS = 2;
-    private static final double SHOOTER_SPEED = 49;
+    private static final double WAIT_TIME_SECONDS = 1.5;
+    private static final double SHOOTER_SPEED = 50;
 
     private Intake mIntake = Intake.getInstance();
     private Shooter mShooter = Shooter.getInstance();
