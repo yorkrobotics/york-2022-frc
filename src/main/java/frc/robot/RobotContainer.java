@@ -214,7 +214,6 @@ public class RobotContainer {
     new JoystickButton(secondaryController, Button.kBack.value).whenPressed(new Burp())
       .whenReleased(new StopIntakeAndConveyor());
 
-    new POVButton(secondaryController, 0).toggleWhenPressed(new ShootBallSequence(50));
     new POVButton(secondaryController, 90).whenPressed(new DeployIntake());
     new POVButton(secondaryController, 270).whenPressed(new HomeTowerAndRetractIntake());
     
