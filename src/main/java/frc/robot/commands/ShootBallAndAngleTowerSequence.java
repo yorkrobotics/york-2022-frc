@@ -21,9 +21,13 @@ public class ShootBallAndAngleTowerSequence extends SequentialCommandGroup {
     // Add your commands in the addCommands() call, e.g.
     // addCommands(new FooCommand(), new BarCommand());
     addCommands(
-      angleTowerSetpoint,
-      new ReverseConveyorTimed(0.25),
-      runShooter,
+      new ParallelCommandGroup(
+        angleTowerSetpoint,
+        new SequentialCommand(
+          new ReverseConveyorTimed(0.25),
+          runShooter
+        )
+      )
       new ParallelRaceGroup(
         runShooterNoSetpoint,
         new RunConveyorTimed(1.5)
