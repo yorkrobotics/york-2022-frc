@@ -14,7 +14,7 @@ public class RotateToTarget extends PIDCommand implements VisionSubscriber {
     private final DriveTrain drive;
     private final PyCamera pycam;
 
-    private final double fudgeFactor = 2;
+    private final double fudgeFactor = 4;
 
     private double targetAngle = 0;
 
@@ -102,7 +102,7 @@ public class RotateToTarget extends PIDCommand implements VisionSubscriber {
 
     @Override
     public void handleNewValue(double x) {
-        targetAngle = getNewAngle();
+        targetAngle = getNewAngle(); 
     }
 
     @Override

@@ -12,6 +12,7 @@ import frc.robot.autonomous.routines.DriveOutStraight;
 import frc.robot.autonomous.routines.FiveBalls;
 import frc.robot.autonomous.routines.FiveBallsLongShot;
 import frc.robot.autonomous.routines.FourBalls;
+import frc.robot.autonomous.routines.FourBallsNEW;
 
 
 /**
@@ -31,8 +32,10 @@ public class CommandBuilder {
         mAutoRoutines.add(new DriveOutStraight());
 
         mAutoRoutines.add(new FourBalls());
-        mAutoRoutines.add(new FiveBalls());
-        mAutoRoutines.add(new FiveBallsLongShot());
+        mAutoRoutines.add(new FourBallsNEW());
+
+        // mAutoRoutines.add(new FiveBalls());
+        // mAutoRoutines.add(new FiveBallsLongShot());
     }
 
     public void displayRoutines(SendableChooser<AutoRoutine> sChooser){

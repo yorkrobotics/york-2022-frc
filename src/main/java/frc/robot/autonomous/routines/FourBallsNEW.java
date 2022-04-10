@@ -18,17 +18,17 @@ import frc.robot.commands.HomeTowerAndRetractIntake;
 import frc.robot.subsystems.Intake;
 import frc.robot.subsystems.Shooter;
 
-public class FourBalls implements AutoRoutine{
+public class FourBallsNEW implements AutoRoutine{
 
-    private static final double WAIT_TIME_SECONDS = 2;
+    private static final double WAIT_TIME_SECONDS = 0.2;
     private static final double SHOOTER_SPEED = 49;
 
     private Intake mIntake = Intake.getInstance();
     private Shooter mShooter = Shooter.getInstance();
-    
+
     @Override
     public String getName() {
-        return "Four Balls";
+        return "Four Balls NEW";
     }
 
     @Override
@@ -53,9 +53,11 @@ public class FourBalls implements AutoRoutine{
                 new RunIntakeAndConveyor()
             ),
 
+            RamseteCommandBuilder.apply(trajectoryBuilder.getTrajectory("New-T-Forward"), false),
+
             new WaitCommand(WAIT_TIME_SECONDS),
 
-            RamseteCommandBuilder.apply(trajectoryBuilder.getTrajectory("Blue-T-Shoot"), false),
+            RamseteCommandBuilder.apply(trajectoryBuilder.getTrajectory("New-T-Shoot"), false),
 
             new ShootBallSequence(SHOOTER_SPEED),
             new InstantCommand(()->{
@@ -64,7 +66,6 @@ public class FourBalls implements AutoRoutine{
             }, mShooter, mIntake),
 
             new HomeTowerAndRetractIntake() 
-        );
-    }
+        );    }
     
 }
