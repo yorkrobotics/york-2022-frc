@@ -100,7 +100,7 @@ public final class Constants {
     public static final double CLIMB_LOWER_PRESET = 0;
 
     public static final double SLEW_RATE_LIMIT_LOW_GEAR = 1.75;
-    public static final double SLEW_RATE_LIMIT_HIGH_GEAR = 1.25;
+    public static final double SLEW_RATE_LIMIT_HIGH_GEAR = 2;
 
 
 

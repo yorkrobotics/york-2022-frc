@@ -46,6 +46,8 @@ public class PyCamera extends SubsystemBase {
   public double towerAngle;
   public boolean isNaN = false;
 
+  public double powerFudge = 0.98;
+
   Number[] default_hoop_center_coord = new Number[] {0,0,0};
   Number[] default_cam_vec = new Number[] {0,0,0};
   NetworkTable table;
@@ -156,7 +158,7 @@ public class PyCamera extends SubsystemBase {
 
   public double calcVelocity() {
     double power = 37.77 + 0.0723 * x_field;
-    return power;
+    return power * powerFudge;
   }
 
   public double calcAngle() {
@@ -274,12 +276,6 @@ public class PyCamera extends SubsystemBase {
 
     /* double velocity = this.calcVelocity();
     SmartDashboard.putNumber("shooter velocity: ", velocity); */
-    double power = 0.490304 + 0.000745817 * x_field;
-    double powerFudge = SmartDashboard.getNumber("Power Fudge", 0);
-    SmartDashboard.putNumber("Target Power", power * powerFudge);
-
-    double angleFudge = SmartDashboard.getNumber("Angle Fudge", 0);
-    double targetAngle = 67.6818 - 0.101674* x_field;
-    SmartDashboard.putNumber("Target Angle", targetAngle * angleFudge);
+   
   }
 }
