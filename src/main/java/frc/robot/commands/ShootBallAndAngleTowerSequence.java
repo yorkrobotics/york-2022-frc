@@ -4,6 +4,7 @@
 
 package frc.robot.commands;
 
+import edu.wpi.first.wpilibj2.command.ParallelCommandGroup;
 import edu.wpi.first.wpilibj2.command.ParallelRaceGroup;
 import edu.wpi.first.wpilibj2.command.SequentialCommandGroup;
 
@@ -21,9 +22,13 @@ public class ShootBallAndAngleTowerSequence extends SequentialCommandGroup {
     // Add your commands in the addCommands() call, e.g.
     // addCommands(new FooCommand(), new BarCommand());
     addCommands(
-      angleTowerSetpoint,
-      new ReverseConveyorTimed(0.25),
-      runShooter,
+      new ParallelCommandGroup(
+        angleTowerSetpoint,
+        new SequentialCommandGroup(
+          new ReverseConveyorTimed(0.25),
+          runShooter
+        )
+      ),
       new ParallelRaceGroup(
         runShooterNoSetpoint,
         new RunConveyorTimed(1.5)
