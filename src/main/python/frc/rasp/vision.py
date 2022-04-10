@@ -23,9 +23,11 @@ BIN_LOW_H = 60  #106
 BIN_LOW_S = 180 #168 
 BIN_LOW_V = 180 #147 
 
-BIN_HIGH_H = 90 #124 
+BIN_HIGH_H = 80 #124 
 BIN_HIGH_S = 255#255 
 BIN_HIGH_V = 255#255 
+
+TOLERANCE = 10 # ignore this amount of area or less 
 
 EPSILON_FACTOR = 0.08 # directly influences the number of vertices for approxPolyDP
 
@@ -433,7 +435,7 @@ if __name__ == "__main__":
             centerY = 0
             idx = 0
             for contour in contour_list:
-                if cv2.contourArea(contour) < 10:
+                if cv2.contourArea(contour) < TOLERANCE:
                     continue
                 rect = cv2.minAreaRect(contour)
                 cx, cy = rect[0]
